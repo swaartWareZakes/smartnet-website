@@ -307,14 +307,42 @@ export function NexusVoiceExperience({
       await input.resume();
 
       // Fetch the token after microphone permission to avoid expiry.
+      const isLocalHost = ['localhost', '127.0.0.1']
+        .includes(window.location.hostname);
+
+      const accessCode = isLocalHost
+        ? ''
+        : window.prompt('NEXUS Live private beta access code');
+
+      if (!isLocalHost && !accessCode?.trim()) {
+        throw new Error('A private beta access code is required.');
+      }
+
       const response = await fetch('/api/nexus/live-token', {
         method: 'POST',
         cache: 'no-store',
+        headers: isLocalHost
+          ? {}
+          : { 'x-nexus-live-access': accessCode!.trim() },
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Incorrect NEXUS access code.');
+        }
+
+        if (response.status === 429) {
+          throw new Error('Too many requests. Please try later.');
+        }
+
+        if (response.status === 503) {
+          throw new Error(
+            'NEXUS Live is not enabled or configured on Netlify.'
+          );
+        }
+
         throw new Error(
-          'Live AI unavailable. Check Gemini Live API access and quota.'
+          'Gemini Live connection failed. HTTP ' + response.status
         );
       }
 
