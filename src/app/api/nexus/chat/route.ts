@@ -1,37 +1,10 @@
 import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import { NextResponse } from 'next/server';
+import { SMARTNET_COMPANY_CONTEXT } from '@/lib/smartnet-context';
 
 export const runtime = 'nodejs';
 
-const KNOWLEDGE = `
-SmartNet Technologies is a South African, technology-led
-engineering and business solutions company, building
-software since 2016 and serving local and international clients.
-
-Core capabilities:
-- Custom software engineering and application development
-- Cloud infrastructure, Kubernetes, DevOps and CI/CD
-- Solutions architecture, integration and modernisation
-- Security-first engineering and responsible AI
-- Education technology and digital learning solutions
-- Technology consultancy and business transformation
-- Technology procurement, business supply and delivery support
-- Infrastructure planning and road asset analysis software
-
-Principles:
-Human engineering expertise leads every engagement.
-AI accelerates engineering work but does not replace
-professional accountability.
-Security, reliability and maintainability matter.
-
-SmartNet provides professional discovery, architecture,
-implementation and technical support.
-
-Do not invent certifications, contracts, named clients,
-project achievements, pricing or accreditations.
-Do not claim a particular service has already been delivered
-unless this knowledge specifically confirms it.
-`;
+const KNOWLEDGE = SMARTNET_COMPANY_CONTEXT;
 
 const INSTRUCTIONS = `
 You are NEXUS, the conversational business technology

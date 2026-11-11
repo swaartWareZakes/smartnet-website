@@ -2,6 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { GoogleGenAI, Modality } from '@google/genai';
+import {
+  SMARTNET_COMPANY_CONTEXT,
+  SMARTNET_LIVE_GREETING,
+} from '@/lib/smartnet-context';
 import { useReducedMotion } from 'motion/react';
 import { AudioLines, Mic, MicOff, PhoneOff, X } from 'lucide-react';
 import {
@@ -14,40 +18,40 @@ type LiveSession =
   Awaited<ReturnType<GoogleGenAI['live']['connect']>>;
 
 const SYSTEM_PROMPT = `
-You are NEXUS, the live AI technology and business consultant
+You are NEXUS, the official AI technology consultant
 representing SmartNet Technologies.
 
-IMPORTANT IDENTITY:
-The company is SMARTNET TECHNOLOGIES, pronounced "Smart Net".
-Spoken references to "SmartNet", "Smart Net", "SmartNet Tech",
-or similar-sounding company names usually mean SmartNet Technologies.
-When a transcription is ambiguous, ask a brief clarifying question.
-Do not reinterpret SmartNet as "market two" or discuss unrelated
-definitions of similarly sounding words.
+YOUR IDENTITY
+You represent SmartNet Technologies, not Google, Cisco
+or another technology company.
+Pronounce SmartNet as "Smart Net".
+When someone asks about SmartNet, our company, our services
+or our technology, answer using the verified profile below.
 
-VERIFIED COMPANY PROFILE:
-SmartNet Technologies is based in South Africa, has developed software
-since 2016 and has worked with international clients.
-Capabilities include custom software development, cloud infrastructure,
-Azure, Kubernetes, DevOps, CI/CD, architecture, systems integration,
-security-first engineering, responsible AI, education technology,
-business technology consulting and technology procurement.
-SmartNet develops road maintenance funding analysis solutions
-and AI-assisted education technology.
+VERIFIED SMARTNET KNOWLEDGE
+${SMARTNET_COMPANY_CONTEXT}
 
-YOUR ROLE:
-First understand the visitor's situation, not simply advertise services.
-Ask one useful discovery question at a time.
-Explain practical ways SmartNet could help, without guaranteeing results.
-Describe possible architectures and implementation phases in clear words.
-If a visitor asks about SmartNet, answer about SmartNet directly.
-When appropriate, offer to connect them with the SmartNet team.
-Keep spoken answers concise and natural.
+CONVERSATION RULES
+- Be natural, warm, confident and professional.
+- Speak in concise, clear sentences suitable for voice.
+- Keep your focus on SmartNet and the visitor's business.
+- Ask only one useful discovery question at a time.
+- If the visitor describes a problem, explain how SmartNet
+  could potentially help, rather than promising a solution.
+- If a name sounds like SmartNet but transcription is unclear,
+  use the conversation context before assuming another meaning.
+- Never present another company's services as SmartNet's services.
+- Do not invent any projects, qualifications or partnerships.
+- Do not request passwords or confidential business records.
+- If asked about unrelated matters, briefly redirect to the
+  visitor's technology or business objectives when appropriate.
+- Do not repeat the entire company profile in every answer.
 
-Never invent contracts, customer identities, awards, qualifications,
-partner arrangements, pricing or project delivery records.
-Never ask for credentials or confidential business information.
-Never pretend to have inspected the visitor's systems.
+FIRST GREETING
+When you receive the automatic introduction request at the
+start of a new live session, deliver the supplied welcome
+message as a natural spoken introduction.
+Finish the greeting and wait for the visitor to speak.
 `;
 
 function topicFromText(text: string): HologramTopic {
@@ -120,9 +124,13 @@ export function NexusVoiceExperience({
   const playbackRef = useRef<Set<AudioBufferSourceNode>>(new Set());
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closingRef = useRef(false);
+  const greetingPendingRef = useRef(false);
+  const greetingFinishedRef = useRef(false);
 
   const disconnect = useCallback(() => {
     closingRef.current = true;
+    greetingPendingRef.current = false;
+    greetingFinishedRef.current = false;
 
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -217,9 +225,16 @@ export function NexusVoiceExperience({
       playbackRef.current.delete(source);
 
       if (playbackRef.current.size === 0) {
-        setStatus((current) =>
-          current === 'speaking' ? 'listening' : current
-        );
+        if (greetingPendingRef.current) {
+          if (greetingFinishedRef.current) {
+            greetingPendingRef.current = false;
+            setStatus('listening');
+          }
+        } else {
+          setStatus((current) =>
+            current === 'speaking' ? 'listening' : current
+          );
+        }
       }
     };
   }
@@ -232,6 +247,8 @@ export function NexusVoiceExperience({
     setSubtitle('');
     setHeard('');
     closingRef.current = false;
+    greetingPendingRef.current = true;
+    greetingFinishedRef.current = false;
 
     try {
       if (!navigator.mediaDevices?.getUserMedia) {
@@ -342,11 +359,15 @@ export function NexusVoiceExperience({
               }
             }
 
-            if (
-              content?.turnComplete &&
-              playbackRef.current.size === 0
-            ) {
-              setStatus('listening');
+            if (content?.turnComplete) {
+              if (greetingPendingRef.current) {
+                greetingFinishedRef.current = true;
+              }
+
+              if (playbackRef.current.size === 0) {
+                greetingPendingRef.current = false;
+                setStatus('listening');
+              }
             }
           },
           onerror: () => {
@@ -370,6 +391,24 @@ export function NexusVoiceExperience({
 
       sessionRef.current = liveSession;
 
+      setStatus('speaking');
+
+      liveSession.sendClientContent({
+        turns: [{
+          role: 'user',
+          parts: [{
+            text:
+              'AUTOMATIC SESSION START. The visitor has just ' +
+              'enabled the microphone. Speak this welcome ' +
+              'message aloud, naturally and briefly. ' +
+              'Do not answer a different question. ' +
+              'Do not add unrelated company information. ' +
+              'Welcome message: ' + SMARTNET_LIVE_GREETING,
+          }],
+        }],
+        turnComplete: true,
+      });
+
       const source = input.createMediaStreamSource(stream);
       const processor = input.createScriptProcessor(2048, 1, 1);
 
@@ -380,7 +419,11 @@ export function NexusVoiceExperience({
         // Never feed the microphone back through the speakers.
         event.outputBuffer.getChannelData(0).fill(0);
 
-        if (!sessionRef.current || closingRef.current) return;
+        if (
+          !sessionRef.current ||
+          closingRef.current ||
+          greetingPendingRef.current
+        ) return;
 
         try {
           sessionRef.current.sendRealtimeInput({
@@ -399,7 +442,8 @@ export function NexusVoiceExperience({
       source.connect(processor);
       processor.connect(input.destination);
 
-      setStatus('listening');
+      // Listening starts once the welcome turn
+      // and queued greeting audio have finished.
 
       // Development safeguard: short sessions while testing.
       timerRef.current = setTimeout(() => {
