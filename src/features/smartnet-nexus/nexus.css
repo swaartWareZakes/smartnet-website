@@ -1212,3 +1212,328 @@
     transition: none;
   }
 }
+
+/* SMARTNET CONTACT V7 */
+
+.snx-contact {
+  position: relative;
+  z-index: 7;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 100svh;
+  padding: 48px 6% 35px;
+  background:
+    radial-gradient(
+      ellipse at 75% 45%,
+      #17445a 0%,
+      #081e2c 42%,
+      #030c14 82%
+    );
+  color: #eef9ff;
+  border-top: 1px solid #38677b;
+}
+
+.snx-contact::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(#70d9ff08 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      #70d9ff08 1px,
+      transparent 1px
+    );
+  background-size: 80px 80px;
+}
+
+.snx-contact-top,
+.snx-contact-bottom,
+.snx-contact-eyebrow,
+.snx-contact-panel-head,
+.snx-contact-note,
+.snx-contact-option-number {
+  font-family: monospace;
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+
+.snx-contact-top,
+.snx-contact-bottom {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  color: #86adbf;
+}
+
+.snx-contact-top {
+  padding-top: 20px;
+  border-top: 1px solid #ffffff29;
+}
+
+.snx-contact-layout {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr);
+  align-items: center;
+  gap: 7%;
+  min-height: 73svh;
+  padding: 95px 0;
+}
+
+.snx-contact-intro h2 {
+  font-size: clamp(65px, 8.2vw, 150px);
+  font-weight: 500;
+  line-height: .94;
+  letter-spacing: -.085em;
+  margin: 28px 0;
+}
+
+.snx-contact-intro h2 em {
+  color: #70e3ff;
+  font-style: normal;
+}
+
+.snx-contact-eyebrow {
+  color: #72dfff;
+}
+
+.snx-contact-intro > p {
+  max-width: 480px;
+  color: #b2cad6;
+  font-size: clamp(15px, 1.35vw, 19px);
+  line-height: 1.8;
+  margin: 0 0 38px;
+}
+
+.snx-contact-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 64px;
+  padding: 0 24px;
+  color: #04131d;
+  background: #83eaff;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  transition: transform .3s, background .3s;
+}
+
+.snx-contact-primary:hover {
+  background: #c9f8ff;
+  transform: translateY(-3px);
+}
+
+.snx-contact-primary svg:last-child {
+  margin-left: 14px;
+}
+
+.snx-contact-note {
+  margin-top: 35px;
+  color: #759cac;
+  line-height: 1.8;
+}
+
+.snx-contact-panel {
+  position: relative;
+  border: 1px solid #ffffff30;
+  background: #081c2ac7;
+  backdrop-filter: blur(18px);
+  padding: 26px;
+}
+
+.snx-contact-panel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  color: #8bb6c8;
+  padding-bottom: 25px;
+}
+
+.snx-contact-option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 6px;
+  color: #f0f8fc;
+  text-decoration: none;
+  border-top: 1px solid #ffffff22;
+  transition: padding-left .3s, background .3s;
+}
+
+.snx-contact-option:hover {
+  padding-left: 15px;
+  background: #56dfff0b;
+}
+
+.snx-contact-option-number {
+  color: #72dfff;
+}
+
+.snx-contact-option-copy {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.snx-contact-option-copy strong {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.snx-contact-option-copy small {
+  font-size: 12px;
+  color: #8eaebe;
+}
+
+.snx-contact-option-arrow {
+  color: #72dfff;
+}
+
+.snx-contact-bottom {
+  padding-top: 28px;
+  border-top: 1px solid #ffffff30;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.snx-contact-bottom a {
+  color: #bdeeff;
+  text-decoration: none;
+}
+
+/* Decorative cinematic orbital system */
+.snx-contact-orbit {
+  position: absolute;
+  right: -12%;
+  top: 8%;
+  width: min(75vw, 1000px);
+  aspect-ratio: 1;
+  z-index: 0;
+  pointer-events: none;
+  opacity: .62;
+}
+
+.snx-contact-ring {
+  position: absolute;
+  inset: 10%;
+  border-radius: 50%;
+  border: 1px solid #69dfff30;
+  box-shadow: 0 0 100px #1b9ed812;
+  animation: snx-contact-rotate 35s linear infinite;
+}
+
+.snx-contact-ring-one {
+  transform: rotateX(65deg) rotateZ(20deg);
+}
+
+.snx-contact-ring-two {
+  inset: 22%;
+  border-style: dashed;
+  border-color: #7deaff45;
+  animation-duration: 25s;
+  animation-direction: reverse;
+}
+
+.snx-contact-orb {
+  position: absolute;
+  inset: 41%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #8bf0ff 0%,
+    #1a82aa 22%,
+    #0b3247 45%,
+    transparent 75%
+  );
+  box-shadow: 0 0 130px #3ed3ff4a;
+  animation: snx-contact-breathe 5s ease-in-out infinite;
+}
+
+@keyframes snx-contact-rotate {
+  to { rotate: 360deg; }
+}
+
+@keyframes snx-contact-breathe {
+  50% { transform: scale(1.17); opacity: .65; }
+}
+
+.snx-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+@media (max-width: 850px) {
+  .snx-contact-layout {
+    grid-template-columns: 1fr;
+    gap: 60px;
+    padding: 90px 0;
+  }
+
+  .snx-contact-intro h2 {
+    font-size: clamp(55px, 11vw, 100px);
+  }
+
+  .snx-contact-orbit {
+    top: 5%;
+    right: -30%;
+    width: 105vw;
+    opacity: .35;
+  }
+
+  .snx-contact-panel {
+    padding: 18px;
+  }
+
+  .snx-contact-top,
+  .snx-contact-bottom {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 520px) {
+  .snx-contact {
+    padding: 35px 6% 30px;
+  }
+
+  .snx-contact-intro h2 {
+    font-size: clamp(48px, 12vw, 68px);
+  }
+
+  .snx-contact-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .snx-contact-panel-head {
+    font-size: 8px;
+  }
+
+  .snx-contact-option-copy strong {
+    font-size: 15px;
+  }
+
+  .snx-nav-links {
+    gap: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snx-contact-ring,
+  .snx-contact-orb {
+    animation: none;
+  }
+
+  .snx-contact-primary,
+  .snx-contact-option {
+    transition: none;
+  }
+}

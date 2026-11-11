@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { SystemsStory } from './components/systems-story';
+import { ContactSection } from './components/contact-section';
 
 const DeliveryLab = dynamic(
   () => import('./components/delivery-lab')
@@ -107,9 +108,10 @@ export function NexusHome() {
           ENGINEERING INTELLIGENCE
         </span>
 
-        <a href="#snx-systems">
-          Explore capabilities ↓
-        </a>
+        <div className="snx-nav-links">
+          <a href="#snx-systems">Capabilities</a>
+          <a href="#snx-contact">Contact ↗</a>
+        </div>
       </header>
 
       <div
@@ -298,6 +300,7 @@ export function NexusHome() {
       {/* 05 — Preserve existing V3 diagram */}
       <SystemsStory />
       <DeliveryLab />
+      <ContactSection />
 
       <footer className="snx-footer">
         <span>SMARTNET TECHNOLOGIES</span>

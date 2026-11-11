@@ -1,10 +1,6 @@
-import '@/features/helios/styles/theme.css';
-import { HeliosHome } from '@/features/helios/home';
+import '@/features/smartnet-nexus/nexus.css';
+import { NexusHome } from '@/features/smartnet-nexus/home';
 
 export default function HomePage() {
-  return (
-    <div className="theme-helios">
-      <HeliosHome />
-    </div>
-  );
+  return <NexusHome />;
 }
