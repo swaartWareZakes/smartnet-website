@@ -172,3 +172,53 @@
     font-size: 8px;
   }
 }
+
+/* SMARTNET NEXUS V2 — CINEMATIC FINISH */
+
+.snx-canvas {
+  background:
+    radial-gradient(
+      ellipse at 64% 47%,
+      rgba(14, 87, 118, 0.44) 0%,
+      rgba(5, 29, 45, 0.7) 38%,
+      #030c14 78%
+    );
+}
+
+.snx-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+
+  background-image:
+    linear-gradient(
+      rgba(91, 216, 255, 0.035) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(91, 216, 255, 0.035) 1px,
+      transparent 1px
+    );
+
+  background-size: 76px 76px;
+
+  mask-image:
+    radial-gradient(
+      ellipse at 67% 48%,
+      black 0%,
+      transparent 74%
+    );
+}
+
+.snx-main h1 {
+  text-shadow: 0 12px 50px rgba(0, 0, 0, 0.38);
+}
+
+@media (max-width: 760px) {
+  .snx-page::before {
+    opacity: 0.35;
+  }
+}
