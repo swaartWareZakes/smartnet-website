@@ -9,6 +9,7 @@ import { NexusAssistant } from './components/nexus-assistant';
 import { SiteEntry } from './components/site-entry';
 import { NexusVoiceExperience } from './components/nexus-voice-experience';
 import { ContactSection } from './components/contact-section';
+import { SignalSection } from '@/components/smartnet/signal-globe';
 
 const DeliveryLab = dynamic(
   () => import('./components/delivery-lab')
@@ -382,6 +383,7 @@ export function NexusHome() {
       {/* 05 — Preserve existing V3 diagram */}
       <SystemsStory />
       <DeliveryLab />
+      <SignalSection />
       <ContactSection />
       <NexusAssistant />
 

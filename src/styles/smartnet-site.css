@@ -680,3 +680,325 @@ html[data-theme="light"] .sn-global-nav a:focus-visible,
 html[data-theme="light"] .sn-global-theme:focus-visible {
   outline-color: #087ea5;
 }
+
+/* SMARTNET V14 SIGNAL NETWORK */
+
+.sn-signal-globe {
+  position: relative;
+  isolation: isolate;
+  min-height: 420px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sn-signal-globe::before {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #32bdfb24 0%,
+    #1b799e0e 44%,
+    transparent 70%
+  );
+  filter: blur(25px);
+}
+
+.sn-signal-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.sn-signal-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.sn-signal-readout {
+  position: absolute;
+  z-index: 2;
+  left: 7%;
+  bottom: 13%;
+  display: grid;
+  gap: 9px;
+  color: #e7faff;
+}
+
+.sn-signal-readout span,
+.sn-signal-readout small,
+.sn-signal-cities {
+  color: #7fcee9;
+  font: 10px monospace;
+  letter-spacing: .1em;
+}
+
+.sn-signal-readout strong {
+  font-size: clamp(13px, 1.3vw, 18px);
+  font-weight: 600;
+  letter-spacing: .04em;
+}
+
+.sn-signal-readout small {
+  opacity: .75;
+  letter-spacing: 0;
+}
+
+.sn-signal-cities {
+  position: absolute;
+  bottom: 6%;
+  right: 7%;
+  font-size: 9px;
+  text-align: right;
+}
+
+/* Futuristic network section on homepage */
+.sn-signal-section {
+  position: relative;
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  align-items: center;
+  gap: 30px;
+  min-height: 730px;
+  padding: 75px 6%;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      ellipse at 75% 45%,
+      #0b3850,
+      transparent 62%
+    ),
+    #03111d;
+  border-top: 1px solid #63cbf72d;
+  border-bottom: 1px solid #63cbf72d;
+  color: #eaf9ff;
+}
+
+.sn-signal-section-copy {
+  position: relative;
+  z-index: 4;
+}
+
+.sn-signal-section-copy > span {
+  color: #78defb;
+  font: 10px monospace;
+  letter-spacing: .13em;
+}
+
+.sn-signal-section-copy h2 {
+  margin: 30px 0 25px;
+  font-size: clamp(44px, 5.4vw, 90px);
+  font-weight: 500;
+  line-height: .99;
+  letter-spacing: -.075em;
+}
+
+.sn-signal-section-copy h2 em {
+  color: #7be4fc;
+  font-style: normal;
+}
+
+.sn-signal-section-copy > p {
+  max-width: 510px;
+  color: #b0c9d6;
+  font-size: clamp(15px, 1.2vw, 18px);
+  line-height: 1.8;
+}
+
+.sn-signal-disciplines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 38px;
+}
+
+.sn-signal-disciplines span {
+  padding: 10px 12px;
+  color: #a4e9ff;
+  border: 1px solid #51a1be72;
+  background: #0c33466e;
+  font: 10px monospace;
+  letter-spacing: .07em;
+}
+
+.sn-signal-section > .sn-signal-globe {
+  width: 100%;
+  height: min(70vw, 670px);
+  max-height: 670px;
+  min-height: 500px;
+}
+
+/* Three new page hero scenes */
+.sn-content-hero > .sn-signal-globe {
+  position: absolute;
+  right: -4%;
+  top: 4%;
+  z-index: 0;
+  width: min(57vw, 820px);
+  height: 90%;
+  opacity: .75;
+}
+
+.sn-content-hero > .sn-signal-globe .sn-signal-readout {
+  bottom: 11%;
+}
+
+.sn-content-hero > .sn-signal-globe .sn-signal-cities {
+  display: none;
+}
+
+/* Light theme preserves 3D contrast */
+html[data-theme="light"] .sn-signal-section {
+  color: #0b2a40;
+  background:
+    radial-gradient(
+      ellipse at 76% 45%,
+      #d2edf7,
+      transparent 63%
+    ),
+    #f2f9fd;
+  border-color: #bbd5e2;
+}
+
+html[data-theme="light"] .sn-signal-section-copy h2 {
+  color: #092a3e;
+}
+
+html[data-theme="light"] .sn-signal-section-copy h2 em {
+  color: #057ca4;
+}
+
+html[data-theme="light"] .sn-signal-section-copy > p {
+  color: #426779;
+}
+
+html[data-theme="light"] .sn-signal-section-copy > span {
+  color: #087ea5;
+}
+
+html[data-theme="light"] .sn-signal-disciplines span {
+  color: #0c637e;
+  background: #e0f2fa;
+  border-color: #abd1df;
+}
+
+html[data-theme="light"] .sn-content-hero > .sn-signal-globe {
+  opacity: .64;
+}
+
+html[data-theme="light"] .sn-content-hero .sn-signal-readout {
+  color: #0d4b69;
+}
+
+html[data-theme="light"] .sn-content-hero .sn-signal-readout :is(span,small) {
+  color: #226c89;
+}
+
+/* Ensure copy stays above globe imagery */
+.sn-content-hero > :not(.sn-signal-globe) {
+  position: relative;
+  z-index: 2;
+}
+
+/* Tablet */
+@media (max-width: 920px) {
+  .sn-signal-section {
+    grid-template-columns: 1fr;
+    gap: 5px;
+    padding: 80px 6% 45px;
+  }
+
+  .sn-signal-section-copy {
+    max-width: 750px;
+  }
+
+  .sn-signal-section > .sn-signal-globe {
+    height: 480px;
+    min-height: 0;
+  }
+
+  .sn-content-hero > .sn-signal-globe {
+    right: -33%;
+    width: 100vw;
+    height: 85%;
+    opacity: .38;
+  }
+
+  .sn-content-hero > .sn-signal-globe .sn-signal-readout {
+    display: none;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .sn-signal-section {
+    min-height: auto;
+    padding: 75px 7% 35px;
+  }
+
+  .sn-signal-section-copy h2 {
+    font-size: clamp(42px, 11vw, 66px);
+  }
+
+  .sn-signal-section > .sn-signal-globe {
+    height: 370px;
+  }
+
+  .sn-signal-readout {
+    left: 3%;
+    right: 3%;
+    bottom: 9%;
+    text-align: center;
+  }
+
+  .sn-signal-readout strong {
+    font-size: 12px;
+  }
+
+  .sn-signal-cities {
+    display: none;
+  }
+
+  .sn-content-hero > .sn-signal-globe {
+    top: 8%;
+    right: -50%;
+    width: 125vw;
+    height: 72%;
+    opacity: .25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sn-signal-globe,
+  .sn-signal-section {
+    scroll-behavior: auto;
+  }
+}
+
+/* V14 final hero layering and accessibility */
+
+.sn-content-hero > .sn-content-topline {
+  position: absolute;
+  z-index: 3;
+}
+
+.sn-content-hero > .sn-content-eyebrow,
+.sn-content-hero > h1,
+.sn-content-hero > .sn-content-intro,
+.sn-content-hero > .sn-content-cta {
+  position: relative;
+  z-index: 3;
+}
+
+html[data-theme="light"] .sn-signal-section .sn-signal-readout {
+  color: #10415a;
+}
+
+html[data-theme="light"] .sn-signal-section .sn-signal-readout span,
+html[data-theme="light"] .sn-signal-section .sn-signal-readout small,
+html[data-theme="light"] .sn-signal-section .sn-signal-cities {
+  color: #206b89;
+}

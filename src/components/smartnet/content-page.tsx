@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { SignalGlobe } from './signal-globe';
 import {
   SERVICES,
   SOLUTIONS,
@@ -51,11 +52,7 @@ export function SmartnetContentPage({
           <span>SMARTNET TECHNOLOGIES / 2026</span>
         </div>
 
-        <div className="sn-content-orbit" aria-hidden="true">
-          <i />
-          <i />
-          <span>SN</span>
-        </div>
+        <SignalGlobe variant={kind} />
 
         <p className="sn-content-eyebrow">{meta.eyebrow}</p>
         <h1>
