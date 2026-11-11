@@ -8,6 +8,8 @@ import {
 } from '@/lib/smartnet-context';
 import { useReducedMotion } from 'motion/react';
 import { AudioLines, Mic, MicOff, PhoneOff, X } from 'lucide-react';
+import { NexusTextConsole } from './nexus-text-console';
+
 import {
   NexusHologram,
   type HologramTopic,
@@ -685,6 +687,20 @@ export function NexusVoiceExperience({
                 </>
               )}
             </div>
+
+            <details className="snx-v12-text-details">
+              <summary>
+                <span>Prefer typing?</span>
+                <strong>OPEN TEXT CONVERSATION</strong>
+              </summary>
+
+              <NexusTextConsole
+                disabled={
+                  status !== 'idle' && status !== 'error'
+                }
+                onTopic={setTopic}
+              />
+            </details>
 
             <small className="snx-live-privacy">
               Microphone access is optional. This session sends

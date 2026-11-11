@@ -3149,3 +3149,604 @@
     transition: none;
   }
 }
+
+/* SMARTNET NEXUS V12 CENTERED EXPERIENCE */
+
+/* One fixed command window */
+.snx-live-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  overflow: hidden;
+  background: rgba(1, 8, 15, 0.84);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.snx-live-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(940px, 100%);
+  height: min(92dvh, 900px);
+  max-width: none;
+  max-height: 100%;
+  margin: 0 auto;
+  border: 1px solid #65dfff55;
+  border-radius: 16px;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      ellipse at 50% 24%,
+      #124862 0%,
+      #071c2b 50%,
+      #030c15 90%
+    );
+  box-shadow:
+    0 30px 100px #000a,
+    0 0 65px #20baff13;
+}
+
+/* Header never scrolls out of view */
+.snx-live-header {
+  position: relative;
+  z-index: 30;
+  flex: 0 0 auto;
+  min-height: 63px;
+  padding: 11px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #04131ff5;
+  border-bottom: 1px solid #62dfff35;
+}
+
+.snx-live-header > div {
+  gap: 14px;
+}
+
+.snx-live-header button {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  padding: 0;
+  border: 1px solid #68dcff66;
+  border-radius: 50%;
+  background: #0c3043;
+  color: #eefcff;
+  cursor: pointer;
+}
+
+.snx-live-header button:hover,
+.snx-live-header button:focus-visible {
+  background: #15536c;
+  outline: 2px solid #8becff;
+  outline-offset: 2px;
+}
+
+/* Remove the desktop split entirely */
+.snx-live-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  gap: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #357b9a transparent;
+}
+
+/* NEXUS face in the middle */
+.snx-live-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: 0;
+  border: none;
+  background: transparent;
+  overflow: visible;
+  padding-top: 8px;
+}
+
+.snx-live-canvas {
+  position: relative;
+  width: min(100%, 620px);
+  height: clamp(235px, 34dvh, 335px);
+  min-height: 0;
+  flex: 0 0 auto;
+  margin: 0 auto;
+}
+
+.snx-live-canvas canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Holographic indicators remain around the face */
+.snx-face-satellites {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(87%, 610px);
+  height: 235px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.snx-face-satellite {
+  min-width: 95px;
+  padding: 9px;
+  font-size: 9px;
+}
+
+.snx-face-satellite-0 {
+  left: 0;
+  top: 12%;
+}
+
+.snx-face-satellite-1 {
+  right: 0;
+  top: 25%;
+}
+
+.snx-face-satellite-2 {
+  left: 4%;
+  bottom: 0;
+}
+
+/* Dynamic architecture beneath the face */
+.snx-live-hologram {
+  position: relative;
+  z-index: 4;
+  width: min(88%, 620px);
+  max-width: 620px;
+  margin: -12px auto 0;
+  padding: 12px 0 7px;
+  border: 0;
+  border-top: 1px solid #67ddff42;
+  background: transparent;
+  box-shadow: none;
+  text-align: center;
+}
+
+.snx-live-hologram > span {
+  font-size: 9px;
+}
+
+.snx-live-hologram strong {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.snx-live-hologram > small {
+  display: none;
+}
+
+.snx-holo-stage svg {
+  display: block;
+  width: 100%;
+  max-height: 140px;
+}
+
+/* Central interaction area */
+.snx-live-conversation {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  width: min(88%, 670px);
+  max-width: 670px;
+  min-height: 0;
+  margin: 0 auto;
+  padding: 12px 0 28px;
+  gap: 12px;
+  overflow: visible;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* Remove duplicated marketing content.
+   The introduction is delivered by NEXUS itself. */
+.snx-live-conversation > .snx-live-kicker,
+.snx-live-conversation > p:not(.snx-live-error),
+.snx-live-pillars {
+  display: none;
+}
+
+/* Keep the heading available for accessibility */
+.snx-live-conversation > h2 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+/* Interactive follow-up choices */
+.snx-live-intro-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px;
+  padding: 8px 0;
+  border: none;
+}
+
+.snx-live-intro-choices > span {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.snx-live-intro-choices button {
+  min-height: 76px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #0b3549a6;
+  border: 1px solid #58b6d3a3;
+  color: #e4f9ff;
+  font-size: 14px;
+}
+
+.snx-live-intro-choices button small {
+  font-size: 10px;
+}
+
+/* Only essential session information */
+.snx-live-status {
+  align-self: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 5px 0;
+  margin: 0;
+  color: #9beaff;
+}
+
+.snx-live-transcript {
+  width: 100%;
+  max-height: 105px;
+  margin: 0;
+  padding: 11px 14px;
+  border-left: 2px solid #72e6ff;
+  border-radius: 0 8px 8px 0;
+  background: #0b2c3dad;
+  overflow-y: auto;
+}
+
+.snx-live-transcript p {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* Keep conversation controls easy to locate */
+.snx-live-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 8px 0 0;
+  padding: 9px;
+  border-radius: 12px;
+  background: #071c2bed;
+}
+
+.snx-live-controls button {
+  min-height: 46px;
+  padding: 12px 20px;
+  border-radius: 30px;
+}
+
+.snx-live-privacy {
+  max-width: 520px;
+  margin: 4px auto;
+  text-align: center;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+/* Expandable text mode */
+.snx-v12-text-details {
+  width: 100%;
+  border: 1px solid #4286a15e;
+  border-radius: 9px;
+  background: #061a2a88;
+}
+
+.snx-v12-text-details summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 15px;
+  color: #bddfee;
+  cursor: pointer;
+  list-style: none;
+  font-size: 12px;
+}
+
+.snx-v12-text-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.snx-v12-text-details summary strong {
+  color: #78e2ff;
+  font: 10px monospace;
+  letter-spacing: .08em;
+}
+
+.snx-v12-text {
+  padding: 12px;
+  border-top: 1px solid #38759058;
+}
+
+.snx-v12-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.snx-v12-suggestions button {
+  border: 1px solid #447e96;
+  background: #0b3044;
+  color: #d0f2ff;
+  border-radius: 7px;
+  padding: 9px 11px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.snx-v12-messages {
+  display: grid;
+  gap: 10px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.snx-v12-message {
+  padding: 12px;
+  border-radius: 8px;
+  background: #0a293c;
+}
+
+.snx-v12-message.is-user {
+  background: #15445b;
+}
+
+.snx-v12-message span {
+  color: #70dfff;
+  font: 10px monospace;
+}
+
+.snx-v12-message p {
+  color: #e5f7ff;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 8px 0 0;
+  white-space: pre-wrap;
+}
+
+.snx-v12-form {
+  display: flex;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.snx-v12-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px;
+  background: #071b2b;
+  color: #e9faff;
+  border: 1px solid #407e97;
+  border-radius: 7px;
+  outline: none;
+}
+
+.snx-v12-form button {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  border: 0;
+  border-radius: 7px;
+  background: #79e4fc;
+  color: #052336;
+  cursor: pointer;
+}
+
+.snx-v12-form button:disabled,
+.snx-v12-suggestions button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.snx-v12-error {
+  color: #ffb0ae;
+  font-size: 12px;
+}
+
+.snx-v12-hint {
+  color: #98bed0;
+  font-size: 11px;
+}
+
+.snx-v12-spin {
+  animation: snx-v12-rotate 1s linear infinite;
+}
+
+@keyframes snx-v12-rotate {
+  to { transform: rotate(360deg); }
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .snx-live-shell {
+    width: min(760px, 100%);
+    height: 94dvh;
+  }
+
+  .snx-live-content {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .snx-live-visual {
+    flex-shrink: 0;
+    min-height: 0;
+  }
+
+  .snx-live-canvas {
+    height: clamp(220px, 32dvh, 290px);
+  }
+
+  .snx-live-conversation {
+    flex-shrink: 0;
+    min-height: 0;
+    width: 90%;
+    padding: 12px 0 24px;
+    overflow: visible;
+  }
+}
+
+/* Phone */
+@media (max-width: 640px) {
+  .snx-live-overlay {
+    padding: 0;
+    backdrop-filter: blur(9px);
+  }
+
+  .snx-live-shell {
+    width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    border: none;
+    border-radius: 0;
+  }
+
+  .snx-live-header {
+    min-height: 56px;
+    padding: 9px 14px;
+  }
+
+  .snx-live-header > div > span {
+    display: none;
+  }
+
+  .snx-live-header button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .snx-live-canvas {
+    height: clamp(185px, 29dvh, 255px);
+  }
+
+  .snx-face-satellites {
+    width: 95%;
+    height: 180px;
+    top: 10px;
+  }
+
+  .snx-face-satellite {
+    min-width: 65px;
+    padding: 6px;
+    font-size: 7px;
+  }
+
+  .snx-face-satellite svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .snx-live-hologram {
+    width: 92%;
+    margin-top: -16px;
+  }
+
+  .snx-live-hologram strong {
+    font-size: 12px;
+  }
+
+  .snx-holo-stage svg {
+    max-height: 105px;
+  }
+
+  .snx-live-conversation {
+    width: 92%;
+    padding-bottom: 20px;
+    gap: 10px;
+  }
+
+  .snx-live-intro-choices {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .snx-live-intro-choices button {
+    min-height: 62px;
+    padding: 10px 14px;
+  }
+
+  .snx-live-controls {
+    padding: 6px;
+  }
+
+  .snx-live-controls button {
+    min-height: 44px;
+    padding: 10px 15px;
+    font-size: 12px;
+  }
+
+  .snx-live-transcript {
+    max-height: 85px;
+  }
+
+  .snx-v12-text-details summary {
+    font-size: 11px;
+    padding: 12px;
+  }
+
+  .snx-v12-text-details summary strong {
+    font-size: 9px;
+  }
+}
+
+/* Compact laptop displays */
+@media (max-height: 750px) and (min-width: 901px) {
+  .snx-live-canvas {
+    height: 245px;
+  }
+
+  .snx-holo-stage svg {
+    max-height: 100px;
+  }
+
+  .snx-live-transcript {
+    max-height: 80px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snx-v12-spin {
+    animation: none;
+  }
+}
