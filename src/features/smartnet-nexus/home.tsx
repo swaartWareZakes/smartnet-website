@@ -5,6 +5,12 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { SystemsStory } from './components/systems-story';
 
+const DeliveryLab = dynamic(
+  () => import('./components/delivery-lab')
+    .then((module) => module.DeliveryLab),
+  { ssr: false }
+);
+
 const NexusScene = dynamic(
   () => import('./components/nexus-scene'),
   { ssr: false }
@@ -21,6 +27,7 @@ export function NexusHome() {
   const journeyRef = useRef<HTMLDivElement>(null);
   const progress = useRef(0);
   const [activeStage, setActiveStage] = useState(0);
+  const [sceneVisible, setSceneVisible] = useState(true);
 
   useEffect(() => {
     let frame = 0;
@@ -75,6 +82,19 @@ export function NexusHome() {
     };
   }, []);
 
+  useEffect(() => {
+    const element = journeyRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setSceneVisible(entry.isIntersecting),
+      { rootMargin: '180px' }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="snx-page">
 
@@ -98,7 +118,7 @@ export function NexusHome() {
       >
         <div className="snx-journey-sticky">
           <div className="snx-canvas" aria-hidden="true">
-            <NexusScene progress={progress} />
+            <NexusScene progress={progress} visible={sceneVisible} />
           </div>
 
           <div className="snx-journey-index">
@@ -277,6 +297,7 @@ export function NexusHome() {
 
       {/* 05 — Preserve existing V3 diagram */}
       <SystemsStory />
+      <DeliveryLab />
 
       <footer className="snx-footer">
         <span>SMARTNET TECHNOLOGIES</span>

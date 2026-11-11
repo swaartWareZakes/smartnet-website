@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useReducedMotion } from 'motion/react';
 
 const CAPABILITIES = [
   {
@@ -52,6 +53,7 @@ const CAPABILITIES = [
 export function SystemsStory() {
   const sectionRef = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
+  const reduced = useReducedMotion();
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -96,6 +98,22 @@ export function SystemsStory() {
       window.removeEventListener('resize', schedule);
     };
   }, []);
+
+  function goToCapability(index: number) {
+    const steps = sectionRef.current?.querySelectorAll<HTMLElement>(
+      '[data-snx-step]'
+    );
+
+    const target = steps?.[index];
+    if (!target) return;
+
+    setActive(index);
+
+    target.scrollIntoView({
+      behavior: reduced ? 'auto' : 'smooth',
+      block: 'center',
+    });
+  }
 
   return (
     <section
@@ -154,6 +172,25 @@ export function SystemsStory() {
             />
           ))}
 
+          {!reduced && (
+            <g key={`transmission-${active}`}>
+              <circle r="5" fill="#c5faff">
+                <animateMotion
+                  dur="2.1s"
+                  repeatCount="indefinite"
+                  path={`M 380 220 L ${CAPABILITIES[active].x} ${CAPABILITIES[active].y}`}
+                />
+              </circle>
+              <circle r="13" fill="#52dfff" opacity=".2">
+                <animateMotion
+                  dur="2.1s"
+                  repeatCount="indefinite"
+                  path={`M 380 220 L ${CAPABILITIES[active].x} ${CAPABILITIES[active].y}`}
+                />
+              </circle>
+            </g>
+          )}
+
           <circle
             cx="380"
             cy="220"
@@ -185,6 +222,16 @@ export function SystemsStory() {
           {CAPABILITIES.map((item, index) => (
             <g
               key={item.name}
+              role="button"
+              tabIndex={0}
+              aria-label={`Show ${item.category}`}
+              onClick={() => goToCapability(index)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  goToCapability(index);
+                }
+              }}
               className={`snx-process-node ${
                 active === index ? 'is-active' : ''
               }`}
@@ -221,6 +268,17 @@ export function SystemsStory() {
           </span>
           <strong>{CAPABILITIES[active].category}</strong>
           <span>{CAPABILITIES[active].number} / 04</span>
+        </div>
+
+        <div className="snx-process-meter" aria-hidden="true">
+          {CAPABILITIES.map((item, index) => (
+            <span
+              key={item.number}
+              className={
+                index <= active ? 'is-active' : ''
+              }
+            />
+          ))}
         </div>
       </div>
 

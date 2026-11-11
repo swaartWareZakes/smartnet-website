@@ -18,6 +18,8 @@ function Network({
   const assembly = useRef<THREE.Group>(null);
   // SMARTNET NEXUS V4 SCROLL CHOREOGRAPHY
   const core = useRef<THREE.Group>(null);
+  const energyMesh = useRef<THREE.Mesh>(null);
+  const networkMaterial = useRef<THREE.LineBasicMaterial>(null);
   const field = useRef<THREE.Group>(null);
   const orbits = useRef<THREE.Group>(null);
   const scrollSmooth = useRef(0);
@@ -111,6 +113,20 @@ function Network({
     );
 
     const p = scrollSmooth.current;
+
+    // Additional energy response across the scroll journey.
+    if (energyMesh.current) {
+      energyMesh.current.scale.setScalar(
+        1 + Math.sin(t * 2.8) * 0.11 + p * 0.07
+      );
+    }
+
+    if (networkMaterial.current) {
+      networkMaterial.current.opacity =
+        0.3 +
+        Math.sin(t * 1.5) * 0.07 +
+        Math.sin(p * Math.PI) * 0.16;
+    }
 
     const ease = (a: number, b: number) => {
       const value = THREE.MathUtils.clamp(
@@ -286,6 +302,7 @@ function Network({
       {/* Network connections */}
       <lineSegments geometry={network.geometry}>
         <lineBasicMaterial
+          ref={networkMaterial}
           color="#42c9fa"
           transparent
           opacity={0.43}
@@ -328,6 +345,15 @@ function Network({
 
       {/* New spatial orbit architecture */}
       <group ref={orbits}>
+        <mesh rotation={[0.5, 0.25, 0.9]}>
+          <torusGeometry args={[2.2, 0.007, 5, 160]} />
+          <meshBasicMaterial
+            color="#79e9ff"
+            transparent
+            opacity={0.18}
+            depthWrite={false}
+          />
+        </mesh>
         <mesh rotation={[Math.PI / 2, 0.25, 0]}>
           <torusGeometry args={[1.65, 0.01, 6, 180]} />
           <meshBasicMaterial
@@ -353,7 +379,7 @@ function Network({
       <group ref={core}>
 
         {/* Inner energy source */}
-        <mesh>
+        <mesh ref={energyMesh}>
           <icosahedronGeometry args={[0.74, 2]} />
           <meshBasicMaterial
             color="#21c9f5"
@@ -414,8 +440,10 @@ function Network({
 
 export default function NexusScene({
   progress,
+  visible,
 }: {
   progress: RefObject<number>;
+  visible: boolean;
 }) {
   const reduced = useReducedMotion();
 
@@ -426,7 +454,7 @@ export default function NexusScene({
         fov: 45,
       }}
       dpr={[1, 1.5]}
-      frameloop={reduced ? 'demand' : 'always'}
+      frameloop={reduced || !visible ? 'demand' : 'always'}
       gl={{
         antialias: true,
         alpha: true,

@@ -752,3 +752,261 @@
     transition: none;
   }
 }
+
+/* SMARTNET NEXUS V5 — CINEMATIC SYSTEMS */
+
+/* Interactive SVG diagram */
+.snx-process-node[role="button"] {
+  cursor: pointer;
+  outline: none;
+}
+
+.snx-process-node:hover .snx-process-node-circle,
+.snx-process-node:focus-visible .snx-process-node-circle {
+  stroke: #c8faff;
+  stroke-width: 3;
+  filter: drop-shadow(0 0 9px #44d5ff);
+}
+
+.snx-process-node.is-active .snx-process-node-circle {
+  filter: drop-shadow(0 0 12px #36cfff66);
+}
+
+.snx-process-wire.is-active {
+  filter: drop-shadow(0 0 6px #5bdfff);
+}
+
+.snx-process-meter {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+  margin-bottom: 28px;
+}
+
+.snx-process-meter span {
+  height: 2px;
+  background: #234455;
+  transition: background .4s, box-shadow .4s;
+}
+
+.snx-process-meter span.is-active {
+  background: #67e3ff;
+  box-shadow: 0 0 10px #67e3ff66;
+}
+
+/* 3D Delivery Engine */
+.snx-lab {
+  position: relative;
+  z-index: 6;
+  padding: 70px 6% 85px;
+  color: #eef9ff;
+  background:
+    radial-gradient(
+      ellipse at 50% 40%,
+      #102e41 0%,
+      #06121c 54%,
+      #030c14 100%
+    );
+  border-top: 1px solid #27536b;
+  overflow: hidden;
+}
+
+.snx-lab-top,
+.snx-lab-eyebrow,
+.snx-lab-meta,
+.snx-lab-outro,
+.snx-lab-controls button span {
+  font-family: monospace;
+  font-size: 10px;
+  letter-spacing: .13em;
+}
+
+.snx-lab-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding-top: 20px;
+  border-top: 1px solid #ffffff24;
+  color: #86a9ba;
+}
+
+.snx-lab-heading {
+  text-align: center;
+  margin: 85px auto 0;
+}
+
+.snx-lab-eyebrow {
+  color: #64dfff;
+}
+
+.snx-lab-heading h2 {
+  margin: 24px 0;
+  font-size: clamp(54px, 8vw, 130px);
+  font-weight: 500;
+  letter-spacing: -.08em;
+  line-height: .96;
+}
+
+.snx-lab-heading h2 em {
+  color: #6bdfff;
+  font-style: normal;
+}
+
+.snx-lab-heading p {
+  max-width: 420px;
+  margin: 0 auto;
+  color: #a6c2d0;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.snx-lab-visual {
+  height: min(62vw, 550px);
+  min-height: 340px;
+  margin: 20px auto;
+  max-width: 1260px;
+}
+
+.snx-lab-visual canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.snx-lab-controls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 980px;
+  margin: 0 auto;
+  border-top: 1px solid #ffffff26;
+  border-bottom: 1px solid #ffffff26;
+}
+
+.snx-lab-controls button {
+  border: 0;
+  background: transparent;
+  color: #8da8b9;
+  cursor: pointer;
+  padding: 24px 12px;
+  font-size: 15px;
+  letter-spacing: .12em;
+  transition: color .3s, background .3s;
+}
+
+.snx-lab-controls button + button {
+  border-left: 1px solid #ffffff20;
+}
+
+.snx-lab-controls button span {
+  display: block;
+  margin-bottom: 8px;
+  color: #7398aa;
+}
+
+.snx-lab-controls button.is-active,
+.snx-lab-controls button:hover {
+  color: #d4faff;
+  background: #1a59712b;
+}
+
+.snx-lab-controls button.is-active {
+  box-shadow: inset 0 -2px #65e3ff;
+}
+
+.snx-lab-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8%;
+  align-items: center;
+  max-width: 980px;
+  margin: 65px auto 110px;
+}
+
+.snx-lab-detail h3 {
+  margin: 16px 0 0;
+  font-size: clamp(32px, 3.8vw, 60px);
+  line-height: 1.08;
+  letter-spacing: -.055em;
+  font-weight: 500;
+}
+
+.snx-lab-detail p {
+  margin: 0 0 24px;
+  color: #afc9d5;
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.snx-lab-meta {
+  color: #6dcfe9;
+}
+
+.snx-lab-outro {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+  padding-top: 35px;
+  border-top: 1px solid #ffffff26;
+  color: #86adbf;
+  line-height: 1.7;
+}
+
+.snx-lab-outro a {
+  color: #a1f2ff;
+  font-family: Arial, sans-serif;
+  font-size: 17px;
+  letter-spacing: 0;
+  text-decoration: none;
+}
+
+.snx-lab-outro a span {
+  margin-left: 12px;
+}
+
+@media (max-width: 760px) {
+  .snx-lab {
+    padding: 50px 6% 65px;
+  }
+
+  .snx-lab-top {
+    font-size: 8px;
+  }
+
+  .snx-lab-heading {
+    margin-top: 65px;
+  }
+
+  .snx-lab-heading h2 {
+    font-size: clamp(44px, 11vw, 72px);
+  }
+
+  .snx-lab-visual {
+    height: 350px;
+    min-height: 0;
+  }
+
+  .snx-lab-controls button {
+    font-size: 11px;
+    padding: 20px 6px;
+  }
+
+  .snx-lab-detail {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    margin: 45px 0 75px;
+  }
+
+  .snx-lab-outro {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snx-process-meter span,
+  .snx-lab-controls button {
+    transition: none;
+  }
+}
