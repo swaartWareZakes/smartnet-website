@@ -222,3 +222,258 @@
     opacity: 0.35;
   }
 }
+
+/* SMARTNET SYSTEMS STORY V3 */
+
+/* Keep the WebGL canvas confined to the opening hero. */
+.snx-page {
+  overflow: clip;
+}
+
+.snx-canvas,
+.snx-page::before,
+.snx-page::after {
+  bottom: auto;
+  height: 100svh;
+}
+
+.snx-main {
+  min-height: calc(100svh - 90px);
+}
+
+/* Scroll story */
+.snx-process {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
+  gap: 4%;
+  padding: 0 5%;
+  background: #06121c;
+  border-top: 1px solid #235068;
+}
+
+/* Diagram remains visible during scrolling */
+.snx-process-visual {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.snx-process-heading,
+.snx-process-status,
+.snx-process-kicker,
+.snx-process-detail {
+  font-family: monospace;
+  font-size: 10px;
+  letter-spacing: .13em;
+}
+
+.snx-process-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  color: #89aaba;
+  border-top: 1px solid #ffffff22;
+  padding-top: 22px;
+}
+
+.snx-process-graph {
+  width: 100%;
+  height: auto;
+  max-height: 64vh;
+  overflow: visible;
+}
+
+.snx-process-wire {
+  stroke: #31596c;
+  stroke-width: 1.2;
+  stroke-dasharray: 4 8;
+  transition: stroke .5s;
+}
+
+.snx-process-wire.is-active {
+  stroke: #6ce4ff;
+  stroke-width: 2;
+  stroke-dasharray: 520;
+  stroke-dashoffset: 520;
+  animation: snx-wire-on 1.2s ease forwards;
+}
+
+@keyframes snx-wire-on {
+  to { stroke-dashoffset: 0; }
+}
+
+.snx-process-core-text {
+  fill: #edfbff;
+  font: bold 34px Arial, sans-serif;
+}
+
+.snx-process-node-circle {
+  fill: #0c2838;
+  stroke: #3b667b;
+  stroke-width: 1.5;
+  transition: fill .4s, stroke .4s;
+}
+
+.snx-process-node-dot {
+  fill: #548ca4;
+  transition: fill .4s;
+}
+
+.snx-process-node-label {
+  fill: #7e9eae;
+  font: 11px monospace;
+  letter-spacing: 1.4px;
+  transition: fill .4s;
+}
+
+.snx-process-node.is-active .snx-process-node-circle {
+  fill: #12495d;
+  stroke: #75e9ff;
+}
+
+.snx-process-node.is-active .snx-process-node-dot {
+  fill: #c0f8ff;
+}
+
+.snx-process-node.is-active .snx-process-node-label {
+  fill: #e7fbff;
+}
+
+.snx-core-orbit {
+  transform-origin: 380px 220px;
+  animation: snx-orbit-spin 40s linear infinite;
+}
+
+@keyframes snx-orbit-spin {
+  to { transform: rotate(360deg); }
+}
+
+.snx-process-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  border-top: 1px solid #ffffff22;
+  padding: 22px 0;
+  color: #8da9b9;
+}
+
+.snx-process-status strong {
+  color: #91edff;
+  font-weight: 500;
+}
+
+.snx-process-status i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  background: #69e5ff;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #69e5ff;
+}
+
+/* Four editorial chapters */
+.snx-process-step {
+  min-height: 90svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 70px 0;
+  opacity: .35;
+  transition: opacity .5s;
+}
+
+.snx-process-step.is-active {
+  opacity: 1;
+}
+
+.snx-process-kicker {
+  color: #6de2ff;
+}
+
+.snx-process-step h2 {
+  margin: 24px 0;
+  font-size: clamp(38px, 4vw, 72px);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -.065em;
+}
+
+.snx-process-step p {
+  max-width: 440px;
+  font-size: 16px;
+  line-height: 1.85;
+  color: #aac1cd;
+}
+
+.snx-process-detail {
+  margin-top: 30px;
+  padding-top: 18px;
+  border-top: 1px solid #ffffff22;
+  color: #7ea5b9;
+}
+
+@media (max-width: 820px) {
+  .snx-process {
+    display: block;
+    padding: 0 6%;
+  }
+
+  .snx-process-visual {
+    top: 0;
+    height: 43svh;
+    z-index: 4;
+    background: #06121c;
+    border-bottom: 1px solid #ffffff20;
+  }
+
+  .snx-process-heading {
+    font-size: 8px;
+  }
+
+  .snx-process-graph {
+    max-height: 30svh;
+    min-height: 0;
+  }
+
+  .snx-process-status {
+    font-size: 8px;
+    padding: 10px 0;
+  }
+
+  .snx-process-step {
+    min-height: 65svh;
+    padding: 50px 0;
+  }
+
+  .snx-process-step h2 {
+    font-size: clamp(36px, 8vw, 58px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snx-process-wire.is-active {
+    animation: none;
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+  }
+
+  .snx-core-orbit {
+    animation: none;
+  }
+
+  .snx-process-step,
+  .snx-process-node-circle,
+  .snx-process-node-dot,
+  .snx-process-node-label {
+    transition: none;
+  }
+}

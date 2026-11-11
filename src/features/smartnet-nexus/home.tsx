@@ -1,6 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
+import { SystemsStory } from './components/systems-story';
 
 const NexusScene = dynamic(
   () => import('./components/nexus-scene'),
@@ -15,13 +17,13 @@ export function NexusHome() {
       </div>
 
       <header className="snx-nav">
-        <a href="/" className="snx-brand">
+        <Link href="/" className="snx-brand">
           <span>SN</span> SMARTNET
-        </a>
+        </Link>
         <span className="snx-nav-label">
           ENGINEERING INTELLIGENCE
         </span>
-        <a href="/">Current website ↗</a>
+        <a href="#snx-systems">Our capabilities ↓</a>
       </header>
 
       <main className="snx-main">
@@ -46,6 +48,8 @@ export function NexusHome() {
           <span>HUMAN-LED / AI-ENABLED</span>
         </div>
       </main>
+
+      <SystemsStory />
 
       <footer className="snx-footer">
         <span>SMARTNET TECHNOLOGIES</span>
