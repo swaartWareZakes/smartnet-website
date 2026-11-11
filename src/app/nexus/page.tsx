@@ -2,8 +2,14 @@ import '@/features/smartnet-nexus/nexus.css';
 import { NexusHome } from '@/features/smartnet-nexus/home';
 
 export const metadata = {
-  title: 'SmartNet Nexus | 3D Concept',
-  description: 'An interactive SmartNet Technologies design concept.',
+  title: 'NEXUS Experience',
+  robots: {
+    index: false,
+    follow: true,
+  },
+  alternates: {
+    canonical: '/',
+  },
 };
 
 export default function NexusPage() {

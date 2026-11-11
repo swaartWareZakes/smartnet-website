@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 64 64">
+  <rect x="2" y="2" width="60" height="60" rx="15"
+        fill="#061825" stroke="#63E3FF"
+        stroke-width="3"/>
+  <path d="M10 45 L10 19" stroke="#63E3FF"
+        stroke-width="2" opacity=".45"/>
+  <path d="M54 19 L54 45" stroke="#63E3FF"
+        stroke-width="2" opacity=".45"/>
+  <text x="32" y="42"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="27" font-weight="800"
+        text-anchor="middle" fill="#E9FAFF">SN</text>
+</svg>
