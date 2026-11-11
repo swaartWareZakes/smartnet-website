@@ -4,6 +4,9 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { SystemsStory } from './components/systems-story';
+import { NexusAssistant } from './components/nexus-assistant';
+import { SiteEntry } from './components/site-entry';
+import { NexusVoiceExperience } from './components/nexus-voice-experience';
 import { ContactSection } from './components/contact-section';
 
 const DeliveryLab = dynamic(
@@ -26,6 +29,7 @@ const STAGES = [
 
 export function NexusHome() {
   const journeyRef = useRef<HTMLDivElement>(null);
+  const [liveOpen, setLiveOpen] = useState(false);
   const progress = useRef(0);
   const [activeStage, setActiveStage] = useState(0);
   const [sceneVisible, setSceneVisible] = useState(true);
@@ -120,7 +124,7 @@ export function NexusHome() {
       >
         <div className="snx-journey-sticky">
           <div className="snx-canvas" aria-hidden="true">
-            <NexusScene progress={progress} visible={sceneVisible} />
+            <NexusScene progress={progress} visible={sceneVisible && !liveOpen} />
           </div>
 
           <div className="snx-journey-index">
@@ -301,6 +305,23 @@ export function NexusHome() {
       <SystemsStory />
       <DeliveryLab />
       <ContactSection />
+      <NexusAssistant />
+
+      <button
+        type="button"
+        className="snx-live-launcher"
+        onClick={() => setLiveOpen(true)}
+      >
+        NEXUS LIVE
+      </button>
+
+      <SiteEntry onEnterAI={() => setLiveOpen(true)} />
+
+      {liveOpen && (
+        <NexusVoiceExperience
+          onClose={() => setLiveOpen(false)}
+        />
+      )}
 
       <footer className="snx-footer">
         <span>SMARTNET TECHNOLOGIES</span>
