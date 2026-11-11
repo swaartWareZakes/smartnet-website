@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { Mic2, Moon, Sun } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { SystemsStory } from './components/systems-story';
 import { NexusAssistant } from './components/nexus-assistant';
@@ -30,7 +31,28 @@ const STAGES = [
 export function NexusHome() {
   const journeyRef = useRef<HTMLDivElement>(null);
   const [liveOpen, setLiveOpen] = useState(false);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const progress = useRef(0);
+
+  useEffect(() => {
+    let saved: string | null = null;
+    try {
+      saved = localStorage.getItem('smartnet-theme');
+    } catch {}
+
+    if (saved === 'light') {
+      const frame = requestAnimationFrame(() => setTheme('light'));
+      return () => cancelAnimationFrame(frame);
+    }
+  }, []);
+
+  function toggleTheme() {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    try {
+      localStorage.setItem('smartnet-theme', next);
+    } catch {}
+  }
   const [activeStage, setActiveStage] = useState(0);
   const [sceneVisible, setSceneVisible] = useState(true);
 
@@ -101,7 +123,7 @@ export function NexusHome() {
   }, []);
 
   return (
-    <div className="snx-page">
+    <div className={`snx-page snx-theme-${theme}`}>
 
       <header className="snx-nav">
         <Link href="/" className="snx-brand">
@@ -114,7 +136,24 @@ export function NexusHome() {
 
         <div className="snx-nav-links">
           <a href="#snx-systems">Capabilities</a>
-          <a href="#snx-contact">Contact ↗</a>
+          <a href="#snx-contact">Contact</a>
+          <button
+            type="button"
+            className="snx-theme-switch"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+          <button
+            type="button"
+            className="snx-nav-ai"
+            onClick={() => setLiveOpen(true)}
+          >
+            <Mic2 size={17} />
+            EXPERIENCE NEXUS
+          </button>
         </div>
       </header>
 
@@ -191,6 +230,21 @@ export function NexusHome() {
             <div className="snx-meta">
               <span>EST. 2016</span>
               <span>HUMAN-LED / AI-ENABLED</span>
+            </div>
+
+            <div className="snx-hero-actions">
+              <button
+                type="button"
+                onClick={() => setLiveOpen(true)}
+                className="snx-hero-ai"
+              >
+                <Mic2 size={20} />
+                Talk to NEXUS AI
+                <span aria-hidden="true">↗</span>
+              </button>
+              <a href="#snx-systems" className="snx-hero-explore">
+                Explore our expertise ↓
+              </a>
             </div>
 
             <a
@@ -306,14 +360,6 @@ export function NexusHome() {
       <DeliveryLab />
       <ContactSection />
       <NexusAssistant />
-
-      <button
-        type="button"
-        className="snx-live-launcher"
-        onClick={() => setLiveOpen(true)}
-      >
-        NEXUS LIVE
-      </button>
 
       <SiteEntry onEnterAI={() => setLiveOpen(true)} />
 

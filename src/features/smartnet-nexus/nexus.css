@@ -2414,3 +2414,507 @@
     backdrop-filter: none;
   }
 }
+
+/* SMARTNET NEXUS V9 CINEMATIC */
+
+/* High-visibility navigation and AI entry */
+.snx-nav-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 2vw, 28px);
+}
+
+.snx-theme-switch {
+  display: grid;
+  place-items: center;
+  width: 39px;
+  height: 39px;
+  padding: 0;
+  border: 1px solid #78dfff55;
+  border-radius: 50%;
+  color: #b9f4ff;
+  background: #13344799;
+  cursor: pointer;
+}
+
+.snx-nav-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 19px;
+  border: 1px solid #83eaff;
+  border-radius: 30px;
+  background: #7be4fc;
+  color: #062334;
+  font: 700 11px monospace;
+  letter-spacing: .04em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .25s, transform .25s;
+}
+
+.snx-nav-ai:hover {
+  background: #d2faff;
+  transform: translateY(-2px);
+}
+
+.snx-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+  pointer-events: auto;
+}
+
+.snx-hero-ai,
+.snx-hero-explore {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 51px;
+  padding: 13px 20px;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.snx-hero-ai {
+  border: 1px solid #a3eeff;
+  background: #85eaff;
+  color: #052234;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.snx-hero-ai span {
+  margin-left: 14px;
+}
+
+.snx-hero-explore {
+  border: 1px solid #5fa6c266;
+  background: #0620338c;
+  color: #d4f8ff;
+}
+
+.snx-hero-ai:hover,
+.snx-hero-explore:hover {
+  filter: brightness(1.12);
+}
+
+/* Immersive voice experience, without a traditional modal box */
+.snx-live-overlay {
+  padding: 0;
+  background: #020b13ed;
+  backdrop-filter: blur(22px);
+}
+
+.snx-live-shell {
+  max-width: none;
+  height: 100dvh;
+  border: 0;
+  border-radius: 0;
+  background:
+    radial-gradient(
+      ellipse at 34% 45%,
+      #164660 0%,
+      #071d2b 40%,
+      #030b13 78%
+    );
+}
+
+.snx-live-header {
+  padding: 18px 5%;
+  border-bottom: 1px solid #81dfff24;
+  background: #04121c77;
+}
+
+.snx-live-content {
+  grid-template-columns: minmax(0, 1.35fr) minmax(350px, .65fr);
+}
+
+.snx-live-visual {
+  border-right: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      ellipse at 54% 43%,
+      #157ba52b,
+      transparent 61%
+    );
+}
+
+.snx-live-canvas {
+  height: 65%;
+  min-height: 320px;
+}
+
+.snx-live-hologram {
+  width: min(90%, 740px);
+  max-width: 740px;
+  margin-top: -30px;
+  padding: 20px 0;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid #6ce3ff52;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.snx-live-hologram strong {
+  margin: 10px 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.snx-holo-stage {
+  width: 100%;
+  overflow: hidden;
+}
+
+.snx-holo-stage svg {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  filter: drop-shadow(0 0 16px #37caff24);
+}
+
+.snx-holo-current {
+  stroke-dasharray: 11 9;
+  animation: snx-holo-energy 2.8s linear infinite;
+}
+
+@keyframes snx-holo-energy {
+  to { stroke-dashoffset: -80; }
+}
+
+.snx-live-conversation {
+  position: relative;
+  z-index: 2;
+  padding: clamp(30px, 4vw, 70px);
+  background: linear-gradient(
+    90deg,
+    #04111b24,
+    #04111be5
+  );
+  overflow-y: auto;
+}
+
+.snx-live-conversation h2 {
+  margin: 24px 0;
+  font-size: clamp(65px, 6vw, 116px);
+  line-height: .92;
+}
+
+.snx-live-conversation > p {
+  font-size: clamp(15px, 1.3vw, 19px);
+  color: #b3cdda;
+}
+
+.snx-live-pillars {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 22px 0;
+  border-top: 1px solid #70dfff30;
+  border-bottom: 1px solid #70dfff30;
+  color: #8fcfe2;
+  font: 10px monospace;
+  letter-spacing: .09em;
+}
+
+.snx-live-status {
+  padding: 12px 0;
+}
+
+.snx-live-transcript {
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 13px 16px;
+  border: 0;
+  border-left: 2px solid #70e6ff;
+  background: #0c304174;
+  backdrop-filter: blur(8px);
+}
+
+.snx-live-controls {
+  margin-top: 20px;
+}
+
+.snx-live-controls button {
+  border-radius: 30px;
+  min-height: 52px;
+  padding: 14px 23px;
+}
+
+.snx-live-controls .snx-live-start {
+  background: #8beaff;
+  color: #042031;
+  font-weight: 700;
+}
+
+.snx-live-privacy {
+  margin-top: 12px;
+}
+
+/* Less boxed-in entry experience */
+.snx-entry--choice {
+  background: #030d16c9;
+  backdrop-filter: blur(20px);
+}
+
+.snx-entry-dialog {
+  width: min(1100px, calc(100% - 36px));
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.snx-entry-dialog h2 {
+  font-size: clamp(50px, 7.5vw, 110px);
+}
+
+.snx-entry-options {
+  gap: 20px;
+}
+
+.snx-entry-options button {
+  min-height: 215px;
+  padding: 30px;
+  border: 1px solid #6bdfff54;
+  background:
+    radial-gradient(
+      circle at 90% 0%,
+      #21648360,
+      transparent 60%
+    ),
+    #071b2bdf;
+  backdrop-filter: blur(10px);
+}
+
+.snx-entry-options button:hover,
+.snx-entry-options button:focus-visible {
+  background:
+    radial-gradient(
+      circle at 90% 0%,
+      #3bbde65f,
+      transparent 60%
+    ),
+    #10334a;
+  box-shadow: 0 0 35px #33caff25;
+}
+
+/* Light theme — technical sections become bright surfaces.
+   The 3D hero and voice cockpit remain intentionally dark. */
+.snx-page.snx-theme-light {
+  background: #f0f6fa;
+}
+
+.snx-theme-light .snx-nav {
+  color: #08293b;
+  background: #f2f9f6ef;
+  border-color: #b7cfdb;
+}
+
+.snx-theme-light .snx-nav-label,
+.snx-theme-light .snx-nav-links > a {
+  color: #174153;
+}
+
+.snx-theme-light .snx-theme-switch {
+  color: #10394e;
+  border-color: #7ca9bb;
+  background: #e4f2f8;
+}
+
+.snx-theme-light .snx-process,
+.snx-theme-light .snx-lab,
+.snx-theme-light .snx-contact {
+  color: #0b283b;
+  background: #edf5f8;
+  border-color: #c7dce5;
+}
+
+.snx-theme-light .snx-process-step h2,
+.snx-theme-light .snx-lab-heading h2,
+.snx-theme-light .snx-lab-detail h3,
+.snx-theme-light .snx-contact-intro h2 {
+  color: #0b283b;
+}
+
+.snx-theme-light .snx-process-step p,
+.snx-theme-light .snx-lab-detail p,
+.snx-theme-light .snx-lab-heading p,
+.snx-theme-light .snx-contact-intro > p {
+  color: #35586a;
+}
+
+.snx-theme-light .snx-process-heading,
+.snx-theme-light .snx-process-status,
+.snx-theme-light .snx-process-detail,
+.snx-theme-light .snx-lab-top,
+.snx-theme-light .snx-contact-top,
+.snx-theme-light .snx-contact-bottom {
+  color: #456c80;
+  border-color: #bed4df;
+}
+
+.snx-theme-light .snx-process-visual {
+  background: #edf5f8;
+}
+
+.snx-theme-light .snx-lab-controls {
+  border-color: #bfd4df;
+}
+
+.snx-theme-light .snx-lab-controls button {
+  color: #254f63;
+}
+
+.snx-theme-light .snx-lab-controls button.is-active {
+  color: #086386;
+}
+
+.snx-theme-light .snx-contact-panel {
+  background: #ffffffd8;
+  border-color: #a6c8d8;
+}
+
+.snx-theme-light .snx-contact-option {
+  color: #0f3347;
+  border-color: #c0d8e1;
+}
+
+.snx-theme-light .snx-contact-option-copy small,
+.snx-theme-light .snx-contact-note,
+.snx-theme-light .snx-contact-panel-head {
+  color: #527487;
+}
+
+.snx-theme-light .snx-contact-bottom a {
+  color: #086486;
+}
+
+.snx-theme-light .snx-footer {
+  background: #e6f1f6;
+  color: #31566a;
+  border-color: #b7d2df;
+}
+
+/* Accessibility and smaller displays */
+.snx-theme-switch:focus-visible,
+.snx-nav-ai:focus-visible,
+.snx-hero-ai:focus-visible,
+.snx-entry-options button:focus-visible {
+  outline: 2px solid #c6faff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 900px) {
+  .snx-live-content {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .snx-live-visual {
+    min-height: 420px;
+    flex-shrink: 0;
+  }
+
+  .snx-live-canvas {
+    height: 305px;
+    min-height: 0;
+  }
+
+  .snx-live-hologram {
+    margin-top: -45px;
+  }
+
+  .snx-live-conversation {
+    flex-shrink: 0;
+    min-height: 0;
+    padding: 30px 7%;
+    background: #051927;
+  }
+
+  .snx-live-conversation h2 {
+    font-size: clamp(48px, 8vw, 80px);
+  }
+}
+
+@media (max-width: 640px) {
+  .snx-nav {
+    padding: 0 4%;
+  }
+
+  .snx-nav-links {
+    gap: 9px;
+  }
+
+  .snx-nav-links > a {
+    display: none;
+  }
+
+  .snx-nav-ai {
+    padding: 10px 12px;
+    font-size: 9px;
+  }
+
+  .snx-theme-switch {
+    width: 34px;
+    height: 34px;
+  }
+
+  .snx-hero-actions {
+    align-items: stretch;
+    flex-direction: column;
+    width: min(100%, 320px);
+    gap: 10px;
+  }
+
+  .snx-hero-ai,
+  .snx-hero-explore {
+    width: 100%;
+  }
+
+  .snx-entry-options button {
+    min-height: 130px;
+    padding: 18px;
+  }
+
+  .snx-live-header {
+    padding: 16px;
+  }
+
+  .snx-live-visual {
+    min-height: 380px;
+  }
+
+  .snx-live-canvas {
+    height: 285px;
+  }
+
+  .snx-holo-stage svg {
+    max-height: 155px;
+  }
+
+  .snx-live-conversation {
+    padding: 25px 6%;
+  }
+
+  .snx-live-conversation h2 {
+    font-size: clamp(45px, 12vw, 68px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snx-holo-current {
+    animation: none;
+    stroke-dasharray: none;
+  }
+
+  .snx-nav-ai {
+    transition: none;
+  }
+}

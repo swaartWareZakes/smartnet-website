@@ -14,33 +14,40 @@ type LiveSession =
   Awaited<ReturnType<GoogleGenAI['live']['connect']>>;
 
 const SYSTEM_PROMPT = `
-You are NEXUS, the live AI business consultant for
-SmartNet Technologies.
+You are NEXUS, the live AI technology and business consultant
+representing SmartNet Technologies.
 
-SmartNet is a South African technology-led company
-building software since 2016, working with local and
-international clients.
+IMPORTANT IDENTITY:
+The company is SMARTNET TECHNOLOGIES, pronounced "Smart Net".
+Spoken references to "SmartNet", "Smart Net", "SmartNet Tech",
+or similar-sounding company names usually mean SmartNet Technologies.
+When a transcription is ambiguous, ask a brief clarifying question.
+Do not reinterpret SmartNet as "market two" or discuss unrelated
+definitions of similarly sounding words.
 
-Its capabilities include:
-Custom software engineering, cloud, Kubernetes,
-DevOps, infrastructure, solutions architecture,
-system integration, security-first engineering,
-responsible AI, education technology,
-digital transformation, consulting and procurement.
+VERIFIED COMPANY PROFILE:
+SmartNet Technologies is based in South Africa, has developed software
+since 2016 and has worked with international clients.
+Capabilities include custom software development, cloud infrastructure,
+Azure, Kubernetes, DevOps, CI/CD, architecture, systems integration,
+security-first engineering, responsible AI, education technology,
+business technology consulting and technology procurement.
+SmartNet develops road maintenance funding analysis solutions
+and AI-assisted education technology.
 
-Conduct natural two-way conversations.
-Understand a visitor's business problem.
-Ask relevant discovery questions one at a time.
-Explain potential solutions in clear, useful language.
-Be concise and conversational because you are speaking.
+YOUR ROLE:
+First understand the visitor's situation, not simply advertise services.
+Ask one useful discovery question at a time.
+Explain practical ways SmartNet could help, without guaranteeing results.
+Describe possible architectures and implementation phases in clear words.
+If a visitor asks about SmartNet, answer about SmartNet directly.
+When appropriate, offer to connect them with the SmartNet team.
+Keep spoken answers concise and natural.
 
-Never invent SmartNet customer references, certifications,
-completed projects, partnerships, pricing or guarantees.
-Separate proposed solutions from confirmed capabilities.
-Never claim to have inspected visitor infrastructure.
-Do not request credentials or confidential information.
-
-When appropriate, suggest a consultation with SmartNet.
+Never invent contracts, customer identities, awards, qualifications,
+partner arrangements, pricing or project delivery records.
+Never ask for credentials or confidential business information.
+Never pretend to have inspected the visitor's systems.
 `;
 
 function topicFromText(text: string): HologramTopic {
@@ -311,6 +318,7 @@ export function NexusVoiceExperience({
             if (content?.inputTranscription?.text) {
               const text = content.inputTranscription.text;
               setHeard(text);
+              setSubtitle('');
               setTopic(topicFromText(text));
             }
 
@@ -402,9 +410,13 @@ export function NexusVoiceExperience({
       disconnect();
       setStatus('error');
       setError(
-        cause instanceof Error
-          ? cause.message
-          : 'Unable to start NEXUS Live.'
+        cause instanceof DOMException &&
+          ['NotAllowedError', 'PermissionDeniedError', 'SecurityError']
+            .includes(cause.name)
+          ? 'Microphone blocked. Check Chrome site permissions and macOS Privacy & Security > Microphone.'
+          : cause instanceof Error
+            ? cause.message
+            : 'Unable to start NEXUS Live.'
       );
     }
   }
@@ -473,10 +485,17 @@ export function NexusVoiceExperience({
             </h2>
 
             <p>
-              Tell me about your business, ask about
-              SmartNet, or explore how technology could
-              help solve a challenge.
+              Describe your biggest business challenge.
+              NEXUS will explore the problem with you,
+              explain possible technology solutions and
+              help identify your next step with SmartNet.
             </p>
+
+            <div className="snx-live-pillars">
+              <span>01 / EXPLAIN YOUR CHALLENGE</span>
+              <span>02 / EXPLORE POSSIBLE SOLUTIONS</span>
+              <span>03 / PLAN YOUR NEXT MOVE</span>
+            </div>
 
             <div className="snx-live-status" aria-live="polite">
               <AudioLines size={19} />

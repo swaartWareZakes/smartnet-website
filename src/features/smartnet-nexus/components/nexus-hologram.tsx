@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { HologramStage } from './hologram-stage';
 
 export type HologramTopic =
   | 'general'
@@ -61,7 +62,15 @@ function Android({
     const dt = Math.min(delta, 0.05);
 
     if (body.current) {
-      body.current.position.y = Math.sin(t * 1.2) * 0.12;
+      body.current.position.y = Math.sin(t * 0.9) * 0.20;
+      body.current.position.x = THREE.MathUtils.damp(
+        body.current.position.x,
+        Math.sin(t * 0.32) * 0.38 + pointer.x * 0.16,
+        1.2,
+        dt
+      );
+      body.current.rotation.z =
+        Math.sin(t * 0.45) * 0.05;
 
       body.current.rotation.y = THREE.MathUtils.damp(
         body.current.rotation.y,
@@ -211,14 +220,11 @@ export function NexusHologram({
         <span>CONTEXTUAL HOLOGRAM / {topic.toUpperCase()}</span>
         <strong>{visual.title}</strong>
 
-        <div className="snx-live-flow">
-          {visual.nodes.map((node, index) => (
-            <div className="snx-live-flow-node" key={node}>
-              <small>0{index + 1}</small>
-              {node}
-            </div>
-          ))}
-        </div>
+        <HologramStage
+          nodes={visual.nodes}
+          topic={topic}
+          state={state}
+        />
 
         <small>ILLUSTRATIVE SYSTEM VISUALISATION</small>
       </div>

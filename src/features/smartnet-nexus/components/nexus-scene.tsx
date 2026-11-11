@@ -179,7 +179,9 @@ function Network({
       // Move the sculpture between left and right
       // so it complements each editorial chapter.
       const targetX =
-        (1.20 - 3.1 * orbit + 3.1 * reassemble) * (1 - dive);
+        (1.8 - 3.1 * orbit + 3.1 * reassemble) *
+        (1 - dive) *
+        (state.size.width < 768 ? 0.35 : 1);
 
       assembly.current.position.x = THREE.MathUtils.damp(
         assembly.current.position.x,
