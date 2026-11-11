@@ -61,7 +61,8 @@ If a fact is missing, acknowledge the limitation.
 
 export const SMARTNET_LIVE_GREETING =
   "Welcome to SmartNet Technologies. I'm NEXUS, your AI technology consultant. " +
-  "We're a South African software and technology engineering company, " +
-  "building solutions since 2016. We help organisations with custom software, " +
-  "cloud infrastructure, AI, education technology and digital transformation. " +
-  "How can I help you or your business today?";
+  "We've been engineering software and technology solutions since 2016. " +
+  "Our expertise includes software, cloud, applied AI, education technology " +
+  "and digital transformation. " +
+  "Would you like to hear more about SmartNet, " +
+  "or explore how SmartNet could help your business?";

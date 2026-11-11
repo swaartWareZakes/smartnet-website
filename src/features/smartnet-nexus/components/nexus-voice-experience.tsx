@@ -73,6 +73,10 @@ function topicFromText(text: string): HologramTopic {
     return 'business';
   }
 
+  if (/\bai\b|artificial intelligence|machine learning/.test(value)) {
+    return 'ai';
+  }
+
   return 'general';
 }
 
@@ -109,6 +113,7 @@ export function NexusVoiceExperience({
   const [topic, setTopic] = useState<HologramTopic>('general');
   const [subtitle, setSubtitle] = useState('');
   const [heard, setHeard] = useState('');
+  const [introComplete, setIntroComplete] = useState(false);
   const [muted, setMuted] = useState(false);
   const [error, setError] = useState('');
 
@@ -118,12 +123,14 @@ export function NexusVoiceExperience({
   const streamRef = useRef<MediaStream | null>(null);
   const inputContextRef = useRef<AudioContext | null>(null);
   const outputContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const playTimeRef = useRef(0);
   const playbackRef = useRef<Set<AudioBufferSourceNode>>(new Set());
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closingRef = useRef(false);
+  const spokenRef = useRef('');
   const greetingPendingRef = useRef(false);
   const greetingFinishedRef = useRef(false);
 
@@ -166,6 +173,9 @@ export function NexusVoiceExperience({
 
     playbackRef.current.clear();
 
+    analyserRef.current?.disconnect();
+    analyserRef.current = null;
+
     void inputContextRef.current?.close().catch(() => {});
     void outputContextRef.current?.close().catch(() => {});
 
@@ -175,6 +185,8 @@ export function NexusVoiceExperience({
 
     setStatus('idle');
     setMuted(false);
+    setIntroComplete(false);
+    spokenRef.current = '';
   }, []);
 
   useEffect(() => {
@@ -209,7 +221,7 @@ export function NexusVoiceExperience({
 
     const source = context.createBufferSource();
     source.buffer = buffer;
-    source.connect(context.destination);
+    source.connect(analyserRef.current ?? context.destination);
 
     const startAt = Math.max(
       context.currentTime + 0.025,
@@ -228,6 +240,7 @@ export function NexusVoiceExperience({
         if (greetingPendingRef.current) {
           if (greetingFinishedRef.current) {
             greetingPendingRef.current = false;
+            setIntroComplete(true);
             setStatus('listening');
           }
         } else {
@@ -246,6 +259,9 @@ export function NexusVoiceExperience({
     setError('');
     setSubtitle('');
     setHeard('');
+    setIntroComplete(false);
+    spokenRef.current = '';
+    setTopic('general');
     closingRef.current = false;
     greetingPendingRef.current = true;
     greetingFinishedRef.current = false;
@@ -258,6 +274,13 @@ export function NexusVoiceExperience({
       // Create and unlock playback from the user gesture.
       const output = new AudioContext({ sampleRate: 24000 });
       outputContextRef.current = output;
+
+      const analyser = output.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.7;
+      analyser.connect(output.destination);
+      analyserRef.current = analyser;
+
       await output.resume();
 
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -346,7 +369,18 @@ export function NexusVoiceExperience({
                 (previous + text).slice(-900)
               );
 
-              const detected = topicFromText(text);
+              spokenRef.current =
+                (spokenRef.current + text).slice(-1200);
+
+              const namedTopics = Array.from(
+                spokenRef.current.matchAll(
+                  /software|applications?|cloud|azure|infrastructure|kubernetes|devops|artificial intelligence|\bai\b|education|learning|school|business|digital transformation/gi
+                )
+              );
+
+              const latest = namedTopics.at(-1)?.[0] ?? '';
+              const detected = topicFromText(latest);
+
               if (detected !== 'general') {
                 setTopic(detected);
               }
@@ -365,6 +399,9 @@ export function NexusVoiceExperience({
               }
 
               if (playbackRef.current.size === 0) {
+                if (greetingPendingRef.current) {
+                  setIntroComplete(true);
+                }
                 greetingPendingRef.current = false;
                 setStatus('listening');
               }
@@ -465,6 +502,34 @@ export function NexusVoiceExperience({
     }
   }
 
+  function selectIntroductionPath(
+    choice: 'company' | 'business'
+  ) {
+    if (!sessionRef.current || status !== 'listening') return;
+
+    const prompt = choice === 'company'
+      ? 'Please tell me more about SmartNet Technologies: its history, values and real capabilities. Keep it conversational and then ask what I would like to explore.'
+      : 'I would like to find out how SmartNet could help my business. Please start by asking what industry I work in and what my biggest operational challenge is. Ask one question at a time.';
+
+    setIntroComplete(false);
+    setSubtitle('');
+    spokenRef.current = '';
+    setStatus('speaking');
+
+    try {
+      sessionRef.current.sendClientContent({
+        turns: [
+          { role: 'user', parts: [{ text: prompt }] },
+        ],
+        turnComplete: true,
+      });
+    } catch {
+      setStatus('listening');
+      setIntroComplete(true);
+      setError('Could not send your selection. Please try speaking.');
+    }
+  }
+
   function toggleMicrophone() {
     const track = streamRef.current?.getAudioTracks()[0];
     if (!track) return;
@@ -515,6 +580,7 @@ export function NexusVoiceExperience({
             state={status}
             topic={topic}
             reduced={!!reduced}
+            analyser={analyserRef}
           />
 
           <div className="snx-live-conversation">
@@ -540,6 +606,28 @@ export function NexusVoiceExperience({
               <span>02 / EXPLORE POSSIBLE SOLUTIONS</span>
               <span>03 / PLAN YOUR NEXT MOVE</span>
             </div>
+
+            {introComplete && status === 'listening' && (
+              <div className="snx-live-intro-choices">
+                <span>WHERE SHALL WE BEGIN?</span>
+
+                <button
+                  type="button"
+                  onClick={() => selectIntroductionPath('company')}
+                >
+                  Discover SmartNet
+                  <small>Our story, expertise and capabilities</small>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => selectIntroductionPath('business')}
+                >
+                  Explore my business
+                  <small>Tell NEXUS about a challenge you face</small>
+                </button>
+              </div>
+            )}
 
             <div className="snx-live-status" aria-live="polite">
               <AudioLines size={19} />

@@ -1,14 +1,28 @@
 'use client';
 
-import { useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
+import type { RefObject } from 'react';
+import { Canvas } from '@react-three/fiber';
+import {
+  BrainCircuit,
+  CloudCog,
+  Code2,
+  Cpu,
+  Database,
+  GraduationCap,
+  Network,
+  ShieldCheck,
+  Workflow,
+  type LucideIcon,
+} from 'lucide-react';
+
+import { NexusFace } from './nexus-face';
 import { HologramStage } from './hologram-stage';
 
 export type HologramTopic =
   | 'general'
   | 'software'
   | 'cloud'
+  | 'ai'
   | 'education'
   | 'business';
 
@@ -19,176 +33,87 @@ export type VoiceState =
   | 'speaking'
   | 'error';
 
+type Satellite = {
+  label: string;
+  Icon: LucideIcon;
+};
+
 const TOPICS: Record<HologramTopic, {
   title: string;
   nodes: string[];
+  satellites: Satellite[];
 }> = {
   general: {
     title: 'SMARTNET INTELLIGENCE',
     nodes: ['ENGINEER', 'CONNECT', 'ENABLE'],
+    satellites: [
+      { label: 'ENGINEERING', Icon: Cpu },
+      { label: 'SECURITY', Icon: ShieldCheck },
+      { label: 'CONNECTED', Icon: Network },
+    ],
   },
   software: {
-    title: 'APPLICATION ARCHITECTURE',
-    nodes: ['USER INTERFACE', 'API SERVICES', 'DATA PLATFORM'],
+    title: 'SOFTWARE ENGINEERING',
+    nodes: ['APPLICATIONS', 'API SERVICES', 'DATA SYSTEMS'],
+    satellites: [
+      { label: 'APPLICATIONS', Icon: Code2 },
+      { label: 'SYSTEM APIs', Icon: Workflow },
+      { label: 'DATA', Icon: Database },
+    ],
   },
   cloud: {
     title: 'CLOUD INFRASTRUCTURE',
     nodes: ['APPLICATIONS', 'KUBERNETES', 'OBSERVABILITY'],
+    satellites: [
+      { label: 'CLOUD', Icon: CloudCog },
+      { label: 'INTEGRATION', Icon: Network },
+      { label: 'SECURITY', Icon: ShieldCheck },
+    ],
+  },
+  ai: {
+    title: 'APPLIED INTELLIGENCE',
+    nodes: ['BUSINESS DATA', 'AI SERVICES', 'DECISIONS'],
+    satellites: [
+      { label: 'INTELLIGENCE', Icon: BrainCircuit },
+      { label: 'DATA', Icon: Database },
+      { label: 'AUTOMATION', Icon: Cpu },
+    ],
   },
   education: {
     title: 'EDUCATION TECHNOLOGY',
-    nodes: ['LEARNERS', 'LEARNING PLATFORM', 'INSIGHTS'],
+    nodes: ['LEARNERS', 'LEARNING', 'INSIGHTS'],
+    satellites: [
+      { label: 'EDUCATION', Icon: GraduationCap },
+      { label: 'PLATFORMS', Icon: Code2 },
+      { label: 'LEARNING AI', Icon: BrainCircuit },
+    ],
   },
   business: {
-    title: 'BUSINESS SOLUTIONS',
-    nodes: ['DISCOVERY', 'IMPLEMENTATION', 'OPERATIONS'],
+    title: 'BUSINESS TRANSFORMATION',
+    nodes: ['DISCOVER', 'IMPLEMENT', 'OPERATE'],
+    satellites: [
+      { label: 'DISCOVERY', Icon: Network },
+      { label: 'SOLUTIONS', Icon: Workflow },
+      { label: 'OPERATIONS', Icon: Cpu },
+    ],
   },
 };
-
-function Android({
-  state,
-  reduced,
-}: {
-  state: VoiceState;
-  reduced: boolean;
-}) {
-  const body = useRef<THREE.Group>(null);
-  const glow = useRef<THREE.Mesh>(null);
-
-  useFrame(({ clock, pointer }, delta) => {
-    if (reduced) return;
-
-    const t = clock.elapsedTime;
-    const dt = Math.min(delta, 0.05);
-
-    if (body.current) {
-      body.current.position.y = Math.sin(t * 0.9) * 0.20;
-      body.current.position.x = THREE.MathUtils.damp(
-        body.current.position.x,
-        Math.sin(t * 0.32) * 0.38 + pointer.x * 0.16,
-        1.2,
-        dt
-      );
-      body.current.rotation.z =
-        Math.sin(t * 0.45) * 0.05;
-
-      body.current.rotation.y = THREE.MathUtils.damp(
-        body.current.rotation.y,
-        pointer.x * 0.18 + Math.sin(t * 0.3) * 0.13,
-        2,
-        dt
-      );
-    }
-
-    if (glow.current) {
-      const intensity = state === 'speaking' ? 0.16 : 0.06;
-      glow.current.scale.setScalar(
-        1 + Math.sin(t * (state === 'speaking' ? 8 : 2)) *
-          intensity
-      );
-    }
-  });
-
-  return (
-    <group ref={body}>
-      {/* Head */}
-      <mesh position={[0, 0.72, 0]} scale={[1.17, .82, .7]}>
-        <sphereGeometry args={[0.86, 32, 24]} />
-        <meshPhysicalMaterial
-          color="#19516d"
-          metalness={0.6}
-          roughness={0.2}
-          clearcoat={1}
-        />
-      </mesh>
-
-      {/* Visor */}
-      <mesh position={[0, 0.78, .57]} scale={[1.24, .43, .12]}>
-        <sphereGeometry args={[0.58, 32, 16]} />
-        <meshBasicMaterial color="#041724" />
-      </mesh>
-
-      {/* Eyes */}
-      {[-.29, .29].map((x) => (
-        <mesh key={x} position={[x, .81, .663]}>
-          <sphereGeometry args={[.092, 20, 20]} />
-          <meshBasicMaterial
-            color={state === 'speaking' ? '#d1fbff' : '#66e0ff'}
-            toneMapped={false}
-          />
-        </mesh>
-      ))}
-
-      {/* Voice indicator */}
-      <mesh
-        ref={glow}
-        position={[0, .48, .65]}
-        scale={[1, 1, .4]}
-      >
-        <sphereGeometry args={[.085, 16, 16]} />
-        <meshBasicMaterial
-          color={state === 'speaking' ? '#ffffff' : '#39c2ee'}
-          toneMapped={false}
-        />
-      </mesh>
-
-      {/* Floating body */}
-      <mesh position={[0, -.62, 0]} scale={[.92, .91, .58]}>
-        <sphereGeometry args={[.8, 30, 20]} />
-        <meshPhysicalMaterial
-          color="#113f57"
-          metalness={.75}
-          roughness={.23}
-          clearcoat={1}
-        />
-      </mesh>
-
-      <mesh position={[0, -.55, .48]}>
-        <icosahedronGeometry args={[.22, 1]} />
-        <meshBasicMaterial
-          color="#67e7ff"
-          wireframe
-          toneMapped={false}
-        />
-      </mesh>
-
-      {/* Orbiting holographic rings */}
-      <mesh rotation={[1.2, .15, .25]}>
-        <torusGeometry args={[1.65, .012, 8, 120]} />
-        <meshBasicMaterial
-          color="#5ddfff"
-          transparent
-          opacity={.45}
-          depthWrite={false}
-        />
-      </mesh>
-
-      <mesh rotation={[.5, 1, .8]}>
-        <torusGeometry args={[1.9, .009, 8, 120]} />
-        <meshBasicMaterial
-          color="#358fca"
-          transparent
-          opacity={.35}
-          depthWrite={false}
-        />
-      </mesh>
-    </group>
-  );
-}
 
 export function NexusHologram({
   state,
   topic,
   reduced,
+  analyser,
 }: {
   state: VoiceState;
   topic: HologramTopic;
   reduced: boolean;
+  analyser: RefObject<AnalyserNode | null>;
 }) {
   const visual = TOPICS[topic];
 
   return (
-    <div className="snx-live-visual">
+    <div className={`snx-live-visual snx-hologram-topic-${topic}`}>
       <div className="snx-live-canvas" aria-hidden="true">
         <Canvas
           camera={{ position: [0, 0, 6], fov: 45 }}
@@ -200,24 +125,48 @@ export function NexusHologram({
             powerPreference: 'high-performance',
           }}
         >
-          <ambientLight intensity={1.4} />
+          <ambientLight intensity={1.45} />
+
           <directionalLight
-            position={[4, 5, 6]}
-            intensity={3}
-            color="#d1f6ff"
+            position={[3, 5, 6]}
+            color="#c4f5ff"
+            intensity={4}
           />
-          <pointLight
-            position={[-3, 2, 3]}
-            intensity={20}
-            distance={9}
-            color="#19beff"
+
+          <directionalLight
+            position={[-4, -2, 3]}
+            color="#25aaff"
+            intensity={2.2}
           />
-          <Android state={state} reduced={reduced} />
+
+          <NexusFace
+            voiceState={state}
+            reduced={reduced}
+            analyser={analyser}
+          />
         </Canvas>
       </div>
 
+      <div
+        key={topic}
+        className={`snx-face-satellites ${
+          state === 'speaking' ? 'is-speaking' : ''
+        }`}
+        aria-hidden="true"
+      >
+        {visual.satellites.map(({ label, Icon }, index) => (
+          <div
+            key={label}
+            className={`snx-face-satellite snx-face-satellite-${index}`}
+          >
+            <Icon size={24} strokeWidth={1.4} />
+            <span>{label}</span>
+          </div>
+        ))}
+      </div>
+
       <div className="snx-live-hologram">
-        <span>CONTEXTUAL HOLOGRAM / {topic.toUpperCase()}</span>
+        <span>LIVE VISUALISATION / {topic.toUpperCase()}</span>
         <strong>{visual.title}</strong>
 
         <HologramStage

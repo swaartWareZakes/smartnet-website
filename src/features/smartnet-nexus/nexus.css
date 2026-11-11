@@ -2918,3 +2918,234 @@
     transition: none;
   }
 }
+
+/* SMARTNET NEXUS V11 HOLOGRAPHIC FACE */
+
+.snx-live-visual {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(
+      ellipse at 53% 40%,
+      #165b7936 0%,
+      #07182744 50%,
+      transparent 80%
+    );
+}
+
+.snx-live-canvas {
+  position: relative;
+  z-index: 1;
+  min-height: 360px;
+}
+
+.snx-live-canvas canvas {
+  display: block;
+  filter: drop-shadow(0 0 35px #2bc8ff30);
+}
+
+/* Holograms floating around the AI's face */
+.snx-face-satellites {
+  position: absolute;
+  z-index: 2;
+  top: 9%;
+  left: 9%;
+  width: 82%;
+  height: 48%;
+  pointer-events: none;
+}
+
+.snx-face-satellite {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 122px;
+  padding: 14px;
+  color: #a9f4ff;
+  text-shadow: 0 0 18px #5fdfff;
+  font: 10px monospace;
+  letter-spacing: .1em;
+  background: linear-gradient(
+    135deg,
+    #0b364b77,
+    transparent 85%
+  );
+  border-left: 1px solid #6be5ff75;
+  animation: snx-satellite-appear .6s ease both;
+}
+
+.snx-face-satellite svg {
+  filter: drop-shadow(0 0 9px #62dfff9a);
+}
+
+.snx-face-satellite-0 {
+  top: 12%;
+  left: 0;
+  animation-delay: .06s;
+}
+
+.snx-face-satellite-1 {
+  top: 22%;
+  right: 0;
+  animation-delay: .18s;
+}
+
+.snx-face-satellite-2 {
+  bottom: 4%;
+  left: 5%;
+  animation-delay: .32s;
+}
+
+.snx-face-satellites.is-speaking .snx-face-satellite {
+  border-color: #b0f6ff;
+  box-shadow: -6px 0 18px -14px #80edff;
+}
+
+@keyframes snx-satellite-appear {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(.86);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Keep the diagram as a supporting hologram,
+   not a traditional boxed interface */
+.snx-live-hologram {
+  position: relative;
+  z-index: 3;
+  margin-top: -42px;
+  width: min(86%, 700px);
+}
+
+.snx-live-intro-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 20px 0;
+  border-top: 1px solid #66dfff3d;
+  border-bottom: 1px solid #66dfff3d;
+}
+
+.snx-live-intro-choices > span {
+  grid-column: 1 / -1;
+  color: #8de6fc;
+  font: 10px monospace;
+  letter-spacing: .14em;
+}
+
+.snx-live-intro-choices button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  min-height: 96px;
+  padding: 17px;
+  text-align: left;
+  color: #e5faff;
+  font-size: 15px;
+  cursor: pointer;
+  border: 1px solid #4489a4;
+  background:
+    radial-gradient(circle at 90% 0%, #267e9a33, transparent 65%),
+    #0a2637;
+  transition:
+    transform .2s ease,
+    border-color .2s ease,
+    background .2s ease;
+}
+
+.snx-live-intro-choices button:hover,
+.snx-live-intro-choices button:focus-visible {
+  transform: translateY(-3px);
+  border-color: #a7f5ff;
+  background: #10445c;
+}
+
+.snx-live-intro-choices button small {
+  color: #9bbfcc;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.snx-live-intro-choices button:focus-visible {
+  outline: 2px solid #9af1ff;
+  outline-offset: 3px;
+}
+
+/* Responsive hologram composition */
+@media (max-width: 900px) {
+  .snx-face-satellites {
+    top: 5%;
+    height: 280px;
+    left: 5%;
+    width: 90%;
+  }
+
+  .snx-face-satellite {
+    min-width: 95px;
+    padding: 10px;
+    font-size: 9px;
+  }
+
+  .snx-live-hologram {
+    margin-top: -20px;
+  }
+}
+
+@media (max-width: 520px) {
+  .snx-live-canvas {
+    min-height: 270px;
+  }
+
+  .snx-face-satellites {
+    top: 5%;
+    height: 235px;
+    left: 2%;
+    width: 96%;
+  }
+
+  .snx-face-satellite {
+    min-width: 70px;
+    padding: 7px;
+    gap: 5px;
+    font-size: 7px;
+  }
+
+  .snx-face-satellite svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .snx-face-satellite-1 {
+    right: 0;
+  }
+
+  .snx-face-satellite-2 {
+    left: 0;
+    bottom: 8%;
+  }
+
+  .snx-live-intro-choices {
+    grid-template-columns: 1fr;
+  }
+
+  .snx-live-intro-choices button {
+    min-height: 78px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snx-face-satellite {
+    animation: none;
+  }
+
+  .snx-live-intro-choices button {
+    transition: none;
+  }
+}
