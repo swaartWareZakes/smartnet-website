@@ -4,6 +4,7 @@ import { useMemo, useRef, type RefObject } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useReducedMotion } from 'motion/react';
 import * as THREE from 'three';
+import { NexusTunnel } from './nexus-tunnel';
 
 const NODE_COUNT = 42;
 const SIGNAL_COUNT = 48;
@@ -146,6 +147,9 @@ function Network({
     // Section 4: reassemble the system.
     const reassemble = ease(0.63, 0.90);
 
+    // Final journey: pull the visitor through the core.
+    const dive = ease(0.76, 0.99);
+
     const expansion =
       (unfold * 0.40 + orbit * 0.22) *
       (1 - reassemble * 0.82);
@@ -175,7 +179,7 @@ function Network({
       // Move the sculpture between left and right
       // so it complements each editorial chapter.
       const targetX =
-        1.20 - 3.1 * orbit + 3.1 * reassemble;
+        (1.20 - 3.1 * orbit + 3.1 * reassemble) * (1 - dive);
 
       assembly.current.position.x = THREE.MathUtils.damp(
         assembly.current.position.x,
@@ -185,6 +189,17 @@ function Network({
       );
 
       assembly.current.position.y = Math.sin(t * 0.45) * 0.07;
+
+      // Move the existing network out of the camera's
+      // path as the tunnel experience takes over.
+      assembly.current.scale.setScalar(
+        THREE.MathUtils.damp(
+          assembly.current.scale.x,
+          1 - dive * 0.91,
+          3.1,
+          dt
+        )
+      );
     }
 
     if (field.current) {
@@ -258,12 +273,22 @@ function Network({
     }
 
     // Give the expanding network more camera space.
+    const baseCameraZ =
+      9 + unfold * 1.3 +
+      orbit * 1.1 -
+      reassemble * 1.7;
+
+    // Accelerating forward travel through the tunnel.
+    const targetCameraZ = THREE.MathUtils.lerp(
+      baseCameraZ,
+      -13,
+      dive
+    );
+
     state.camera.position.z = THREE.MathUtils.damp(
       state.camera.position.z,
-      9 + unfold * 1.3 +
-        orbit * 1.1 -
-        reassemble * 1.7,
-      2,
+      targetCameraZ,
+      3.6,
       dt
     );
 
@@ -480,6 +505,7 @@ export default function NexusScene({
       />
 
       <Network reduced={!!reduced} progress={progress} />
+      {!reduced && <NexusTunnel progress={progress} />}
     </Canvas>
   );
 }

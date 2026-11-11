@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
+import { ArchitectureGraph } from './architecture-graph';
 
 const CAPABILITIES = [
   {
@@ -128,139 +129,11 @@ export function SystemsStory() {
           <span>CONNECTED BY DESIGN / 001—004</span>
         </div>
 
-        <svg
-          className="snx-process-graph"
-          viewBox="0 0 760 440"
-          role="img"
-          aria-label={`SmartNet capability diagram: ${CAPABILITIES[active].category} is highlighted`}
-        >
-          <defs>
-            <radialGradient id="snx-core-gradient">
-              <stop offset="0%" stopColor="#185e80" />
-              <stop offset="100%" stopColor="#091c2c" />
-            </radialGradient>
-          </defs>
-
-          <circle
-            cx="380"
-            cy="220"
-            r="175"
-            fill="none"
-            stroke="#20465a"
-            strokeDasharray="3 12"
-          />
-
-          <circle
-            cx="380"
-            cy="220"
-            r="116"
-            fill="none"
-            stroke="#24506a"
-            strokeOpacity=".5"
-          />
-
-          {CAPABILITIES.map((item, index) => (
-            <line
-              key={item.number}
-              className={`snx-process-wire ${
-                active === index ? 'is-active' : ''
-              }`}
-              x1="380"
-              y1="220"
-              x2={item.x}
-              y2={item.y}
-            />
-          ))}
-
-          {!reduced && (
-            <g key={`transmission-${active}`}>
-              <circle r="5" fill="#c5faff">
-                <animateMotion
-                  dur="2.1s"
-                  repeatCount="indefinite"
-                  path={`M 380 220 L ${CAPABILITIES[active].x} ${CAPABILITIES[active].y}`}
-                />
-              </circle>
-              <circle r="13" fill="#52dfff" opacity=".2">
-                <animateMotion
-                  dur="2.1s"
-                  repeatCount="indefinite"
-                  path={`M 380 220 L ${CAPABILITIES[active].x} ${CAPABILITIES[active].y}`}
-                />
-              </circle>
-            </g>
-          )}
-
-          <circle
-            cx="380"
-            cy="220"
-            r="67"
-            fill="url(#snx-core-gradient)"
-            stroke="#60d9ff"
-            strokeWidth="1.5"
-          />
-
-          <circle
-            cx="380"
-            cy="220"
-            r="80"
-            fill="none"
-            stroke="#3d94b5"
-            strokeDasharray="5 9"
-            className="snx-core-orbit"
-          />
-
-          <text
-            x="380"
-            y="229"
-            textAnchor="middle"
-            className="snx-process-core-text"
-          >
-            SN
-          </text>
-
-          {CAPABILITIES.map((item, index) => (
-            <g
-              key={item.name}
-              role="button"
-              tabIndex={0}
-              aria-label={`Show ${item.category}`}
-              onClick={() => goToCapability(index)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault();
-                  goToCapability(index);
-                }
-              }}
-              className={`snx-process-node ${
-                active === index ? 'is-active' : ''
-              }`}
-            >
-              <circle
-                cx={item.x}
-                cy={item.y}
-                r="33"
-                className="snx-process-node-circle"
-              />
-
-              <circle
-                cx={item.x}
-                cy={item.y}
-                r="5"
-                className="snx-process-node-dot"
-              />
-
-              <text
-                x={item.x}
-                y={item.y < 220 ? item.y - 51 : item.y + 59}
-                textAnchor="middle"
-                className="snx-process-node-label"
-              >
-                {item.name}
-              </text>
-            </g>
-          ))}
-        </svg>
+        <ArchitectureGraph
+          active={active}
+          onSelect={goToCapability}
+          reduced={!!reduced}
+        />
 
         <div className="snx-process-status" aria-live="polite">
           <span>
