@@ -31,6 +31,30 @@ const STAGES = [
 export function NexusHome() {
   const journeyRef = useRef<HTMLDivElement>(null);
   const [liveOpen, setLiveOpen] = useState(false);
+  useEffect(() => {
+    const openNexus = () => setLiveOpen(true);
+
+    window.addEventListener('smartnet:open-nexus', openNexus);
+
+    const url = new URL(window.location.href);
+    let timer: number | undefined;
+
+    if (url.searchParams.get('nexus') === '1') {
+      url.searchParams.delete('nexus');
+      window.history.replaceState(
+        null,
+        '',
+        url.pathname + url.search + url.hash
+      );
+      timer = window.setTimeout(openNexus, 0);
+    }
+
+    return () => {
+      window.removeEventListener('smartnet:open-nexus', openNexus);
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
+  }, []);
+
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const progress = useRef(0);
 
@@ -123,7 +147,7 @@ export function NexusHome() {
   }, []);
 
   return (
-    <div className={`snx-page snx-theme-${theme}`}>
+    <div className="snx-page">
 
       <header className="snx-nav">
         <Link href="/" className="snx-brand">

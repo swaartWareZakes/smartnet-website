@@ -3750,3 +3750,417 @@
     animation: none;
   }
 }
+
+/* SMARTNET V13 COMPLETE THEME */
+
+html[data-theme="light"] .snx-page {
+  background: #f3f9fd !important;
+  color: #0a293b;
+}
+
+/* Hero and scrolling 3D journey */
+html[data-theme="light"] .snx-canvas {
+  background:
+    radial-gradient(
+      ellipse at 63% 45%,
+      #c8eaf7,
+      #e9f5fb 48%,
+      #f8fcff 85%
+    ) !important;
+}
+
+html[data-theme="light"] .snx-journey,
+html[data-theme="light"] .snx-story,
+html[data-theme="light"] .snx-story-panel,
+html[data-theme="light"] .snx-main {
+  color: #102d40;
+}
+
+html[data-theme="light"] .snx-story-copy {
+  background: linear-gradient(
+    90deg,
+    #f4fbffea,
+    #f4fbff79
+  ) !important;
+}
+
+html[data-theme="light"] .snx-story-copy h2,
+html[data-theme="light"] .snx-story-copy p,
+html[data-theme="light"] .snx-main h1,
+html[data-theme="light"] .snx-main p,
+html[data-theme="light"] .snx-journey-index {
+  color: #0a293b;
+  text-shadow: none;
+}
+
+html[data-theme="light"] .snx-story-copy em {
+  color: #087ea5;
+}
+
+html[data-theme="light"] .snx-hero-explore {
+  color: #0b4055;
+  background: #ffffffd9;
+  border-color: #8cb9cb;
+}
+
+/* Interactive system map and scrolling capabilities */
+html[data-theme="light"] .snx-process,
+html[data-theme="light"] .snx-process-visual,
+html[data-theme="light"] .snx-process-step,
+html[data-theme="light"] .snx-lab,
+html[data-theme="light"] .snx-contact {
+  background: #f3f9fd !important;
+  color: #0b293b !important;
+}
+
+html[data-theme="light"] .snx-process-visual {
+  border-color: #bdd7e5 !important;
+}
+
+html[data-theme="light"] .snx-process-step h2,
+html[data-theme="light"] .snx-lab-heading h2,
+html[data-theme="light"] .snx-lab-detail h3,
+html[data-theme="light"] .snx-contact-intro h2,
+html[data-theme="light"] .snx-contact-option-copy strong {
+  color: #09283b !important;
+}
+
+html[data-theme="light"] .snx-process-step p,
+html[data-theme="light"] .snx-lab-detail p,
+html[data-theme="light"] .snx-lab-heading p,
+html[data-theme="light"] .snx-contact-intro > p {
+  color: #436477 !important;
+}
+
+html[data-theme="light"] .snx-process-heading,
+html[data-theme="light"] .snx-process-status,
+html[data-theme="light"] .snx-process-detail,
+html[data-theme="light"] .snx-contact-top,
+html[data-theme="light"] .snx-contact-bottom {
+  color: #426679;
+  border-color: #bad3e0;
+}
+
+html[data-theme="light"] .snx-arch-zone {
+  fill: #e8f3f9;
+  stroke: #b7d4e1;
+}
+
+html[data-theme="light"] .snx-arch-card {
+  fill: #fff;
+  stroke: #91b8ca;
+}
+
+html[data-theme="light"] .snx-arch-card-title {
+  fill: #0b364b;
+}
+
+html[data-theme="light"] .snx-arch-card-detail,
+html[data-theme="light"] .snx-arch-zone-title {
+  fill: #4a7082;
+}
+
+html[data-theme="light"] .snx-arch-domain-card {
+  fill: #f7fcff;
+  stroke: #8db3c7;
+}
+
+html[data-theme="light"] .snx-arch-domain.is-active .snx-arch-domain-card {
+  fill: #ccecf8;
+  stroke: #087fa8;
+  filter: drop-shadow(0 0 7px #2db5e92d);
+}
+
+html[data-theme="light"] .snx-arch-domain-strip,
+html[data-theme="light"] .snx-arch-domain-led {
+  fill: #6d9fb7;
+}
+
+html[data-theme="light"] .snx-arch-domain.is-active .snx-arch-domain-strip,
+html[data-theme="light"] .snx-arch-domain.is-active .snx-arch-domain-led {
+  fill: #0089b6;
+}
+
+html[data-theme="light"] .snx-arch-wire {
+  stroke: #8db3c7;
+}
+
+html[data-theme="light"] .snx-arch-live-wire {
+  stroke: #0283ad;
+}
+
+html[data-theme="light"] .snx-arch-foundation {
+  fill: #dceef6;
+  stroke: #83afc5;
+}
+
+html[data-theme="light"] .snx-arch-foundation-title {
+  fill: #006c90;
+}
+
+html[data-theme="light"] .snx-arch-foundation-copy {
+  fill: #3f6b80;
+}
+
+html[data-theme="light"] .snx-arch-head,
+html[data-theme="light"] .snx-arch-legend {
+  color: #426e82;
+}
+
+html[data-theme="light"] .snx-process-status,
+html[data-theme="light"] .snx-process-heading,
+html[data-theme="light"] .snx-lab-controls,
+html[data-theme="light"] .snx-lab-detail {
+  border-color: #bad1dc;
+}
+
+/* Contact */
+html[data-theme="light"] .snx-contact-panel {
+  background: #ffffffed !important;
+  border-color: #a3c3d2;
+}
+
+html[data-theme="light"] .snx-contact-option {
+  color: #0c3247;
+  border-color: #c3d9e5;
+}
+
+html[data-theme="light"] .snx-contact-panel-head,
+html[data-theme="light"] .snx-contact-option-copy small,
+html[data-theme="light"] .snx-contact-note {
+  color: #4a7285;
+}
+
+html[data-theme="light"] .snx-contact-bottom a {
+  color: #006f95;
+}
+
+html[data-theme="light"] .snx-contact-orbit {
+  opacity: .2;
+}
+
+/* Text assistant */
+html[data-theme="light"] .snx-ai-layer {
+  background: #cbdce2a9;
+}
+
+html[data-theme="light"] .snx-ai-modal {
+  background: #f7fcff;
+  color: #09273a;
+  border-color: #90b8ca;
+}
+
+html[data-theme="light"] .snx-ai-intro {
+  background: radial-gradient(circle at 50% 30%, #d2edf7, #f2f9fd 70%);
+}
+
+html[data-theme="light"] .snx-ai-intro h2,
+html[data-theme="light"] .snx-ai-message p {
+  color: #0b2d40;
+}
+
+html[data-theme="light"] .snx-ai-chat {
+  background: #fff;
+  border-color: #bfd9e5;
+}
+
+html[data-theme="light"] .snx-ai-user,
+html[data-theme="light"] .snx-ai-form {
+  background: #e2f1f8;
+  border-color: #8ab6c9;
+}
+
+html[data-theme="light"] .snx-ai-form input {
+  color: #0b293d;
+}
+
+/* Voice assistant uses a light cockpit without changing the 3D materials */
+html[data-theme="light"] .snx-live-overlay {
+  background: #d0e2eaa8;
+}
+
+html[data-theme="light"] .snx-live-shell {
+  background:
+    radial-gradient(
+      ellipse at 50% 27%,
+      #d1edf8,
+      #eef7fc 65%,
+      #f8fcff 95%
+    ) !important;
+  border-color: #9bc4d5;
+}
+
+html[data-theme="light"] .snx-live-header {
+  background: #f9fdffed;
+  border-color: #b4d3e0;
+  color: #12364a;
+}
+
+html[data-theme="light"] .snx-live-header strong {
+  color: #14364a;
+}
+
+html[data-theme="light"] .snx-live-conversation {
+  background: transparent !important;
+  color: #0a2a3e;
+}
+
+html[data-theme="light"] .snx-live-conversation h2 {
+  color: #092a3e;
+}
+
+html[data-theme="light"] .snx-live-conversation > p,
+html[data-theme="light"] .snx-live-privacy {
+  color: #4c7081;
+}
+
+html[data-theme="light"] .snx-live-hologram strong,
+html[data-theme="light"] .snx-live-status {
+  color: #10465e;
+}
+
+html[data-theme="light"] .snx-live-intro-choices button,
+html[data-theme="light"] .snx-live-transcript,
+html[data-theme="light"] .snx-v12-text-details {
+  background: #ffffffd9;
+  color: #15384c;
+  border-color: #9fc6d6;
+}
+
+html[data-theme="light"] .snx-live-transcript p,
+html[data-theme="light"] .snx-live-intro-choices button small {
+  color: #416476;
+}
+
+html[data-theme="light"] .snx-v12-text-details summary,
+html[data-theme="light"] .snx-v12-message p {
+  color: #193e52;
+}
+
+html[data-theme="light"] .snx-v12-text,
+html[data-theme="light"] .snx-v12-message {
+  background: #e9f4f9;
+}
+
+html[data-theme="light"] .snx-v12-form input {
+  background: #fff;
+  color: #0b3044;
+}
+
+html[data-theme="light"] .snx-face-satellite {
+  color: #046f94;
+  background: #e5f3f9ce;
+  border-color: #2998bb;
+  text-shadow: none;
+}
+
+/* Site entry */
+html[data-theme="light"] .snx-entry--choice {
+  background: #d6e9f0cb;
+}
+
+html[data-theme="light"] .snx-entry-dialog {
+  color: #09283a;
+}
+
+html[data-theme="light"] .snx-entry-dialog h2 {
+  color: #09283a;
+}
+
+html[data-theme="light"] .snx-entry-dialog > p {
+  color: #42697c;
+}
+
+html[data-theme="light"] .snx-entry-options button {
+  background: #ffffffeb;
+  color: #0b344b;
+  border-color: #9cbecd;
+}
+
+html[data-theme="light"] .snx-entry-options button small {
+  color: #527588;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="light"] .snx-page {
+    transition: none;
+  }
+}
+
+/* SMARTNET V13 / INTERACTIVE ARCHITECTURE */
+
+.snx-arch-pick {
+  cursor: pointer;
+  outline: none;
+}
+
+.snx-arch-pick .snx-arch-card {
+  transition: stroke .25s, fill .25s, filter .25s;
+}
+
+.snx-arch-pick:hover .snx-arch-card,
+.snx-arch-pick:focus-visible .snx-arch-card,
+.snx-arch-pick.is-inspected .snx-arch-card {
+  stroke: #92efff;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 9px #4bd6ff51);
+}
+
+.snx-arch-inspector {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 25px;
+  padding: 18px 20px;
+  border: 1px solid #40819d;
+  background: #0a293ac7;
+  color: #e7f9ff;
+}
+
+.snx-arch-inspector-index {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  color: #8ab6ca;
+  font: 9px monospace;
+  letter-spacing: .12em;
+}
+
+.snx-arch-inspector strong {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: .03em;
+}
+
+.snx-arch-inspector p {
+  margin: 0;
+  max-width: 650px;
+  color: #a8cad8;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+html[data-theme="light"] .snx-arch-inspector {
+  background: #fff;
+  color: #0b3044;
+  border-color: #9bbfce;
+}
+
+html[data-theme="light"] .snx-arch-inspector p,
+html[data-theme="light"] .snx-arch-inspector-index {
+  color: #4c7386;
+}
+
+html[data-theme="light"] .snx-arch-pick.is-inspected .snx-arch-card {
+  fill: #d9eef8;
+  stroke: #087ca5;
+}
+
+@media (max-width: 600px) {
+  .snx-arch-inspector-index {
+    flex-direction: column;
+  }
+
+  .snx-arch-inspector {
+    padding: 13px;
+  }
+}

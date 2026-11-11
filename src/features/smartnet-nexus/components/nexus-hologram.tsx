@@ -24,7 +24,8 @@ export type HologramTopic =
   | 'cloud'
   | 'ai'
   | 'education'
-  | 'business';
+  | 'business'
+  | 'roads';
 
 export type VoiceState =
   | 'idle'
@@ -43,6 +44,15 @@ const TOPICS: Record<HologramTopic, {
   nodes: string[];
   satellites: Satellite[];
 }> = {
+  roads: {
+    title: 'ROAD FUNDING GAP ANALYSIS',
+    nodes: ['ROAD CONDITION', 'SCENARIO MODEL', 'FUNDING CASE'],
+    satellites: [
+      { label: 'ROAD DATA', Icon: Database },
+      { label: 'SCENARIOS', Icon: Workflow },
+      { label: 'FUNDING', Icon: Network },
+    ],
+  },
   general: {
     title: 'SMARTNET INTELLIGENCE',
     nodes: ['ENGINEER', 'CONNECT', 'ENABLE'],

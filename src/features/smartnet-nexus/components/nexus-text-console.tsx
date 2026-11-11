@@ -22,6 +22,12 @@ const PROMPTS = [
 function detectTopic(text: string): HologramTopic {
   const value = text.toLowerCase();
 
+  if (/road funding gap|\brfg\b|road maintenance|road infrastructure|road authority/.test(value)) {
+    return 'roads';
+  }
+
+
+
   if (/cloud|azure|kubernetes|devops|infrastructure/.test(value)) {
     return 'cloud';
   }

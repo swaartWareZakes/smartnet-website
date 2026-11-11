@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 const CHANNELS = [
   ['USER EXPERIENCE', 'WEB / MOBILE'],
   ['PARTNER SYSTEMS', 'EXTERNAL APIs'],
@@ -25,6 +27,37 @@ const OPERATIONS = [
   ['OBSERVABILITY', 'HEALTH / TELEMETRY'],
 ];
 
+
+// V13_NODE_DETAILS — illustrative architecture explanations.
+const V13_NODE_DETAILS: Record<string, string> = {
+  'USER EXPERIENCE':
+    'Web and mobile interfaces through which people interact with business systems.',
+  'PARTNER SYSTEMS':
+    'External platforms connected through authenticated and documented integrations.',
+  'DATA SOURCES':
+    'Structured records, imported files and business events that support the workflow.',
+  'API GATEWAY':
+    'Entry point for service requests, API routing and interface contracts.',
+  'IDENTITY & ACCESS':
+    'Authentication, authorisation and role-based access controls.',
+  'EVENT ORCHESTRATION':
+    'Asynchronous events and workflows connecting independent services.',
+  'SOFTWARE':
+    'Custom applications, operational workflows, secure APIs and business platforms.',
+  'CLOUD':
+    'Infrastructure design, container platforms, deployment automation and resilience.',
+  'EDUCATION':
+    'Digital learning applications and responsible AI-assisted education initiatives.',
+  'BUSINESS':
+    'Business technology consulting, connected operations and technology sourcing.',
+  'CLOUD RUNTIME':
+    'Hosting, container execution, scaling and application runtime operations.',
+  'DATA SERVICES':
+    'Storage, transactional databases, information management and reporting foundations.',
+  'OBSERVABILITY':
+    'Logs, metrics, telemetry and operational diagnostics supporting reliability.',
+};
+
 type Props = {
   active: number;
   onSelect: (index: number) => void;
@@ -36,6 +69,27 @@ export function ArchitectureGraph({
   onSelect,
   reduced,
 }: Props) {
+  const [inspected, setInspected] = useState<{
+    name: string;
+    detail: string;
+    atStep: number;
+  } | null>(null);
+
+  const currentName = DOMAINS[active]?.[0] ?? 'SOFTWARE';
+
+  const selected =
+    inspected?.atStep === active
+      ? inspected
+      : {
+          name: currentName,
+          detail: V13_NODE_DETAILS[currentName],
+          atStep: active,
+        };
+
+  function inspect(name: string, detail: string) {
+    setInspected({ name, detail, atStep: active });
+  }
+
   const centerY = 135 + active * 84;
   const operationsY = [160, 266, 372, 372][active];
 
@@ -173,7 +227,22 @@ export function ArchitectureGraph({
           {CHANNELS.map(([name, detail], i) => {
             const y = 127 + i * 104;
             return (
-              <g key={name}>
+              <g
+                key={name}
+                className={`snx-arch-pick ${
+                  selected.name === name ? 'is-inspected' : ''
+                }`}
+                role="button"
+                tabIndex={0}
+                aria-label={`Inspect ${name}`}
+                onClick={() => inspect(name, detail)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    inspect(name, detail);
+                  }
+                }}
+              >
                 <rect
                   x="38"
                   y={y}
@@ -209,7 +278,22 @@ export function ArchitectureGraph({
           {PLATFORM.map(([name, detail], i) => {
             const y = 127 + i * 104;
             return (
-              <g key={name}>
+              <g
+                key={name}
+                className={`snx-arch-pick ${
+                  selected.name === name ? 'is-inspected' : ''
+                }`}
+                role="button"
+                tabIndex={0}
+                aria-label={`Inspect ${name}`}
+                onClick={() => inspect(name, detail)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    inspect(name, detail);
+                  }
+                }}
+              >
                 <rect
                   x="253"
                   y={y}
@@ -252,7 +336,10 @@ export function ArchitectureGraph({
                 role="button"
                 tabIndex={0}
                 aria-label={`Explore ${name.toLowerCase()}`}
-                onClick={() => onSelect(index)}
+                onClick={() => {
+                  inspect(name, detail);
+                  onSelect(index);
+                }}
                 onKeyDown={(event) => {
                   if (
                     event.key === 'Enter' ||
@@ -306,7 +393,22 @@ export function ArchitectureGraph({
           {OPERATIONS.map(([name, detail], index) => {
             const y = 128 + index * 106;
             return (
-              <g key={name}>
+              <g
+                key={name}
+                className={`snx-arch-pick ${
+                  selected.name === name ? 'is-inspected' : ''
+                }`}
+                role="button"
+                tabIndex={0}
+                aria-label={`Inspect ${name}`}
+                onClick={() => inspect(name, detail)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    inspect(name, detail);
+                  }
+                }}
+              >
                 <rect
                   x="803"
                   y={y}
@@ -364,6 +466,19 @@ export function ArchitectureGraph({
             strokeWidth="1"
           />
         </svg>
+
+        <div className="snx-arch-inspector" aria-live="polite">
+          <div className="snx-arch-inspector-index">
+            <span>SELECTED SYSTEM MODULE</span>
+            <span>INTERACTIVE ARCHITECTURE</span>
+          </div>
+          <strong>{selected.name}</strong>
+          <p>
+            {V13_NODE_DETAILS[selected.name] ??
+              selected.detail}
+          </p>
+        </div>
+
       </div>
 
       <div className="snx-arch-legend">

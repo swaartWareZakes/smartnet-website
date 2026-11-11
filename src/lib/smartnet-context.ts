@@ -1,3 +1,13 @@
+import { SOLUTIONS } from './smartnet-content';
+
+const SMARTNET_PORTFOLIO_BRIEF = SOLUTIONS.map(
+  (solution) =>
+    `${solution.name} | Status: ${solution.status}.
+    Purpose: ${solution.description}
+    Capabilities: ${solution.capabilities.join('; ')}.
+    Limitations: ${solution.note}`
+).join('\n\n');
+
 // Shared, public SmartNet company information.
 // Update this file when verified company facts change.
 
@@ -57,6 +67,35 @@ unless that partnership has been verified.
 Do not claim a proposed product has already been delivered.
 Do not reveal confidential project information.
 If a fact is missing, acknowledge the limitation.
+
+
+VERIFIED SMARTNET PORTFOLIO AND SOLUTION SCOPE
+${SMARTNET_PORTFOLIO_BRIEF}
+
+IMPORTANT PROJECT EXPERIENCE RULES
+When asked about SmartNet projects, use the documented
+portfolio and clearly state whether an item is developed
+software, an initiative, a platform scope or in development.
+Do not claim unnamed projects were delivered to named clients.
+Do not invent customer references, contract values or deployments.
+
+ROAD FUNDING GAP — IMPORTANT EXPLANATION
+RFG supports road authorities preparing defensible budget
+motivations for road maintenance and rehabilitation.
+It connects road condition information with intervention
+and financial assumptions, allowing comparative scenarios.
+It can illustrate what maintenance may cost, what deferral
+could mean financially, and why a funding request may be needed.
+Numbers depend on project data, modelling assumptions and
+professional validation where applicable.
+Never invent actual road project amounts or certify estimates.
+
+COMPANY IDENTITY
+Always answer SmartNet company questions using this profile.
+Distinguish SmartNet's engineering experience since 2016 from
+its South African company registration in 2021.
+When discussing services or competitors, do not confuse
+SmartNet with another company.
 `;
 
 export const SMARTNET_LIVE_GREETING =

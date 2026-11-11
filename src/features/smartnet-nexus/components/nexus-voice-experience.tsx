@@ -59,6 +59,12 @@ Finish the greeting and wait for the visitor to speak.
 function topicFromText(text: string): HologramTopic {
   const value = text.toLowerCase();
 
+  if (/road funding gap|\brfg\b|road maintenance|road infrastructure|road authority/.test(value)) {
+    return 'roads';
+  }
+
+
+
   if (/school|student|learner|education|university|training/.test(value)) {
     return 'education';
   }
@@ -376,7 +382,7 @@ export function NexusVoiceExperience({
 
               const namedTopics = Array.from(
                 spokenRef.current.matchAll(
-                  /software|applications?|cloud|azure|infrastructure|kubernetes|devops|artificial intelligence|\bai\b|education|learning|school|business|digital transformation/gi
+                  /software|applications?|cloud|azure|infrastructure|kubernetes|devops|artificial intelligence|\bai\b|education|learning|school|business|digital transformation|road funding gap|road maintenance|road infrastructure|rfg/gi
                 )
               );
 
