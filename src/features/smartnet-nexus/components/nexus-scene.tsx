@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, type RefObject } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useReducedMotion } from 'motion/react';
 import * as THREE from 'three';
@@ -8,9 +8,20 @@ import * as THREE from 'three';
 const NODE_COUNT = 42;
 const SIGNAL_COUNT = 48;
 
-function Network({ reduced }: { reduced: boolean }) {
+function Network({
+  reduced,
+  progress,
+}: {
+  reduced: boolean;
+  progress: RefObject<number>;
+}) {
   const assembly = useRef<THREE.Group>(null);
+  // SMARTNET NEXUS V4 SCROLL CHOREOGRAPHY
   const core = useRef<THREE.Group>(null);
+  const field = useRef<THREE.Group>(null);
+  const orbits = useRef<THREE.Group>(null);
+  const scrollSmooth = useRef(0);
+
   const signals = useRef<THREE.InstancedMesh>(null);
 
   const dummy = useMemo(() => new THREE.Object3D(), []);
@@ -91,30 +102,154 @@ function Network({ reduced }: { reduced: boolean }) {
     const t = state.clock.elapsedTime;
     const dt = Math.min(delta, 0.05);
 
+    // Smooth the incoming scroll value to avoid abrupt movement.
+    scrollSmooth.current = THREE.MathUtils.damp(
+      scrollSmooth.current,
+      progress.current,
+      3.2,
+      dt
+    );
+
+    const p = scrollSmooth.current;
+
+    const ease = (a: number, b: number) => {
+      const value = THREE.MathUtils.clamp(
+        (p - a) / (b - a),
+        0,
+        1
+      );
+      return value * value * (3 - 2 * value);
+    };
+
+    // Section 2: unfold the computational network.
+    const unfold = ease(0.10, 0.33);
+
+    // Section 3: expand into an orbital structure.
+    const orbit = ease(0.34, 0.61);
+
+    // Section 4: reassemble the system.
+    const reassemble = ease(0.63, 0.90);
+
+    const expansion =
+      (unfold * 0.40 + orbit * 0.22) *
+      (1 - reassemble * 0.82);
+
     if (assembly.current) {
-      assembly.current.rotation.y += dt * 0.09;
+      assembly.current.rotation.y += dt * (
+        0.09 + orbit * 0.18
+      );
 
       assembly.current.rotation.x = THREE.MathUtils.damp(
         assembly.current.rotation.x,
-        Math.sin(t * 0.22) * 0.07 - state.pointer.y * 0.15,
+        Math.sin(t * 0.22) * 0.07 +
+          orbit * 0.30 -
+          state.pointer.y * 0.10,
         1.8,
         dt
       );
 
       assembly.current.rotation.z = THREE.MathUtils.damp(
         assembly.current.rotation.z,
-        state.pointer.x * 0.09,
+        state.pointer.x * 0.07 +
+          orbit * 0.13,
         1.8,
         dt
       );
 
-      assembly.current.position.y = Math.sin(t * 0.45) * 0.08;
+      // Move the sculpture between left and right
+      // so it complements each editorial chapter.
+      const targetX =
+        1.20 - 3.1 * orbit + 3.1 * reassemble;
+
+      assembly.current.position.x = THREE.MathUtils.damp(
+        assembly.current.position.x,
+        targetX,
+        2.6,
+        dt
+      );
+
+      assembly.current.position.y = Math.sin(t * 0.45) * 0.07;
+    }
+
+    if (field.current) {
+      const targetScale = 1 + expansion;
+
+      field.current.scale.setScalar(
+        THREE.MathUtils.damp(
+          field.current.scale.x,
+          targetScale,
+          3.3,
+          dt
+        )
+      );
+
+      field.current.rotation.z = THREE.MathUtils.damp(
+        field.current.rotation.z,
+        orbit * 0.62 - reassemble * 0.54,
+        2.2,
+        dt
+      );
+
+      field.current.rotation.x = THREE.MathUtils.damp(
+        field.current.rotation.x,
+        orbit * 0.55 - reassemble * 0.45,
+        2.2,
+        dt
+      );
     }
 
     if (core.current) {
-      core.current.rotation.y -= dt * 0.21;
+      core.current.rotation.y -= dt * (
+        0.21 + orbit * 0.25
+      );
+
       core.current.rotation.z += dt * 0.055;
+
+      const targetCoreScale =
+        1 - unfold * 0.40 -
+        orbit * 0.20 +
+        reassemble * 0.58;
+
+      core.current.scale.setScalar(
+        THREE.MathUtils.damp(
+          core.current.scale.x,
+          Math.max(0.35, targetCoreScale),
+          3,
+          dt
+        )
+      );
     }
+
+    if (orbits.current) {
+      orbits.current.rotation.y += dt * (
+        0.12 + orbit * 0.45
+      );
+
+      orbits.current.rotation.x += dt * 0.08;
+
+      const targetOrbitScale =
+        0.72 + orbit * 0.72 -
+        reassemble * 0.42;
+
+      orbits.current.scale.setScalar(
+        THREE.MathUtils.damp(
+          orbits.current.scale.x,
+          targetOrbitScale,
+          3,
+          dt
+        )
+      );
+    }
+
+    // Give the expanding network more camera space.
+    state.camera.position.z = THREE.MathUtils.damp(
+      state.camera.position.z,
+      9 + unfold * 1.3 +
+        orbit * 1.1 -
+        reassemble * 1.7,
+      2,
+      dt
+    );
 
     // Animate luminous data packets along network edges.
     if (signals.current) {
@@ -147,6 +282,7 @@ function Network({ reduced }: { reduced: boolean }) {
   return (
     <group ref={assembly}>
 
+      <group ref={field}>
       {/* Network connections */}
       <lineSegments geometry={network.geometry}>
         <lineBasicMaterial
@@ -187,6 +323,31 @@ function Network({ reduced }: { reduced: boolean }) {
           toneMapped={false}
         />
       </instancedMesh>
+
+      </group>
+
+      {/* New spatial orbit architecture */}
+      <group ref={orbits}>
+        <mesh rotation={[Math.PI / 2, 0.25, 0]}>
+          <torusGeometry args={[1.65, 0.01, 6, 180]} />
+          <meshBasicMaterial
+            color="#72e6ff"
+            transparent
+            opacity={0.36}
+            depthWrite={false}
+          />
+        </mesh>
+
+        <mesh rotation={[0.55, Math.PI / 2, 0.8]}>
+          <torusGeometry args={[1.85, 0.008, 6, 180]} />
+          <meshBasicMaterial
+            color="#238ebc"
+            transparent
+            opacity={0.28}
+            depthWrite={false}
+          />
+        </mesh>
+      </group>
 
       {/* Computational core */}
       <group ref={core}>
@@ -251,7 +412,11 @@ function Network({ reduced }: { reduced: boolean }) {
   );
 }
 
-export default function NexusScene() {
+export default function NexusScene({
+  progress,
+}: {
+  progress: RefObject<number>;
+}) {
   const reduced = useReducedMotion();
 
   return (
@@ -286,7 +451,7 @@ export default function NexusScene() {
         color="#29aaf0"
       />
 
-      <Network reduced={!!reduced} />
+      <Network reduced={!!reduced} progress={progress} />
     </Canvas>
   );
 }

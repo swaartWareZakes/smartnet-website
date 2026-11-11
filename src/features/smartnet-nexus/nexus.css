@@ -477,3 +477,278 @@
     transition: none;
   }
 }
+
+
+/* SMARTNET NEXUS V4 SCROLL CHOREOGRAPHY */
+
+.snx-page > .snx-nav {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 20;
+  background: linear-gradient(
+    180deg,
+    rgba(3, 12, 20, .95),
+    rgba(3, 12, 20, .25)
+  );
+}
+
+/* Move the visual overlays into the sticky scene. */
+.snx-page::before,
+.snx-page::after {
+  display: none;
+}
+
+.snx-journey {
+  position: relative;
+  isolation: isolate;
+}
+
+.snx-journey-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 100svh;
+  overflow: hidden;
+  background: #030c14;
+}
+
+.snx-journey-sticky .snx-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.snx-journey-sticky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(#70d9ff0a 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      #70d9ff0a 1px,
+      transparent 1px
+    );
+  background-size: 80px 80px;
+}
+
+.snx-journey-sticky::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(3, 12, 20, .72) 0%,
+    rgba(3, 12, 20, .10) 50%,
+    rgba(3, 12, 20, .10) 100%
+  );
+}
+
+/* Panels overlay the sticky WebGL scene. */
+.snx-journey-panels {
+  position: relative;
+  z-index: 2;
+  margin-top: -100svh;
+  pointer-events: none;
+}
+
+.snx-journey-panel {
+  position: relative;
+  min-height: 100svh;
+}
+
+.snx-main.snx-journey-panel {
+  min-height: 100svh;
+  padding-top: 130px;
+  padding-bottom: 85px;
+}
+
+.snx-journey-panel a {
+  pointer-events: auto;
+}
+
+.snx-journey-next {
+  display: inline-block;
+  width: fit-content;
+  margin-top: 35px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #64dfff;
+  color: #71e1ff;
+  text-decoration: none;
+  font: 10px monospace;
+  letter-spacing: .16em;
+}
+
+.snx-story-panel {
+  display: flex;
+  align-items: center;
+  padding: 15vh 8%;
+}
+
+.snx-story-panel--right {
+  justify-content: flex-end;
+}
+
+.snx-story-copy {
+  max-width: 490px;
+  padding: 24px 0;
+  background: linear-gradient(
+    90deg,
+    rgba(3, 12, 20, .32),
+    transparent
+  );
+}
+
+.snx-story-kicker,
+.snx-story-footer,
+.snx-journey-index {
+  font: 10px monospace;
+  letter-spacing: .15em;
+  color: #6edfff;
+}
+
+.snx-story-copy h2 {
+  margin: 25px 0;
+  font-size: clamp(48px, 6.2vw, 110px);
+  font-weight: 500;
+  line-height: .98;
+  letter-spacing: -.075em;
+  color: #f0f9ff;
+}
+
+.snx-story-copy h2 em {
+  font-style: normal;
+  color: #6de0ff;
+}
+
+.snx-story-copy p {
+  max-width: 400px;
+  color: #b6cdd8;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.snx-story-footer {
+  display: block;
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid #ffffff30;
+  color: #8eaebe;
+}
+
+.snx-journey-index {
+  position: absolute;
+  z-index: 4;
+  bottom: 46px;
+  left: 7%;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  color: #80aabc;
+}
+
+.snx-journey-index strong {
+  color: #d2f7ff;
+  font-weight: 500;
+}
+
+.snx-journey-rail {
+  position: absolute;
+  z-index: 4;
+  top: 50%;
+  right: 3%;
+  transform: translateY(-50%);
+  display: grid;
+  gap: 20px;
+}
+
+.snx-journey-rail a {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  pointer-events: auto;
+}
+
+.snx-journey-rail a span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1px solid #89b5c8;
+  transition: all .3s;
+}
+
+.snx-journey-rail a.is-active span {
+  width: 11px;
+  height: 11px;
+  background: #70e4ff;
+  border-color: #70e4ff;
+  box-shadow: 0 0 17px #55dfff;
+}
+
+.snx-process {
+  position: relative;
+  z-index: 5;
+  background: #06121c;
+}
+
+/* Mobile: keep the sculpture visible above the copy. */
+@media (max-width: 760px) {
+  .snx-journey-rail {
+    display: none;
+  }
+
+  .snx-journey-sticky::after {
+    background: linear-gradient(
+      0deg,
+      #030c14ed 0%,
+      #030c1440 55%,
+      transparent 100%
+    );
+  }
+
+  .snx-main.snx-journey-panel {
+    justify-content: flex-end;
+    padding: 120px 7% 80px;
+  }
+
+  .snx-story-panel,
+  .snx-story-panel--right {
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding: 100px 7% 85px;
+  }
+
+  .snx-story-copy {
+    max-width: 100%;
+    padding: 22px 0;
+    background: linear-gradient(
+      90deg,
+      #030c14c9,
+      #030c1450
+    );
+  }
+
+  .snx-story-copy h2 {
+    font-size: clamp(45px, 11vw, 76px);
+  }
+
+  .snx-story-copy p {
+    font-size: 14px;
+  }
+
+  .snx-journey-index {
+    bottom: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snx-journey-rail a span {
+    transition: none;
+  }
+}
