@@ -1,4 +1,5 @@
 'use client';
+import { companyContext, nexusHeaders, recordMessage, visitorState } from '@/lib/nexus-visitor';
 
 import { useEffect, useRef, useState } from 'react';
 import { ArrowUp, LoaderCircle } from 'lucide-react';
@@ -82,13 +83,14 @@ export function NexusTextConsole({ disabled, onTopic }: Props) {
     setError('');
     setDraft('');
 
-    const history = messages.slice(-8);
+    const history = visitorState().messages.slice(-8).map(({ role, content }) => ({ role, content: content.slice(0, 1500) }));
 
     setMessages((previous) => [
       ...previous,
       { role: 'user', content: message },
     ]);
 
+    recordMessage('user', message, 'text');
     onTopic(detectTopic(message));
 
     const controller = new AbortController();
@@ -102,13 +104,12 @@ export function NexusTextConsole({ disabled, onTopic }: Props) {
     try {
       const response = await fetch('/api/nexus/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: await nexusHeaders(),
         signal: controller.signal,
         body: JSON.stringify({
           message,
           history,
+          context: companyContext(),
         }),
       });
 
@@ -126,6 +127,7 @@ export function NexusTextConsole({ disabled, onTopic }: Props) {
         { role: 'assistant', content: data.answer! },
       ]);
 
+      recordMessage('assistant', data.answer, 'text');
       const topic = detectTopic(data.answer);
       if (topic !== 'general') onTopic(topic);
     } catch (cause) {

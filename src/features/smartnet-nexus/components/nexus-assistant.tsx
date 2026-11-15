@@ -1,4 +1,6 @@
 'use client';
+import { CompanyConsultation } from './company-consultation';
+import { companyContext, nexusHeaders, recordMessage, visitorState } from '@/lib/nexus-visitor';
 
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -73,13 +75,14 @@ export function NexusAssistant() {
     setError('');
     setLoading(true);
 
-    const history = messages.slice(-8);
+    const history = visitorState().messages.slice(-8).map(({ role, content }) => ({ role, content: content.slice(0, 1500) }));
 
     setMessages((current) => [
       ...current,
       { role: 'user', content: message },
     ]);
 
+    recordMessage('user', message, 'text');
     const controller = new AbortController();
     const timeoutId = window.setTimeout(
       () => controller.abort(),
@@ -90,8 +93,8 @@ export function NexusAssistant() {
       const response = await fetch('/api/nexus/chat', {
         method: 'POST',
         signal: controller.signal,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, history }),
+        headers: await nexusHeaders(),
+        body: JSON.stringify({ message, history, context: companyContext() }),
       });
 
       const data: { answer?: string; error?: string } =
@@ -101,6 +104,7 @@ export function NexusAssistant() {
         throw new Error(data.error || 'Unable to respond.');
       }
 
+      recordMessage('assistant', data.answer, 'text');
       setMessages((current) => [
         ...current,
         { role: 'assistant', content: data.answer! },
@@ -203,7 +207,8 @@ export function NexusAssistant() {
                   <span>TEXT MODE / LIVE AI</span>
                 </div>
 
-                <div className="snx-ai-messages"
+                <CompanyConsultation disabled={loading} />
+              <div className="snx-ai-messages"
                   aria-live="polite">
                   {messages.map((item, index) => (
                     <div

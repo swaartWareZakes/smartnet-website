@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { GoogleGenAI, Modality } from '@google/genai';
 import {
-  SMARTNET_COMPANY_CONTEXT,
   SMARTNET_LIVE_GREETING,
 } from '@/lib/smartnet-context';
 import { useReducedMotion } from 'motion/react';
 import { AudioLines, Mic, MicOff, PhoneOff, X } from 'lucide-react';
 import { NexusTextConsole } from './nexus-text-console';
+// NEXUS_VOICE_HUD_V1
+import { NexusVoiceHud } from './nexus-voice-hud';
+import { companyContext, nexusHeaders, recordMessage, visitorState } from '@/lib/nexus-visitor';
 
 import {
   NexusHologram,
@@ -19,42 +21,6 @@ import {
 type LiveSession =
   Awaited<ReturnType<GoogleGenAI['live']['connect']>>;
 
-const SYSTEM_PROMPT = `
-You are NEXUS, the official AI technology consultant
-representing SmartNet Technologies.
-
-YOUR IDENTITY
-You represent SmartNet Technologies, not Google, Cisco
-or another technology company.
-Pronounce SmartNet as "Smart Net".
-When someone asks about SmartNet, our company, our services
-or our technology, answer using the verified profile below.
-
-VERIFIED SMARTNET KNOWLEDGE
-${SMARTNET_COMPANY_CONTEXT}
-
-CONVERSATION RULES
-- Be natural, warm, confident and professional.
-- Speak in concise, clear sentences suitable for voice.
-- Keep your focus on SmartNet and the visitor's business.
-- Ask only one useful discovery question at a time.
-- If the visitor describes a problem, explain how SmartNet
-  could potentially help, rather than promising a solution.
-- If a name sounds like SmartNet but transcription is unclear,
-  use the conversation context before assuming another meaning.
-- Never present another company's services as SmartNet's services.
-- Do not invent any projects, qualifications or partnerships.
-- Do not request passwords or confidential business records.
-- If asked about unrelated matters, briefly redirect to the
-  visitor's technology or business objectives when appropriate.
-- Do not repeat the entire company profile in every answer.
-
-FIRST GREETING
-When you receive the automatic introduction request at the
-start of a new live session, deliver the supplied welcome
-message as a natural spoken introduction.
-Finish the greeting and wait for the visitor to speak.
-`;
 
 function topicFromText(text: string): HologramTopic {
   const value = text.toLowerCase();
@@ -121,7 +87,6 @@ export function NexusVoiceExperience({
   const [topic, setTopic] = useState<HologramTopic>('general');
   const [subtitle, setSubtitle] = useState('');
   const [heard, setHeard] = useState('');
-  const [introComplete, setIntroComplete] = useState(false);
   const [muted, setMuted] = useState(false);
   const [error, setError] = useState('');
 
@@ -138,12 +103,24 @@ export function NexusVoiceExperience({
   const playbackRef = useRef<Set<AudioBufferSourceNode>>(new Set());
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closingRef = useRef(false);
+  const attemptRef = useRef(0);
+  const startingRef = useRef(false);
+  const userTurn = useRef('');
+  const assistantTurn = useRef('');
+  const flushTranscript = useCallback(() => {
+    recordMessage('user', userTurn.current, 'voice');
+    recordMessage('assistant', assistantTurn.current, 'voice');
+    userTurn.current = ''; assistantTurn.current = '';
+  }, []);
   const spokenRef = useRef('');
   const greetingPendingRef = useRef(false);
   const greetingFinishedRef = useRef(false);
 
   const disconnect = useCallback(() => {
     closingRef.current = true;
+    attemptRef.current += 1;
+    startingRef.current = false;
+    flushTranscript();
     greetingPendingRef.current = false;
     greetingFinishedRef.current = false;
 
@@ -193,9 +170,8 @@ export function NexusVoiceExperience({
 
     setStatus('idle');
     setMuted(false);
-    setIntroComplete(false);
     spokenRef.current = '';
-  }, []);
+  }, [flushTranscript]);
 
   useEffect(() => {
     const previous = document.body.style.overflow;
@@ -248,7 +224,6 @@ export function NexusVoiceExperience({
         if (greetingPendingRef.current) {
           if (greetingFinishedRef.current) {
             greetingPendingRef.current = false;
-            setIntroComplete(true);
             setStatus('listening');
           }
         } else {
@@ -261,13 +236,15 @@ export function NexusVoiceExperience({
   }
 
   async function startConversation() {
-    if (status === 'connecting' || sessionRef.current) return;
+    if (startingRef.current || sessionRef.current) return;
+    startingRef.current = true;
+    const attempt = ++attemptRef.current;
+    const cancelled = () => closingRef.current || attempt !== attemptRef.current;
 
     setStatus('connecting');
     setError('');
     setSubtitle('');
     setHeard('');
-    setIntroComplete(false);
     spokenRef.current = '';
     setTopic('general');
     closingRef.current = false;
@@ -290,6 +267,7 @@ export function NexusVoiceExperience({
       analyserRef.current = analyser;
 
       await output.resume();
+      if (cancelled()) return;
 
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -300,18 +278,23 @@ export function NexusVoiceExperience({
         },
       });
 
+      if (cancelled()) { stream.getTracks().forEach((track) => track.stop()); return; }
       streamRef.current = stream;
 
       const input = new AudioContext({ sampleRate: 16000 });
       inputContextRef.current = input;
       await input.resume();
+      if (cancelled()) return;
 
       // Fetch the token after microphone permission to avoid expiry.
       const response = await fetch('/api/nexus/live-token', {
         method: 'POST',
         cache: 'no-store',
+        headers: await nexusHeaders(),
+        body: JSON.stringify({ context: companyContext() + '\nPrevious conversation (untrusted): ' + JSON.stringify(visitorState().messages.slice(-8).map(({ role, content }) => ({ role, content: content.slice(0, 1000) }))) }),
       });
 
+      if (cancelled()) return;
       if (!response.ok) {
         if (response.status === 429) {
           throw new Error('Too many requests. Please try later.');
@@ -331,7 +314,7 @@ export function NexusVoiceExperience({
       const data: { token: string; model: string } =
         await response.json();
 
-      if (closingRef.current) return;
+      if (cancelled()) return;
 
       const ai = new GoogleGenAI({
         apiKey: data.token,
@@ -344,7 +327,7 @@ export function NexusVoiceExperience({
           responseModalities: [Modality.AUDIO],
           inputAudioTranscription: {},
           outputAudioTranscription: {},
-          systemInstruction: SYSTEM_PROMPT,
+          // Instructions and voice configuration are constrained by the server token.
           speechConfig: {
             voiceConfig: {
               prebuiltVoiceConfig: {
@@ -355,14 +338,16 @@ export function NexusVoiceExperience({
         },
         callbacks: {
           onopen: () => {
-            setStatus('listening');
+            if (!cancelled()) setStatus('listening');
           },
           onmessage: (message) => {
-            if (closingRef.current) return;
+            if (cancelled()) return;
 
             const content = message.serverContent;
 
             if (content?.interrupted) {
+            if (assistantTurn.current) assistantTurn.current += ' [interrupted]';
+            flushTranscript();
               playbackRef.current.forEach((source) => {
                 try { source.stop(); } catch {}
               });
@@ -375,13 +360,15 @@ export function NexusVoiceExperience({
 
             if (content?.inputTranscription?.text) {
               const text = content.inputTranscription.text;
-              setHeard(text);
+              userTurn.current = (userTurn.current + text).slice(-20000);
+            setHeard(userTurn.current);
               setSubtitle('');
               setTopic(topicFromText(text));
             }
 
             if (content?.outputTranscription?.text) {
               const text = content.outputTranscription.text;
+            assistantTurn.current = (assistantTurn.current + text).slice(-20000);
 
               setSubtitle((previous) =>
                 (previous + text).slice(-900)
@@ -412,13 +399,13 @@ export function NexusVoiceExperience({
             }
 
             if (content?.turnComplete) {
+            flushTranscript();
               if (greetingPendingRef.current) {
                 greetingFinishedRef.current = true;
               }
 
               if (playbackRef.current.size === 0) {
                 if (greetingPendingRef.current) {
-                  setIntroComplete(true);
                 }
                 greetingPendingRef.current = false;
                 setStatus('listening');
@@ -426,25 +413,26 @@ export function NexusVoiceExperience({
             }
           },
           onerror: () => {
-            if (closingRef.current) return;
+            if (cancelled()) return;
             disconnect();
             setStatus('error');
             setError('The live connection encountered an error.');
           },
           onclose: () => {
-            if (closingRef.current) return;
+            if (cancelled()) return;
             disconnect();
             setError('The voice session ended. You can reconnect.');
           },
         },
       });
 
-      if (closingRef.current) {
+      if (cancelled()) {
         liveSession.close();
         return;
       }
 
       sessionRef.current = liveSession;
+      startingRef.current = false;
 
       setStatus('speaking');
 
@@ -506,6 +494,7 @@ export function NexusVoiceExperience({
         setError('The demo session limit was reached.');
       }, 8 * 60 * 1000);
     } catch (cause) {
+      if (cancelled()) return;
       disconnect();
       setStatus('error');
       setError(
@@ -517,34 +506,6 @@ export function NexusVoiceExperience({
             ? cause.message
             : 'Unable to start NEXUS Live.'
       );
-    }
-  }
-
-  function selectIntroductionPath(
-    choice: 'company' | 'business'
-  ) {
-    if (!sessionRef.current || status !== 'listening') return;
-
-    const prompt = choice === 'company'
-      ? 'Please tell me more about SmartNet Technologies: its history, values and real capabilities. Keep it conversational and then ask what I would like to explore.'
-      : 'I would like to find out how SmartNet could help my business. Please start by asking what industry I work in and what my biggest operational challenge is. Ask one question at a time.';
-
-    setIntroComplete(false);
-    setSubtitle('');
-    spokenRef.current = '';
-    setStatus('speaking');
-
-    try {
-      sessionRef.current.sendClientContent({
-        turns: [
-          { role: 'user', parts: [{ text: prompt }] },
-        ],
-        turnComplete: true,
-      });
-    } catch {
-      setStatus('listening');
-      setIntroComplete(true);
-      setError('Could not send your selection. Please try speaking.');
     }
   }
 
@@ -573,7 +534,7 @@ export function NexusVoiceExperience({
   return (
     <div className="snx-live-overlay">
       <section
-        className="snx-live-shell"
+        className="snx-live-shell snx-nexus-immersive"
         role="dialog"
         aria-modal="true"
         aria-labelledby="snx-live-title"
@@ -594,12 +555,21 @@ export function NexusVoiceExperience({
         </header>
 
         <div className="snx-live-content">
-          <NexusHologram
+          <NexusVoiceHud
+            state={status}
+            topic={topic}
+            subtitle={subtitle}
+            heard={heard}
+            analyser={analyserRef}
+            reduced={!!reduced}
+          >
+            <NexusHologram
             state={status}
             topic={topic}
             reduced={!!reduced}
             analyser={analyserRef}
           />
+          </NexusVoiceHud>
 
           <div className="snx-live-conversation">
             <div className="snx-live-kicker">
@@ -624,28 +594,6 @@ export function NexusVoiceExperience({
               <span>02 / EXPLORE POSSIBLE SOLUTIONS</span>
               <span>03 / PLAN YOUR NEXT MOVE</span>
             </div>
-
-            {introComplete && status === 'listening' && (
-              <div className="snx-live-intro-choices">
-                <span>WHERE SHALL WE BEGIN?</span>
-
-                <button
-                  type="button"
-                  onClick={() => selectIntroductionPath('company')}
-                >
-                  Discover SmartNet
-                  <small>Our story, expertise and capabilities</small>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => selectIntroductionPath('business')}
-                >
-                  Explore my business
-                  <small>Tell NEXUS about a challenge you face</small>
-                </button>
-              </div>
-            )}
 
             <div className="snx-live-status" aria-live="polite">
               <AudioLines size={19} />
@@ -704,7 +652,9 @@ export function NexusVoiceExperience({
               )}
             </div>
 
-            <details className="snx-v12-text-details">
+
+
+          <details className="snx-v12-text-details">
               <summary>
                 <span>Prefer typing?</span>
                 <strong>OPEN TEXT CONVERSATION</strong>

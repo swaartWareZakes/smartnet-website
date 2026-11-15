@@ -13,6 +13,10 @@ SMARTNET TECHNOLOGIES — VERIFIED COMPANY PROFILE 2026
 
 LEGAL IDENTITY AND HISTORY
 Official company name: SmartNet Technologies.
+Former brand name: SwaartWare (also written swaartware).
+The business moved from SwaartWare to SmartNet. Use SmartNet for current branding.
+Historical SwaartWare projects may be discussed when supported by project evidence;
+the name change alone does not establish delivery status or client relationships.
 Company registration: 2021/570418/07, South Africa.
 Location: Gauteng, South Africa.
 Website: smartnetsa.co.za.
@@ -282,8 +286,5 @@ SmartNet with another company.
 
 export const SMARTNET_LIVE_GREETING =
   "Welcome to SmartNet Technologies. I'm NEXUS, your AI technology consultant. " +
-  "We've been engineering software and technology solutions since 2016. " +
-  "Our expertise includes software, cloud, applied AI, education technology " +
-  "and digital transformation. " +
-  "Would you like to hear more about SmartNet, " +
-  "or explore how SmartNet could help your business?";
+  "Would you like to hear about SmartNet, or talk through a business challenge? " +
+  "Tell me where you would like to begin.";
