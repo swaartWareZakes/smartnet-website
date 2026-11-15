@@ -1,4 +1,10 @@
 'use client';
+// NEXUS_VOICE_RESEARCH_V1
+import { NEXUS_RESEARCH_TOOLS } from '@/lib/nexus-research-tools';
+import {
+  useVoiceCompanyResearch,
+  VoiceResearchPanel,
+} from './voice-company-research';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { GoogleGenAI, Modality } from '@google/genai';
@@ -116,7 +122,11 @@ export function NexusVoiceExperience({
   const greetingPendingRef = useRef(false);
   const greetingFinishedRef = useRef(false);
 
+  const voiceResearch = useVoiceCompanyResearch();
+  const cancelResearch = voiceResearch.cancelAll;
+
   const disconnect = useCallback(() => {
+    cancelResearch();
     closingRef.current = true;
     attemptRef.current += 1;
     startingRef.current = false;
@@ -171,7 +181,7 @@ export function NexusVoiceExperience({
     setStatus('idle');
     setMuted(false);
     spokenRef.current = '';
-  }, [flushTranscript]);
+  }, [flushTranscript, cancelResearch]);
 
   useEffect(() => {
     const previous = document.body.style.overflow;
@@ -318,13 +328,14 @@ export function NexusVoiceExperience({
 
       const ai = new GoogleGenAI({
         apiKey: data.token,
-        httpOptions: { apiVersion: 'v1beta' },
+        httpOptions: { apiVersion: 'v1alpha' },
       });
 
       const liveSession = await ai.live.connect({
         model: data.model,
         config: {
           responseModalities: [Modality.AUDIO],
+          tools: NEXUS_RESEARCH_TOOLS,
           inputAudioTranscription: {},
           outputAudioTranscription: {},
           // Instructions and voice configuration are constrained by the server token.
@@ -343,6 +354,7 @@ export function NexusVoiceExperience({
           onmessage: (message) => {
             if (cancelled()) return;
 
+            voiceResearch.handle(message, sessionRef.current);
             const content = message.serverContent;
 
             if (content?.interrupted) {
@@ -555,6 +567,11 @@ export function NexusVoiceExperience({
         </header>
 
         <div className="snx-live-content">
+          <div className={
+            voiceResearch.state.phase === 'idle'
+              ? 'nx-research-stage'
+              : 'nx-research-stage has-research'
+          }>
           <NexusVoiceHud
             state={status}
             topic={topic}
@@ -570,6 +587,8 @@ export function NexusVoiceExperience({
             analyser={analyserRef}
           />
           </NexusVoiceHud>
+          <VoiceResearchPanel research={voiceResearch.state} />
+          </div>
 
           <div className="snx-live-conversation">
             <div className="snx-live-kicker">

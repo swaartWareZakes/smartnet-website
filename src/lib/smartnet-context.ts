@@ -286,5 +286,5 @@ SmartNet with another company.
 
 export const SMARTNET_LIVE_GREETING =
   "Welcome to SmartNet Technologies. I'm NEXUS, your AI technology consultant. " +
-  "Would you like to hear about SmartNet, or talk through a business challenge? " +
-  "Tell me where you would like to begin.";
+  "Would you like to hear about SmartNet, or explore how we could help your business? " +
+  "If you'd like to explore your business, tell me your company name or website.";
