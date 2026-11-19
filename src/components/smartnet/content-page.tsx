@@ -1,8 +1,12 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { SignalGlobe } from './signal-globe';
+import { ProjectCallTrigger } from './project-call-modal';
 import {
   SERVICES,
   SOLUTIONS,
+  CLIENT_BRANDS,
+  ADDITIONAL_WEB_BUILDS,
   DELIVERY_STAGES,
 } from '@/lib/smartnet-content';
 
@@ -19,11 +23,11 @@ const META = {
   },
   portfolio: {
     index: '02 / ENGINEERED SOLUTIONS',
-    eyebrow: 'PRODUCTS / PLATFORMS / INITIATIVES',
+    eyebrow: 'PRODUCTS / CLIENT WORK / SAAS',
     heading: 'Built around',
     accent: 'real-world problems.',
     description:
-      'Technology initiatives and platforms developed by SmartNet, with clear distinctions between software scope and verified deployment outcomes.',
+      'Explore SmartNet’s live demos, upcoming Kairo Studio SaaS platform, cloud tools, and verified applications delivered since our SwaartWare roots.',
   },
   about: {
     index: '03 / THE COMPANY',
@@ -63,9 +67,18 @@ export function SmartnetContentPage({
 
         <p className="sn-content-intro">{meta.description}</p>
 
-        <Link href="/#snx-contact" className="sn-content-cta">
-          Start a conversation <span aria-hidden="true">↗</span>
-        </Link>
+        <div className="sn-hero-cta-row">
+          <Link href="/#snx-contact" className="sn-content-cta">
+            Start a conversation <span aria-hidden="true">↗</span>
+          </Link>
+          {kind === 'portfolio' && (
+            <ProjectCallTrigger
+              projectName="SmartNet Solutions"
+              label="Schedule a discovery call"
+              variant="secondary"
+            />
+          )}
+        </div>
       </section>
 
       {kind === 'services' && (
@@ -98,41 +111,190 @@ export function SmartnetContentPage({
       )}
 
       {kind === 'portfolio' && (
-        <section className="sn-content-section" id="solutions">
-          <div className="sn-content-section-head">
-            <span>SELECTED SOFTWARE AND INITIATIVES</span>
-            <span>DOCUMENTED PRODUCT SCOPE</span>
-          </div>
+        <>
+          <section className="sn-content-section" id="solutions">
+            <div className="sn-content-section-head">
+              <span>PRODUCTS, PLATFORMS &amp; CASE STUDIES</span>
+              <span>CLICK ANY PROJECT FOR FULL DETAILS</span>
+            </div>
 
-          <div className="sn-project-list">
-            {SOLUTIONS.map((solution) => (
-              <article className="sn-project" key={solution.name}>
-                <div className="sn-project-symbol" aria-hidden="true">
-                  <span>{solution.shortName}</span>
-                  <div className="sn-project-symbol-orbit" />
-                </div>
-
-                <div className="sn-project-info">
-                  <div className="sn-card-index">
-                    <span>{solution.code}</span>
-                    <span>{solution.status}</span>
+            <div className="sn-project-list">
+              {SOLUTIONS.map((solution) => (
+                <article
+                  className={`sn-project ${
+                    solution.isComingSoon ? 'sn-project--featured' : ''
+                  }`}
+                  key={solution.slug}
+                >
+                  <div className="sn-project-media">
+                    {solution.coverImage ? (
+                      <Link
+                        href={`/portfolio/${solution.slug}`}
+                        className="sn-project-thumb-link"
+                        aria-label={`View ${solution.name} case study`}
+                      >
+                        <Image
+                          src={solution.coverImage}
+                          alt={`${solution.name} preview`}
+                          width={720}
+                          height={460}
+                          className="sn-project-thumb"
+                        />
+                      </Link>
+                    ) : (
+                      <Link
+                        href={`/portfolio/${solution.slug}`}
+                        className="sn-project-symbol"
+                        aria-label={`View ${solution.name} details`}
+                      >
+                        <span>{solution.shortName}</span>
+                        <div className="sn-project-symbol-orbit" />
+                      </Link>
+                    )}
                   </div>
 
-                  <h2>{solution.name}</h2>
-                  <p>{solution.description}</p>
+                  <div className="sn-project-info">
+                    <div className="sn-card-index">
+                      <span>{solution.code}</span>
+                      <span
+                        className={
+                          solution.isComingSoon || solution.demoUrl
+                            ? 'sn-status-pill'
+                            : ''
+                        }
+                      >
+                        {solution.status}
+                      </span>
+                    </div>
 
-                  <div className="sn-project-tags">
-                    {solution.capabilities.map((item) => (
-                      <span key={item}>{item}</span>
-                    ))}
+                    <h2>
+                      <Link href={`/portfolio/${solution.slug}`}>
+                        {solution.name}
+                      </Link>
+                    </h2>
+
+                    <p className="sn-project-tagline">{solution.tagline}</p>
+                    <p>{solution.description}</p>
+
+                    <div className="sn-project-tags">
+                      {solution.capabilities.map((item) => (
+                        <span key={item}>{item}</span>
+                      ))}
+                    </div>
+
+                    <div className="sn-project-actions">
+                      <Link
+                        href={`/portfolio/${solution.slug}`}
+                        className="sn-btn-primary"
+                      >
+                        View project page <span aria-hidden="true">→</span>
+                      </Link>
+
+                      {solution.demoUrl && (
+                        <a
+                          href={solution.demoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="sn-btn-secondary"
+                        >
+                          {solution.demoLabel || 'Open live demo'}{' '}
+                          <span aria-hidden="true">↗</span>
+                        </a>
+                      )}
+
+                      <ProjectCallTrigger
+                        projectName={solution.name}
+                        label={
+                          solution.isComingSoon
+                            ? 'Request early access'
+                            : 'Book a call'
+                        }
+                        variant="secondary"
+                      />
+                    </div>
+
+                    <p className="sn-project-note">
+                      {solution.legacyBrand && (
+                        <strong>SwaartWare → SmartNet continuity: </strong>
+                      )}
+                      {solution.note}
+                    </p>
                   </div>
+                </article>
+              ))}
+            </div>
+          </section>
 
-                  <p className="sn-project-note">{solution.note}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+          <section
+            className="sn-content-section sn-clients-section"
+            id="clients"
+            aria-labelledby="sn-clients-heading"
+          >
+            <div className="sn-content-section-head">
+              <span>ORGANISATIONS &amp; BRANDS WE&apos;VE WORKED WITH</span>
+              <span>SWAARTWARE TO SMARTNET TECHNOLOGIES</span>
+            </div>
+
+            <div className="sn-clients-intro">
+              <h2 id="sn-clients-heading">
+                Trusted across retail, automotive, security, and creative teams.
+              </h2>
+              <p>
+                SmartNet Technologies evolved from our earlier brand,
+                SwaartWare. Below are organisations and brands we have built
+                software, cloud solutions, and digital platforms with across
+                South Africa.
+              </p>
+            </div>
+
+            <div className="sn-client-grid">
+              {CLIENT_BRANDS.map((client) => (
+                <a
+                  key={client.name}
+                  href={client.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="sn-client-tile"
+                  title={client.name}
+                >
+                  <div className="sn-client-logo-box">
+                    <Image
+                      src={client.logo}
+                      alt={client.name}
+                      width={180}
+                      height={72}
+                      className="sn-client-logo"
+                    />
+                  </div>
+                  <span>{client.name}</span>
+                </a>
+              ))}
+            </div>
+
+            <div className="sn-web-builds">
+              <div className="sn-content-section-head">
+                <span>ADDITIONAL CLIENT WEB BUILDS</span>
+                <span>ARCHIVED UNDER SWAARTWARE / SMARTNET</span>
+              </div>
+              <div className="sn-web-builds-grid">
+                {ADDITIONAL_WEB_BUILDS.map((site) => (
+                  <a
+                    key={site.name}
+                    href={site.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="sn-web-build-card"
+                  >
+                    <small>{site.category}</small>
+                    <strong>
+                      {site.name} <span aria-hidden="true">↗</span>
+                    </strong>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </section>
+        </>
       )}
 
       {kind === 'about' && (
@@ -147,11 +309,11 @@ export function SmartnetContentPage({
               <span>OUR FOUNDATION</span>
               <h2>Engineering beyond the code.</h2>
               <p>
-                SmartNet Technologies focuses on custom software,
-                cloud infrastructure, DevOps, architecture, security
-                and independent technology advisory. The company is
-                registered in South Africa under 2021/570418/07,
-                with engineering experience dating to 2016.
+                SmartNet Technologies (formerly SwaartWare) focuses on custom
+                software, cloud infrastructure, DevOps, architecture, security
+                and independent technology advisory. The company is registered
+                in South Africa under 2021/570418/07, with engineering
+                experience dating to 2016.
               </p>
             </article>
 
@@ -198,9 +360,16 @@ export function SmartnetContentPage({
       <section className="sn-content-end">
         <span>THE NEXT CHAPTER / STARTS WITH A CONVERSATION</span>
         <h2>Let&apos;s engineer what&apos;s next.</h2>
-        <Link href="/#snx-contact">
-          Connect with SmartNet <span aria-hidden="true">↗</span>
-        </Link>
+        <div className="sn-hero-cta-row">
+          <Link href="/#snx-contact">
+            Connect with SmartNet <span aria-hidden="true">↗</span>
+          </Link>
+          <ProjectCallTrigger
+            projectName="a new SmartNet project"
+            label="Set up a meeting"
+            variant="secondary"
+          />
+        </div>
       </section>
     </main>
   );

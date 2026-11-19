@@ -111,7 +111,8 @@ export function SiteChrome({
           {LINKS.map((link) => {
             const active =
               link.href === pathname ||
-              (link.href === '/' && pathname === '/nexus');
+              (link.href === '/' && pathname === '/nexus') ||
+              (link.href === '/portfolio' && pathname.startsWith('/portfolio/'));
 
             return (
               <Link

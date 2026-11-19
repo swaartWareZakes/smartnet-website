@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { SOLUTIONS } from '@/lib/smartnet-content';
 
 const SITE = 'https://smartnetsa.co.za';
 
@@ -19,6 +20,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.9,
     },
+    ...SOLUTIONS.map((solution) => ({
+      url: `${SITE}/portfolio/${solution.slug}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.85,
+    })),
     {
       url: `${SITE}/about`,
       changeFrequency: 'monthly',

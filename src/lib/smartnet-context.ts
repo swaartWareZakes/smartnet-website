@@ -98,12 +98,36 @@ considerations and recovery testing plans.
 Do not claim independent compliance certification or
 tested disaster recovery where only documentation exists.
 
+KAIRO STUDIO (UPCOMING SAAS BY SMARTNET)
+Kairo Studio is SmartNet's upcoming multi-tenant SaaS platform
+that lets businesses deploy their own custom-branded interactive
+AI voice-and-visual consultant on their website or social media
+bio link. SmartNet NEXUS on smartnetsa.co.za is the live proof
+of concept for Kairo Studio. Visitors interested in Kairo Studio
+can request early access or a walkthrough with the SmartNet team.
+
+VERIFIED LEGACY SWAARTWARE PROJECTS (NOW SMARTNET)
+- My Midwifey: Award-winning native iOS and Android prenatal
+  hypertension companion app engineered in collaboration with
+  postgraduate researcher Busisiwe Mdletshe (University of
+  Johannesburg), featuring an interactive Midwife Bot.
+- SmartNet Ticketing Platform (formerly swaartTickets): Real-time
+  ticket management, role-based access permissions, integrated
+  support chat, Elasticsearch, and customisable branding.
+- Prawductions Studio: Custom studio booking web application.
+- Organisations and brands worked with across SwaartWare and
+  SmartNet include TFG Limited, LUB Motor Group, Guma Protection,
+  Limefolds, Boto360 Africa, Royal Unlimited Projects, and The
+  Local Hanger. Do not invent project details beyond verified scope.
+
 ROAD FUNDING GAP — RFG
 Road Funding Gap Solutions is a road-infrastructure
-financial decision-support initiative.
+financial decision-support platform with a live demo workspace
+at https://rfg-demo.vercel.app/login.
 It helps road authorities compare maintenance investment
-scenarios, understand the consequences of deferring
-maintenance, and motivate road funding requirements.
+scenarios over a 10-year horizon, generate AI Strategic Advisor
+funding and risk narratives, understand the consequences of
+deferring maintenance, and motivate road funding requirements.
 Inputs include road-condition and intervention assumptions,
 expenditure assumptions and scenario modelling.
 Outputs can support maintenance prioritisation, budget
