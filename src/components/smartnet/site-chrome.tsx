@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { CardFxController } from './card-fx';
+import { RouteTransition } from './route-transition';
 import {
   ArrowUpRight,
   Menu,
@@ -84,6 +85,9 @@ export function SiteChrome({
     if (pathname === '/' || pathname === '/nexus') {
       window.dispatchEvent(new Event('smartnet:open-nexus'));
     } else {
+      window.dispatchEvent(
+        new CustomEvent('smartnet:route-start', { detail: { path: '/' } })
+      );
       router.push('/?nexus=1');
     }
   }
@@ -167,6 +171,7 @@ export function SiteChrome({
         </div>
       </header>
 
+      <RouteTransition />
       <CardFxController />
       {children}
     </>

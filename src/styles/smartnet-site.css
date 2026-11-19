@@ -3345,3 +3345,240 @@ html[data-theme="light"] .sn-contact-error {
     gap: 8px;
   }
 }
+
+
+/* SMARTNET HOLOGRAPHIC ROUTE TRANSITION V22 */
+
+/* Sticky-safe entrance glide on every route mount (opacity-only so position: sticky never breaks) */
+.sn-page-enter {
+  animation: sn-page-fade-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes sn-page-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Laser progress bar anchored cleanly beneath the global header */
+.sn-route-progress {
+  position: fixed;
+  top: 73px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 95;
+  pointer-events: none;
+  transform-origin: left center;
+  background: linear-gradient(90deg, #0ea5e9, #7beeff 65%, #ffba6b);
+  box-shadow: 0 0 14px rgba(112, 224, 255, 0.85);
+}
+
+.sn-route-progress.is-entering {
+  animation: sn-progress-grow 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.sn-route-progress.is-exiting {
+  transform: scaleX(1);
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+/* Full-viewport frosted HUD veil sitting right beneath the global header (z-index: 88 < 90) */
+.sn-route-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 88;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding-top: 74px;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(12, 62, 88, 0.92), rgba(3, 13, 22, 0.97) 68%);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  color: var(--sn-text);
+  overflow: hidden;
+  transition: opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.32s ease;
+}
+
+html[data-theme="light"] .sn-route-veil {
+  background:
+    radial-gradient(circle at 50% 48%, rgba(226, 244, 253, 0.94), rgba(243, 249, 253, 0.97) 70%);
+}
+
+.sn-route-veil.is-entering {
+  opacity: 1;
+  pointer-events: auto;
+  animation: sn-veil-in 0.16s ease-out both;
+}
+
+.sn-route-veil.is-exiting {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sn-route-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--sn-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--sn-grid) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 72%);
+}
+
+.sn-route-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(112, 224, 255, 0.04) 45%,
+    rgba(130, 242, 255, 0.22) 50%,
+    rgba(112, 224, 255, 0.04) 55%,
+    transparent 100%
+  );
+  animation: sn-route-sweep 1.2s ease-in-out infinite;
+}
+
+html[data-theme="light"] .sn-route-scan {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(8, 126, 165, 0.03) 45%,
+    rgba(8, 126, 165, 0.16) 50%,
+    rgba(8, 126, 165, 0.03) 55%,
+    transparent 100%
+  );
+}
+
+.sn-route-core {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  display: grid;
+  place-items: center;
+}
+
+.sn-route-ring {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.sn-route-ring--outer {
+  inset: 0;
+  border: 1.5px solid rgba(112, 224, 255, 0.28);
+  border-top-color: var(--sn-accent);
+  border-right-color: var(--sn-accent);
+  animation: sn-spin-cw 1.3s linear infinite;
+}
+
+.sn-route-ring--inner {
+  inset: 14px;
+  border: 1px dashed rgba(112, 224, 255, 0.42);
+  animation: sn-spin-ccw 2.4s linear infinite;
+}
+
+.sn-route-ring--amber {
+  inset: 24px;
+  border: 1.5px solid transparent;
+  border-bottom-color: #ffba6b;
+  border-left-color: rgba(255, 186, 107, 0.45);
+  animation: sn-spin-cw 0.95s linear infinite;
+}
+
+html[data-theme="light"] .sn-route-ring--amber {
+  border-bottom-color: #d97c1c;
+  border-left-color: rgba(217, 124, 28, 0.45);
+}
+
+.sn-route-monogram {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--sn-accent);
+  background: var(--sn-surface);
+  color: var(--sn-accent);
+  font: 700 13px monospace;
+  letter-spacing: 0.12em;
+  box-shadow: 0 0 26px rgba(84, 215, 250, 0.26);
+}
+
+.sn-route-readout {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 6px;
+  text-align: center;
+}
+
+.sn-route-readout strong {
+  font: 600 11px monospace;
+  letter-spacing: 0.18em;
+  color: var(--sn-text);
+}
+
+.sn-route-readout span {
+  font: 9px monospace;
+  letter-spacing: 0.2em;
+  color: var(--sn-accent);
+  opacity: 0.85;
+}
+
+@keyframes sn-veil-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sn-progress-grow {
+  0% { transform: scaleX(0.08); }
+  55% { transform: scaleX(0.74); }
+  100% { transform: scaleX(0.92); }
+}
+
+@keyframes sn-route-sweep {
+  0% { transform: translateY(-60%); opacity: 0; }
+  45%, 55% { opacity: 1; }
+  100% { transform: translateY(60%); opacity: 0; }
+}
+
+@keyframes sn-spin-cw {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sn-spin-ccw {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@media (max-width: 560px) {
+  .sn-route-progress {
+    top: 63px;
+  }
+
+  .sn-route-veil {
+    padding-top: 64px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sn-page-enter,
+  .sn-route-scan,
+  .sn-route-ring {
+    animation: none !important;
+  }
+}

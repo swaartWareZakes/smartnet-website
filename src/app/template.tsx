@@ -1,10 +1,5 @@
-import '@/styles/smartnet-site.css';
-import { SiteChrome } from '@/components/smartnet/site-chrome';
+import type { ReactNode } from 'react';
 
-export default function Template({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <SiteChrome>{children}</SiteChrome>;
+export default function RootTemplate({ children }: { children: ReactNode }) {
+  return <div className="sn-page-enter">{children}</div>;
 }
