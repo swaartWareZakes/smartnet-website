@@ -12,75 +12,54 @@ import {
 
 type Variant = 'landing' | 'services' | 'portfolio' | 'about';
 
-// Simplified Natural Earth country outline.
-// Coordinates are [longitude, latitude].
 const SA_BORDER: [number, number][] = [
-  [16.344977,-28.576705],
-  [16.824017,-28.082162],
-  [17.836152,-28.856378],
-  [19.002127,-28.972443],
-  [19.894734,-28.461105],
-  [19.895768,-24.76779],
-  [20.758609,-25.868136],
-  [20.889609,-26.828543],
-  [21.605896,-26.726534],
-  [22.579532,-25.979448],
-  [23.312097,-25.26869],
-  [24.211267,-25.670216],
-  [25.664666,-25.486816],
-  [26.485753,-24.616327],
-  [27.11941,-23.574323],
-  [28.017236,-22.827754],
-  [29.432188,-22.091313],
-  [30.659865,-22.151567],
-  [31.191409,-22.25151],
-  [31.670398,-23.658969],
-  [31.930589,-24.369417],
-  [31.752408,-25.484284],
-  [31.333158,-25.660191],
-  [30.949667,-26.022649],
-  [30.676609,-26.398078],
-  [31.282773,-27.285879],
-  [31.86806,-27.177927],
-  [32.83012,-26.742192],
-  [32.462133,-28.301011],
-  [31.521001,-29.257387],
-  [30.622813,-30.423776],
-  [30.055716,-31.140269],
-  [28.925553,-32.172041],
-  [27.464608,-33.226964],
-  [26.419452,-33.61495],
-  [25.780628,-33.944646],
-  [24.677853,-33.987176],
-  [23.594043,-33.794474],
-  [22.574157,-33.864083],
-  [21.542799,-34.258839],
-  [20.071261,-34.795137],
-  [19.616405,-34.819166],
-  [19.193278,-34.462599],
-  [18.424643,-33.997873],
-  [18.244499,-33.867752],
-  [18.25008,-33.281431],
-  [17.92519,-32.611291],
-  [18.24791,-32.429131],
-  [18.221762,-31.661633],
-  [17.566918,-30.725721],
-  [17.064416,-29.878641],
+  [16.344977,-28.576705],[16.824017,-28.082162],[17.836152,-28.856378],
+  [19.002127,-28.972443],[19.894734,-28.461105],[19.895768,-24.76779],
+  [20.758609,-25.868136],[20.889609,-26.828543],[21.605896,-26.726534],
+  [22.579532,-25.979448],[23.312097,-25.26869],[24.211267,-25.670216],
+  [25.664666,-25.486816],[26.485753,-24.616327],[27.11941,-23.574323],
+  [28.017236,-22.827754],[29.432188,-22.091313],[30.659865,-22.151567],
+  [31.191409,-22.25151],[31.670398,-23.658969],[31.930589,-24.369417],
+  [31.752408,-25.484284],[31.333158,-25.660191],[30.949667,-26.022649],
+  [30.676609,-26.398078],[31.282773,-27.285879],[31.86806,-27.177927],
+  [32.83012,-26.742192],[32.462133,-28.301011],[31.521001,-29.257387],
+  [30.622813,-30.423776],[30.055716,-31.140269],[28.925553,-32.172041],
+  [27.464608,-33.226964],[26.419452,-33.61495],[25.780628,-33.944646],
+  [24.677853,-33.987176],[23.594043,-33.794474],[22.574157,-33.864083],
+  [21.542799,-34.258839],[20.071261,-34.795137],[19.616405,-34.819166],
+  [19.193278,-34.462599],[18.424643,-33.997873],[18.244499,-33.867752],
+  [18.25008,-33.281431],[17.92519,-32.611291],[18.24791,-32.429131],
+  [18.221762,-31.661633],[17.566918,-30.725721],[17.064416,-29.878641],
   [16.344977,-28.576705],
 ];
 
 const LESOTHO: [number, number][] = [
-  [28.978263,-28.955597],
-  [28.5417,-28.647502],
-  [28.074338,-28.851469],
-  [27.532511,-29.242711],
-  [26.999262,-29.875954],
-  [27.749397,-30.645106],
-  [28.107205,-30.545732],
-  [28.8484,-30.070051],
-  [29.325166,-29.257387],
+  [28.978263,-28.955597],[28.5417,-28.647502],[28.074338,-28.851469],
+  [27.532511,-29.242711],[26.999262,-29.875954],[27.749397,-30.645106],
+  [28.107205,-30.545732],[28.8484,-30.070051],[29.325166,-29.257387],
   [28.978263,-28.955597],
 ];
+
+const ATMO_VERTEX = /* glsl */ `
+  varying vec3 vNormal;
+  varying vec3 vView;
+  void main() {
+    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+    vNormal = normalize(normalMatrix * normal);
+    vView = normalize(-mv.xyz);
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+
+const ATMO_FRAGMENT = /* glsl */ `
+  varying vec3 vNormal;
+  varying vec3 vView;
+  void main() {
+    float rim = pow(1.0 - max(dot(vNormal, vView), 0.0), 3.0);
+    vec3 col = mix(vec3(0.15, 0.78, 1.0), vec3(0.75, 0.98, 1.0), rim);
+    gl_FragColor = vec4(col, rim * 0.62);
+  }
+`;
 
 function geo(lat: number, lon: number, radius = 1.79) {
   const a = THREE.MathUtils.degToRad(lat);
@@ -95,11 +74,8 @@ function geo(lat: number, lon: number, radius = 1.79) {
 
 function markerPosition(hub: BusinessHub) {
   const p = geo(hub.latitude, hub.longitude, 1.85);
-
-  // Visually separate offices within the same metro.
   p.x += hub.offsetX;
   p.y += hub.offsetY;
-
   return p.normalize().multiplyScalar(1.85);
 }
 
@@ -113,6 +89,11 @@ function GlobeScene({
   reduced: boolean;
 }) {
   const globe = useRef<THREE.Group>(null);
+  const outerRingA = useRef<THREE.Group>(null);
+  const outerRingB = useRef<THREE.Group>(null);
+  const pulsesRef = useRef<THREE.InstancedMesh>(null);
+  const dummyRef = useRef(new THREE.Object3D());
+  const posRef = useRef(new THREE.Vector3());
 
   const geometry = useMemo(() => {
     const shape = new THREE.Shape(
@@ -120,9 +101,7 @@ function GlobeScene({
     );
 
     shape.holes.push(
-      new THREE.Path(
-        LESOTHO.map(([lon, lat]) => new THREE.Vector2(lon, lat))
-      )
+      new THREE.Path(LESOTHO.map(([lon, lat]) => new THREE.Vector2(lon, lat)))
     );
 
     const fill = new THREE.ShapeGeometry(shape, 2);
@@ -136,53 +115,71 @@ function GlobeScene({
     fill.computeVertexNormals();
 
     const border = new THREE.BufferGeometry().setFromPoints(
-      SA_BORDER.map(([lon, lat]) => geo(lat, lon, 1.78))
+      SA_BORDER.map(([lon, lat]) => geo(lat, lon, 1.785))
     );
 
     const hole = new THREE.BufferGeometry().setFromPoints(
-      LESOTHO.map(([lon, lat]) => geo(lat, lon, 1.78))
+      LESOTHO.map(([lon, lat]) => geo(lat, lon, 1.785))
     );
 
     const cloud = new THREE.BufferGeometry();
-    const count = 1150;
+    const count = 1350;
     const points = new Float32Array(count * 3);
     const angle = Math.PI * (3 - Math.sqrt(5));
 
     for (let i = 0; i < count; i++) {
-      const y = 1 - i / (count - 1) * 2;
+      const y = 1 - (i / (count - 1)) * 2;
       const radius = Math.sqrt(1 - y * y);
       const theta = angle * i;
-
-      points[i * 3] = Math.cos(theta) * radius * 1.79;
-      points[i * 3 + 1] = y * 1.79;
-      points[i * 3 + 2] = Math.sin(theta) * radius * 1.79;
+      points[i * 3] = Math.cos(theta) * radius * 1.8;
+      points[i * 3 + 1] = y * 1.8;
+      points[i * 3 + 2] = Math.sin(theta) * radius * 1.8;
     }
 
-    cloud.setAttribute(
+    cloud.setAttribute('position', new THREE.BufferAttribute(points, 3));
+
+    // Precision outer radar ticks
+    const tickCoords: number[] = [];
+    for (let i = 0; i < 120; i++) {
+      const a = (i / 120) * Math.PI * 2;
+      const r0 = 2.18;
+      const r1 = r0 + (i % 5 === 0 ? 0.11 : 0.045);
+      tickCoords.push(
+        Math.cos(a) * r0,
+        Math.sin(a) * r0,
+        0,
+        Math.cos(a) * r1,
+        Math.sin(a) * r1,
+        0
+      );
+    }
+    const ticks = new THREE.BufferGeometry();
+    ticks.setAttribute(
       'position',
-      new THREE.BufferAttribute(points, 3)
+      new THREE.Float32BufferAttribute(tickCoords, 3)
     );
 
-    return { fill, border, hole, cloud };
+    return { fill, border, hole, cloud, ticks };
   }, []);
 
   const links = useMemo(() => {
     const origin = geo(-26.2041, 28.0473, 1.82);
 
     const destinations = [
-      [-33.9249,18.4241],
-      [-33.9346,18.8668],
-      [-29.7276,31.0855],
-      [-25.7479,28.2293],
-      [-33.9608,25.6022],
+      [-33.9249, 18.4241],
+      [-33.9346, 18.8668],
+      [-29.7276, 31.0855],
+      [-25.7479, 28.2293],
+      [-33.9608, 25.6022],
     ];
 
     return destinations.map(([lat, lon]) => {
       const destination = geo(lat, lon, 1.82);
-      const midpoint = origin.clone()
+      const midpoint = origin
+        .clone()
         .add(destination)
         .normalize()
-        .multiplyScalar(2.03);
+        .multiplyScalar(2.1);
 
       return new THREE.QuadraticBezierCurve3(
         origin.clone(),
@@ -198,88 +195,166 @@ function GlobeScene({
     };
   }, [geometry]);
 
-  useFrame(({ clock }) => {
-    if (reduced || !globe.current) return;
-
+  useFrame(({ clock, pointer }) => {
+    if (reduced) return;
     const t = clock.elapsedTime;
 
-    globe.current.rotation.y =
-      -0.44 + Math.sin(t * 0.16) * 0.035;
+    if (globe.current) {
+      globe.current.rotation.y =
+        -0.44 + Math.sin(t * 0.18) * 0.045 + pointer.x * 0.06;
+      globe.current.rotation.x =
+        -0.51 + Math.sin(t * 0.14) * 0.03 - pointer.y * 0.04;
+      globe.current.position.y = Math.sin(t * 0.5) * 0.04;
+    }
 
-    globe.current.rotation.x =
-      -0.51 + Math.sin(t * 0.12) * 0.025;
+    if (outerRingA.current) {
+      outerRingA.current.rotation.z = t * 0.14;
+    }
 
-    globe.current.position.y = Math.sin(t * 0.45) * 0.035;
+    if (outerRingB.current) {
+      outerRingB.current.rotation.z = -t * 0.19;
+    }
+
+    // Stream live light pulses along every South African network arc
+    if (pulsesRef.current && links.length > 0) {
+      const dummy = dummyRef.current;
+      const pos = posRef.current;
+      const totalPulses = links.length * 2;
+      for (let i = 0; i < totalPulses; i++) {
+        const curve = links[i % links.length];
+        const phase = (t * 0.34 + i * 0.23) % 1;
+        curve.getPoint(phase, pos);
+        dummy.position.copy(pos);
+        const s = 0.65 + Math.sin(phase * Math.PI) * 1.1;
+        dummy.scale.setScalar(s);
+        dummy.updateMatrix();
+        pulsesRef.current.setMatrixAt(i, dummy.matrix);
+      }
+      pulsesRef.current.instanceMatrix.needsUpdate = true;
+    }
   });
 
   return (
     <group ref={globe} rotation={[-0.51, -0.44, 0]}>
+      {/* Deep planet core */}
       <mesh>
         <sphereGeometry args={[1.73, 44, 32]} />
         <meshStandardMaterial
-          color="#061d31"
-          metalness={0.54}
-          roughness={0.58}
+          color="#062238"
+          metalness={0.58}
+          roughness={0.46}
+        />
+      </mesh>
+
+      {/* Atmospheric Fresnel holographic rim */}
+      <mesh>
+        <sphereGeometry args={[1.81, 44, 32]} />
+        <shaderMaterial
+          vertexShader={ATMO_VERTEX}
+          fragmentShader={ATMO_FRAGMENT}
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
         />
       </mesh>
 
       <mesh>
-        <sphereGeometry args={[1.742, 26, 20]} />
+        <sphereGeometry args={[1.745, 28, 22]} />
         <meshBasicMaterial
-          color="#4ccbeb"
+          color="#5ad8ff"
           wireframe
           transparent
-          opacity={0.065}
+          opacity={0.095}
           depthWrite={false}
         />
       </mesh>
 
       <points geometry={geometry.cloud}>
         <pointsMaterial
-          color="#74dcfb"
-          size={0.014}
+          color="#7be8ff"
+          size={0.016}
           sizeAttenuation
           transparent
-          opacity={0.65}
+          opacity={0.72}
           depthWrite={false}
         />
       </points>
 
-      {/* South Africa land area */}
+      {/* South Africa luminous land fill & border */}
       <mesh geometry={geometry.fill}>
         <meshBasicMaterial
-          color="#17a5b4"
+          color="#1ec5d6"
           side={THREE.DoubleSide}
           transparent
-          opacity={0.48}
+          opacity={0.58}
           depthWrite={false}
         />
       </mesh>
 
       <lineLoop geometry={geometry.border}>
-        <lineBasicMaterial
-          color="#a1f6ff"
-          transparent
-          opacity={0.98}
-        />
+        <lineBasicMaterial color="#c4fbff" transparent opacity={1} />
       </lineLoop>
 
       <lineLoop geometry={geometry.hole}>
-        <lineBasicMaterial color="#83bbcb" />
+        <lineBasicMaterial color="#90d3e5" />
       </lineLoop>
 
+      {/* Network arcs + live travelling signal pulses */}
       {links.map((curve, i) => (
         <mesh key={i}>
-          <tubeGeometry args={[curve, 30, 0.006, 5, false]} />
+          <tubeGeometry args={[curve, 32, 0.007, 5, false]} />
           <meshBasicMaterial
-            color="#65dfff"
+            color="#72ecff"
             transparent
-            opacity={0.48}
+            opacity={0.55}
             depthWrite={false}
           />
         </mesh>
       ))}
 
+      <instancedMesh
+        ref={pulsesRef}
+        args={[undefined, undefined, links.length * 2]}
+        frustumCulled={false}
+      >
+        <sphereGeometry args={[0.036, 10, 10]} />
+        <meshBasicMaterial color="#fff1cc" toneMapped={false} />
+      </instancedMesh>
+
+      {/* Outer orbital HUD radar rings */}
+      <group ref={outerRingA} rotation={[0.55, 0.25, 0]}>
+        <lineSegments geometry={geometry.ticks}>
+          <lineBasicMaterial
+            color="#78e8ff"
+            transparent
+            opacity={0.42}
+            depthWrite={false}
+          />
+        </lineSegments>
+        <mesh>
+          <torusGeometry args={[2.32, 0.007, 5, 140, Math.PI * 1.4]} />
+          <meshBasicMaterial
+            color="#70e8ff"
+            transparent
+            opacity={0.42}
+            depthWrite={false}
+          />
+        </mesh>
+      </group>
+
+      <group ref={outerRingB} rotation={[-0.65, -0.35, 0.4]}>
+        <mesh>
+          <torusGeometry args={[2.12, 0.008, 5, 140, Math.PI * 1.15]} />
+          <meshBasicMaterial
+            color="#ffba6b"
+            transparent
+            opacity={0.48}
+            depthWrite={false}
+          />
+        </mesh>
+      </group>
+
+      {/* Glowing South African Hub Beacons */}
       {SA_BUSINESS_HUBS.map((hub) => {
         const active = selected === hub.id;
 
@@ -291,7 +366,7 @@ function GlobeScene({
                 onSelect(hub);
               }}
             >
-              <sphereGeometry args={[0.065, 14, 14]} />
+              <sphereGeometry args={[active ? 0.075 : 0.06, 14, 14]} />
               <meshBasicMaterial
                 color={active ? '#ffffff' : '#ffbc74'}
                 toneMapped={false}
@@ -299,13 +374,11 @@ function GlobeScene({
             </mesh>
 
             <mesh>
-              <sphereGeometry
-                args={[active ? 0.13 : 0.095, 12, 12]}
-              />
+              <sphereGeometry args={[active ? 0.145 : 0.105, 12, 12]} />
               <meshBasicMaterial
-                color={active ? '#b2f9ff' : '#ffbc74'}
+                color={active ? '#b2f9ff' : '#ffaa52'}
                 transparent
-                opacity={0.22}
+                opacity={active ? 0.34 : 0.24}
                 depthWrite={false}
               />
             </mesh>
@@ -325,14 +398,10 @@ export function SignalGlobe({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
 
-  const selected = SA_BUSINESS_HUBS.find(
-    (hub) => hub.id === selectedId
-  );
+  const selected = SA_BUSINESS_HUBS.find((hub) => hub.id === selectedId);
 
   const results = SA_BUSINESS_HUBS.filter((hub) =>
-    `${hub.name} ${hub.city}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
+    `${hub.name} ${hub.city}`.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -351,17 +420,13 @@ export function SignalGlobe({
             powerPreference: 'high-performance',
           }}
         >
-          <ambientLight intensity={1.5} />
-          <directionalLight
-            position={[3, 5, 6]}
-            intensity={2.6}
-            color="#b9f0ff"
-          />
+          <ambientLight intensity={1.6} />
+          <directionalLight position={[3, 5, 6]} intensity={2.8} color="#c5f4ff" />
           <pointLight
             position={[-3, -2, 4]}
-            intensity={8}
-            distance={10}
-            color="#3ebaff"
+            intensity={10}
+            distance={12}
+            color="#3ec4ff"
           />
 
           <GlobeScene
@@ -398,9 +463,7 @@ export function SignalGlobe({
               <button
                 type="button"
                 key={hub.id}
-                className={
-                  selectedId === hub.id ? 'is-selected' : ''
-                }
+                className={selectedId === hub.id ? 'is-selected' : ''}
                 onClick={() => setSelectedId(hub.id)}
               >
                 <span>{hub.name}</span>
@@ -408,9 +471,7 @@ export function SignalGlobe({
               </button>
             ))}
 
-            {results.length === 0 && (
-              <p>No matching featured offices.</p>
-            )}
+            {results.length === 0 && <p>No matching featured offices.</p>}
           </div>
 
           {selected && (
@@ -419,9 +480,9 @@ export function SignalGlobe({
               <p>{selected.address}, South Africa</p>
               <div>
                 <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${
-                    encodeURIComponent(selected.address + ', South Africa')
-                  }`}
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                    selected.address + ', South Africa'
+                  )}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -439,9 +500,8 @@ export function SignalGlobe({
           )}
 
           <small>
-            Approximate metro markers. Addresses sourced from
-            published company information. These are not
-            SmartNet client references.
+            Approximate metro markers. Addresses sourced from published company
+            information. These are not SmartNet client references.
           </small>
         </div>
       )}
@@ -465,10 +525,9 @@ export function SignalSection() {
         </h2>
 
         <p>
-          Explore a curated view of major South African
-          financial-services offices and their locations.
-          A demonstration of connected geographic data
-          and interactive technology.
+          Explore a curated view of major South African financial-services
+          offices and their locations. A demonstration of connected geographic
+          data and interactive technology.
         </p>
 
         <div className="sn-signal-disciplines">

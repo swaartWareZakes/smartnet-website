@@ -5105,3 +5105,40 @@ html[data-theme="light"] .snx-journey-sticky::after {
     --sn-base-rx: 0deg;
   }
 }
+
+
+/* SMARTNET FUTURISTIC STORY HUD V19 */
+
+.snx-story-copy {
+  --sn-base-ry: 7deg;
+  --sn-base-rx: 2deg;
+}
+
+.snx-story-panel--right .snx-story-copy {
+  --sn-base-ry: -7deg;
+  --sn-base-rx: 2deg;
+}
+
+.snx-hero-ai {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+  box-shadow: 0 0 28px rgba(102, 228, 255, 0.30);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.snx-hero-ai:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 34px rgba(102, 228, 255, 0.45);
+}
+
+.snx-hero-explore {
+  border-radius: 6px;
+  backdrop-filter: blur(12px);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.snx-hero-explore:hover {
+  transform: translateY(-2px);
+  border-color: #7eeeff;
+}

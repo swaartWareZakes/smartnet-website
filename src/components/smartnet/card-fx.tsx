@@ -91,13 +91,15 @@ export function CardFxController() {
         let nextRy = 0;
         let nextMx = 50;
         let nextMy = 20;
+        let nextPx = 0;
+        let nextPy = 0;
 
-        // Larger cards tilt subtly so text stays razor-sharp; smaller tiles tilt slightly more
+        // Larger cards tilt smoothly so copy stays sharp; compact cards get a deeper sci-fi angle
         const isLarge =
           card.classList.contains('sn-project') ||
           card.classList.contains('sn-hubs-panel') ||
           card.classList.contains('snx-contact-panel');
-        const maxTilt = isLarge ? 3.2 : 5.5;
+        const maxTilt = isLarge ? 4.2 : 7.5;
 
         const applyFrame = () => {
           rafId = 0;
@@ -105,6 +107,8 @@ export function CardFxController() {
           card.style.setProperty('--sn-ry', `${nextRy.toFixed(2)}deg`);
           card.style.setProperty('--sn-mx', `${nextMx.toFixed(1)}%`);
           card.style.setProperty('--sn-my', `${nextMy.toFixed(1)}%`);
+          card.style.setProperty('--sn-px', nextPx.toFixed(3));
+          card.style.setProperty('--sn-py', nextPy.toFixed(3));
         };
 
         const onMove = (event: PointerEvent) => {
@@ -117,8 +121,10 @@ export function CardFxController() {
 
           nextMx = Math.max(0, Math.min(100, px * 100));
           nextMy = Math.max(0, Math.min(100, py * 100));
-          nextRy = (px - 0.5) * (maxTilt * 2);
-          nextRx = (0.5 - py) * (maxTilt * 2);
+          nextPx = Math.max(-1, Math.min(1, (px - 0.5) * 2));
+          nextPy = Math.max(-1, Math.min(1, (py - 0.5) * 2));
+          nextRy = nextPx * maxTilt;
+          nextRx = -nextPy * maxTilt;
 
           if (!rafId) rafId = window.requestAnimationFrame(applyFrame);
         };
@@ -138,6 +144,8 @@ export function CardFxController() {
           card.style.removeProperty('--sn-ry');
           card.style.removeProperty('--sn-mx');
           card.style.removeProperty('--sn-my');
+          card.style.removeProperty('--sn-px');
+          card.style.removeProperty('--sn-py');
         };
 
         card.addEventListener('pointerenter', onEnter);

@@ -147,8 +147,15 @@ export function SmartnetContentPage({
                         className="sn-project-symbol"
                         aria-label={`View ${solution.name} details`}
                       >
-                        <span>{solution.shortName}</span>
-                        <div className="sn-project-symbol-orbit" />
+                        <div className="sn-holo-grid-floor" aria-hidden="true" />
+                        <div className="sn-holo-scan-beam" aria-hidden="true" />
+                        <div className="sn-project-symbol-orbit" aria-hidden="true" />
+                        <div className="sn-project-symbol-orbit sn-project-symbol-orbit--outer" aria-hidden="true" />
+                        <div className="sn-project-symbol-orbit sn-project-symbol-orbit--amber" aria-hidden="true" />
+                        <span className="sn-symbol-core">{solution.shortName}</span>
+                        <small className="sn-symbol-tag" aria-hidden="true">
+                          {solution.isComingSoon ? 'SAAS // PREVIEW' : 'SYSTEM // MODULE'}
+                        </small>
                       </Link>
                     )}
                   </div>
