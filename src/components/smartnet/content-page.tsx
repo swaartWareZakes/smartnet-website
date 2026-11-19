@@ -14,28 +14,28 @@ type PageKind = 'services' | 'portfolio' | 'about';
 
 const META = {
   services: {
-    index: '01 / CAPABILITIES',
-    eyebrow: 'ENGINEERING DISCIPLINES',
-    heading: 'Capability,',
-    accent: 'without compromise.',
+    index: '01 · CAPABILITIES',
+    eyebrow: 'ENGINEERING & ADVISORY',
+    heading: 'Enterprise capability,',
+    accent: 'engineered to last.',
     description:
-      'Specialist technology expertise spanning the complete life of a digital system — from initial architecture to production operation.',
+      'Specialist software engineering, cloud infrastructure, and technical advisory spanning the complete lifecycle of business-critical systems.',
   },
   portfolio: {
-    index: '02 / ENGINEERED SOLUTIONS',
-    eyebrow: 'PRODUCTS / CLIENT WORK / SAAS',
-    heading: 'Built around',
-    accent: 'real-world problems.',
+    index: '02 · OUR WORK',
+    eyebrow: 'EXPERIENCE & PLATFORMS',
+    heading: 'Proven work across',
+    accent: 'complex environments.',
     description:
-      'Explore SmartNet’s live demos, upcoming Kairo Studio SaaS platform, cloud tools, and verified applications delivered since our SwaartWare roots.',
+      'Selected platforms, client engagements, and proprietary initiatives engineered by SmartNet Technologies—continuing our delivery track record from SwaartWare.',
   },
   about: {
-    index: '03 / THE COMPANY',
-    eyebrow: 'HUMAN EXPERTISE / INTELLIGENT EXECUTION',
+    index: '03 · COMPANY',
+    eyebrow: 'LEADERSHIP & METHODOLOGY',
     heading: 'Real engineering.',
-    accent: 'Intelligent execution.',
+    accent: 'Accountable execution.',
     description:
-      'A South African technology engineering company delivering systems with technical accountability, practical judgement and long-term maintainability.',
+      'A South African technology engineering firm delivering dependable software, cloud infrastructure, and independent advisory with long-term technical ownership.',
   },
 };
 
@@ -74,7 +74,7 @@ export function SmartnetContentPage({
           {kind === 'portfolio' && (
             <ProjectCallTrigger
               projectName="SmartNet Solutions"
-              label="Schedule a discovery call"
+              label="Request a consultation"
               variant="secondary"
             />
           )}
@@ -114,8 +114,8 @@ export function SmartnetContentPage({
         <>
           <section className="sn-content-section" id="solutions">
             <div className="sn-content-section-head">
-              <span>PRODUCTS, PLATFORMS &amp; CASE STUDIES</span>
-              <span>CLICK ANY PROJECT FOR FULL DETAILS</span>
+              <span>EXPERIENCE, PLATFORMS &amp; CASE STUDIES</span>
+              <span>SELECT AN ENGAGEMENT FOR DETAILS</span>
             </div>
 
             <div className="sn-project-list">
@@ -154,7 +154,7 @@ export function SmartnetContentPage({
                         <div className="sn-project-symbol-orbit sn-project-symbol-orbit--amber" aria-hidden="true" />
                         <span className="sn-symbol-core">{solution.shortName}</span>
                         <small className="sn-symbol-tag" aria-hidden="true">
-                          {solution.isComingSoon ? 'SAAS // PREVIEW' : 'SYSTEM // MODULE'}
+                          {solution.isComingSoon ? 'UPCOMING PLATFORM' : 'ENGINEERED SYSTEM'}
                         </small>
                       </Link>
                     )}
@@ -194,7 +194,7 @@ export function SmartnetContentPage({
                         href={`/portfolio/${solution.slug}`}
                         className="sn-btn-primary"
                       >
-                        View project page <span aria-hidden="true">→</span>
+                        View case study <span aria-hidden="true">→</span>
                       </Link>
 
                       {solution.demoUrl && (
@@ -214,7 +214,7 @@ export function SmartnetContentPage({
                         label={
                           solution.isComingSoon
                             ? 'Request early access'
-                            : 'Book a call'
+                            : 'Request consultation'
                         }
                         variant="secondary"
                       />
@@ -222,7 +222,7 @@ export function SmartnetContentPage({
 
                     <p className="sn-project-note">
                       {solution.legacyBrand && (
-                        <strong>SwaartWare → SmartNet continuity: </strong>
+                        <strong>Legacy SwaartWare engagement: </strong>
                       )}
                       {solution.note}
                     </p>
@@ -238,13 +238,13 @@ export function SmartnetContentPage({
             aria-labelledby="sn-clients-heading"
           >
             <div className="sn-content-section-head">
-              <span>ORGANISATIONS &amp; BRANDS WE&apos;VE WORKED WITH</span>
-              <span>SWAARTWARE TO SMARTNET TECHNOLOGIES</span>
+              <span>SELECTED CLIENTS &amp; ORGANISATIONS</span>
+              <span>PROVEN TRACK RECORD</span>
             </div>
 
             <div className="sn-clients-intro">
               <h2 id="sn-clients-heading">
-                Trusted across retail, automotive, security, and creative teams.
+                Trusted across enterprise, industrial, and growth organisations.
               </h2>
               <p>
                 SmartNet Technologies evolved from our earlier brand,
@@ -280,8 +280,8 @@ export function SmartnetContentPage({
 
             <div className="sn-web-builds">
               <div className="sn-content-section-head">
-                <span>ADDITIONAL CLIENT WEB BUILDS</span>
-                <span>ARCHIVED UNDER SWAARTWARE / SMARTNET</span>
+                <span>ADDITIONAL WEB ENGAGEMENTS</span>
+                <span>DELIVERED UNDER SWAARTWARE &amp; SMARTNET</span>
               </div>
               <div className="sn-web-builds-grid">
                 {ADDITIONAL_WEB_BUILDS.map((site) => (
@@ -365,15 +365,15 @@ export function SmartnetContentPage({
       )}
 
       <section className="sn-content-end">
-        <span>THE NEXT CHAPTER / STARTS WITH A CONVERSATION</span>
-        <h2>Let&apos;s engineer what&apos;s next.</h2>
+        <span>ENGAGE OUR TEAM</span>
+        <h2>Discuss your technical roadmap.</h2>
         <div className="sn-hero-cta-row">
           <Link href="/contact">
-            Connect with SmartNet <span aria-hidden="true">↗</span>
+            Contact our team <span aria-hidden="true">↗</span>
           </Link>
           <ProjectCallTrigger
             projectName="a new SmartNet project"
-            label="Set up a meeting"
+            label="Request consultation"
             variant="secondary"
           />
         </div>

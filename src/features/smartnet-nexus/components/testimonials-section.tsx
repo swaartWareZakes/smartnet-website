@@ -17,17 +17,17 @@ export function TestimonialsSection({
       aria-labelledby="sn-testimonials-heading"
     >
       <div className="sn-testimonials-top">
-        <span>05 / CLIENT VOICES &amp; PROVEN IMPACT</span>
-        <span>SWAARTWARE → SMARTNET TECHNOLOGIES</span>
+        <span>05 · EXPERIENCE &amp; DELIVERY</span>
+        <span>ESTABLISHED TRACK RECORD</span>
       </div>
 
       <div className="sn-testimonials-intro">
         <div>
-          <span className="sn-content-eyebrow">BUILT TO STAND BEHIND</span>
+          <span className="sn-content-eyebrow">PROVEN DELIVERY</span>
           <h2 id="sn-testimonials-heading">
-            Engineered in the field.
+            Proven delivery.
             <br />
-            <em>Backed by real work.</em>
+            <em>Built for production.</em>
           </h2>
         </div>
         <p>
@@ -75,9 +75,9 @@ export function TestimonialsSection({
       {/* Verified Client Brand Ribbon */}
       <div className="sn-trusted-strip">
         <div className="sn-trusted-strip-head">
-          <span>ORGANISATIONS &amp; BRANDS WORKED WITH</span>
+          <span>SELECTED CLIENTS &amp; ORGANISATIONS</span>
           <Link href="/portfolio#clients">
-            View full portfolio <ArrowUpRight size={13} aria-hidden="true" />
+            Explore all work <ArrowUpRight size={13} aria-hidden="true" />
           </Link>
         </div>
 
@@ -106,20 +106,20 @@ export function TestimonialsSection({
       {/* Dedicated Portal CTA leading to the 3D Global /contact page or NEXUS */}
       <div className="sn-portal-banner">
         <div className="sn-portal-copy">
-          <span>06 / GLOBAL CONTACT COMMAND</span>
+          <span>06 · ENGAGE SMARTNET</span>
           <h3>
-            Ready to engineer <em>what&apos;s next?</em>
+            Discuss your <em>next initiative.</em>
           </h3>
           <p>
-            Step into our global contact workspace to schedule a direct call
-            with a SmartNet engineer, or speak with NEXUS AI right now.
+            Connect directly with our engineering team to scope a project,
+            review architecture, or start with a quick briefing via NEXUS.
           </p>
         </div>
 
         <div className="sn-portal-actions">
           <Link href="/contact" className="sn-btn-primary">
             <Globe2 size={16} aria-hidden="true" />
-            <span>Open Global Contact Page</span>
+            <span>Contact Our Team</span>
             <ArrowUpRight size={16} aria-hidden="true" />
           </Link>
           <button
@@ -128,7 +128,7 @@ export function TestimonialsSection({
             onClick={onOpenNexus}
           >
             <AudioLines size={16} aria-hidden="true" />
-            <span>Talk to NEXUS AI</span>
+            <span>Consult NEXUS</span>
           </button>
         </div>
       </div>

@@ -12,8 +12,8 @@ export default function GlobalLoading() {
       </div>
 
       <div className="sn-route-readout">
-        <strong>SMARTNET // LOADING</strong>
-        <span>INITIALISING 3D STAGE</span>
+        <strong>SMARTNET TECHNOLOGIES</strong>
+        <span>PREPARING VIEW</span>
       </div>
     </div>
   );

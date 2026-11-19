@@ -7,19 +7,19 @@ type Phase = 'idle' | 'entering' | 'exiting';
 
 function formatRouteLabel(path: string): string {
   const clean = path.split(/[?#]/)[0].replace(/\/+$/, '') || '/';
-  if (clean === '/' || clean === '/nexus') return 'HOME // NEXUS STAGE';
-  if (clean === '/services') return 'SERVICES // CAPABILITIES';
-  if (clean === '/portfolio') return 'PORTFOLIO // SOLUTIONS';
-  if (clean === '/about') return 'ABOUT // SMARTNET';
-  if (clean === '/contact') return 'CONTACT // GLOBAL NETWORK';
+  if (clean === '/' || clean === '/nexus') return 'SMARTNET TECHNOLOGIES';
+  if (clean === '/services') return 'SERVICES & CAPABILITIES';
+  if (clean === '/portfolio') return 'OUR WORK & EXPERIENCE';
+  if (clean === '/about') return 'OUR COMPANY';
+  if (clean === '/contact') return 'CONTACT & ENQUIRIES';
   if (clean.startsWith('/portfolio/')) {
     const slug = clean
       .replace('/portfolio/', '')
       .replace(/-/g, ' ')
       .toUpperCase();
-    return `CASE STUDY // ${slug}`;
+    return `CASE STUDY · ${slug}`;
   }
-  return `LOADING // ${clean.replace(/^\//, '').toUpperCase()}`;
+  return clean.replace(/^\//, '').toUpperCase();
 }
 
 export function RouteTransition() {
@@ -188,7 +188,7 @@ export function RouteTransition() {
 
         <div className="sn-route-readout">
           <strong>{label}</strong>
-          <span>INITIALISING 3D STAGE</span>
+          <span>LOADING VIEW</span>
         </div>
       </div>
     </>

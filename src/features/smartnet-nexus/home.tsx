@@ -264,11 +264,11 @@ export function NexusHome() {
                 className="snx-hero-ai"
               >
                 <Mic2 size={20} />
-                Talk to NEXUS AI
+                Consult NEXUS
                 <span aria-hidden="true">↗</span>
               </button>
               <a href="#snx-systems" className="snx-hero-explore">
-                Explore our expertise ↓
+                Explore our capabilities ↓
               </a>
             </div>
 

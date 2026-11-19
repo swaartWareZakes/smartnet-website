@@ -19,8 +19,8 @@ type Theme = 'dark' | 'light';
 const LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Services', href: '/services' },
-  { label: 'Portfolio', href: '/portfolio' },
-  { label: 'About', href: '/about' },
+  { label: 'Our Work', href: '/portfolio' },
+  { label: 'Company', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ] as const;
 
@@ -154,7 +154,7 @@ export function SiteChrome({
             onClick={openNexus}
           >
             <AudioLines size={18} />
-            <span>ENTER NEXUS</span>
+            <span>Consult NEXUS</span>
             <ArrowUpRight size={16} />
           </button>
 

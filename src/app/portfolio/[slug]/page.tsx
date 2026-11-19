@@ -22,7 +22,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${project.name} | Portfolio`,
+    title: `${project.name} | Our Work`,
     description: project.description,
     alternates: { canonical: `/portfolio/${project.slug}` },
     openGraph: {
@@ -54,7 +54,7 @@ export default async function PortfolioProjectPage({
       <section className="sn-case-hero">
         <div className="sn-case-breadcrumb">
           <Link href="/portfolio">
-            <ArrowLeft size={15} aria-hidden="true" /> Back to Portfolio
+            <ArrowLeft size={15} aria-hidden="true" /> Back to Our Work
           </Link>
           <span>{project.code}</span>
         </div>
@@ -64,7 +64,7 @@ export default async function PortfolioProjectPage({
           <span className="sn-category-pill">{project.category}</span>
           {project.legacyBrand && (
             <span className="sn-category-pill">
-              Engineered under SwaartWare → SmartNet
+              Delivered under SwaartWare (now SmartNet)
             </span>
           )}
         </div>
@@ -78,8 +78,8 @@ export default async function PortfolioProjectPage({
             projectName={project.name}
             label={
               project.isComingSoon
-                ? 'Request early access & walkthrough'
-                : 'Set up a call / Request demo'
+                ? 'Request early access'
+                : 'Request a consultation'
             }
             variant="primary"
           />
@@ -100,8 +100,8 @@ export default async function PortfolioProjectPage({
             <AudioLines size={15} aria-hidden="true" />
             <span>
               {project.slug === 'kairo-studio'
-                ? 'Try live POC (NEXUS)'
-                : 'Ask NEXUS about this'}
+                ? 'Experience live POC'
+                : 'Consult NEXUS'}
             </span>
           </Link>
         </div>
@@ -130,7 +130,7 @@ export default async function PortfolioProjectPage({
 
         <div className="sn-case-body-grid">
           <div className="sn-case-story">
-            <h2>The Problem &amp; Solution</h2>
+            <h2>Challenge &amp; Architecture</h2>
             {project.overview.map((paragraph, i) => (
               <p key={i}>{paragraph}</p>
             ))}
@@ -155,12 +155,12 @@ export default async function PortfolioProjectPage({
 
             <div className="sn-case-sidebar-cta">
               <p>
-                Want a walkthrough, architecture review, or tailored quote for
-                your organisation?
+                Looking for a technical walkthrough, architecture review, or
+                scoped proposal for your organisation?
               </p>
               <ProjectCallTrigger
                 projectName={project.name}
-                label="Schedule a meeting"
+                label="Request consultation"
                 variant="primary"
               />
             </div>
@@ -191,7 +191,7 @@ export default async function PortfolioProjectPage({
         <section className="sn-case-section">
           <div className="sn-content-section-head">
             <span>VISUAL GALLERY</span>
-            <span>ACTUAL APPLICATION SCREENS</span>
+            <span>SELECTED INTERFACE VIEWS</span>
           </div>
 
           <div className="sn-case-gallery">
@@ -226,7 +226,7 @@ export default async function PortfolioProjectPage({
       </section>
 
       <section className="sn-content-end">
-        <span>NEXT IN PORTFOLIO</span>
+        <span>NEXT CASE STUDY</span>
         <h2>{nextProject.name}</h2>
         <div className="sn-hero-cta-row">
           <Link href={`/portfolio/${nextProject.slug}`}>
@@ -234,7 +234,7 @@ export default async function PortfolioProjectPage({
           </Link>
           <ProjectCallTrigger
             projectName={project.name}
-            label="Book a call about this project"
+            label="Discuss this solution"
             variant="secondary"
           />
         </div>

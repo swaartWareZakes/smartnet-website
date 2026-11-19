@@ -247,13 +247,13 @@ export function ContactPageClient() {
       {/* Full-Scale 3D Global Network Hero */}
       <section className="sn-global-contact-hero">
         <div className="sn-content-topline">
-          <span>04 / GLOBAL CONTACT COMMAND</span>
+          <span>04 · CONTACT &amp; ENQUIRIES</span>
           <span>GAUTENG, SOUTH AFRICA · GLOBAL REMOTE DELIVERY</span>
         </div>
 
         <div className="sn-global-hero-grid">
           <div className="sn-global-hero-copy">
-            <p className="sn-content-eyebrow">START A CONVERSATION</p>
+            <p className="sn-content-eyebrow">DIRECT ENGINEERING ENQUIRIES</p>
             <h1>
               Connect globally.
               <br />
@@ -268,7 +268,7 @@ export function ContactPageClient() {
             <div className="sn-global-telemetry-card sn-contact-card">
               <div className="sn-telemetry-row">
                 <span>
-                  <Globe2 size={14} aria-hidden="true" /> ACTIVE NODE
+                  <Globe2 size={14} aria-hidden="true" /> DELIVERY REGION
                 </span>
                 <strong>{activeHub.city}</strong>
               </div>
@@ -302,7 +302,7 @@ export function ContactPageClient() {
             <div className="sn-global-earth-hud" aria-hidden="true">
               <span>LAT {activeHub.lat.toFixed(2)}°</span>
               <span>LON {activeHub.lon.toFixed(2)}°</span>
-              <span>LINK // ACTIVE</span>
+              <span>REGION · ACTIVE</span>
             </div>
             <GlobalContactGlobe
               activeHub={activeHub}
@@ -344,7 +344,7 @@ export function ContactPageClient() {
                     Send another enquiry
                   </button>
                   <Link href="/portfolio" className="sn-btn-primary">
-                    Explore our portfolio →
+                    Explore our work →
                   </Link>
                 </div>
               </div>
@@ -352,7 +352,7 @@ export function ContactPageClient() {
               <form ref={formRef} onSubmit={handleSubmit} noValidate>
                 <div className="sn-contact-form-head">
                   <span>REQUEST A FOLLOW-UP</span>
-                  <h2>Tell us what you&apos;re building.</h2>
+                  <h2>Outline your requirements.</h2>
                   <p>
                     Share your challenge or project scope below. A SmartNet
                     engineer will follow up directly to arrange a call.
@@ -591,8 +591,8 @@ export function ContactPageClient() {
             </div>
 
             <div className="sn-contact-card sn-contact-direct-card">
-              <span>PREFER A LIVE VOICE BRIEFING?</span>
-              <h3>Talk to NEXUS AI first.</h3>
+              <span>INTERACTIVE BRIEFING</span>
+              <h3>Start with NEXUS.</h3>
               <p>
                 Explore our capabilities by voice, run public company research,
                 and hand over a summary straight to our engineering team.
@@ -600,7 +600,7 @@ export function ContactPageClient() {
               <div className="sn-contact-direct-actions">
                 <Link href="/?nexus=1" className="sn-btn-primary">
                   <AudioLines size={16} aria-hidden="true" />
-                  <span>Launch NEXUS AI</span>
+                  <span>Consult NEXUS</span>
                 </Link>
               </div>
               <dl className="sn-contact-facts">
