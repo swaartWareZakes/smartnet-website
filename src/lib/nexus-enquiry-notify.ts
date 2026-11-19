@@ -34,7 +34,6 @@ function resolveNetlifyFormEndpoint(): string | null {
 
 export async function notifySmartnetEnquiry(
   lead: EnquiryNotificationPayload,
-  options?: { origin?: string }
 ): Promise<NotificationResult> {
   const to =
     process.env.SMARTNET_ENQUIRY_TO_EMAIL?.trim() || 'info@smartnetsa.co.za';

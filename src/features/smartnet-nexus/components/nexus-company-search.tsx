@@ -39,10 +39,10 @@ export function NexusCompanySearch({
 
   useEffect(() => {
     if (!active) return;
-    setStep(1);
-    setError('');
-    setSubmitting(false);
     const timer = window.setTimeout(() => {
+      setStep(1);
+      setError('');
+      setSubmitting(false);
       companyInputRef.current?.focus();
     }, 60);
     return () => window.clearTimeout(timer);
