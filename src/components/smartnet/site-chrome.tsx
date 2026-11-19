@@ -172,8 +172,8 @@ export function SiteChrome({
       </header>
 
       <RouteTransition />
-      <CardFxController />
       {children}
+      <CardFxController />
     </>
   );
 }
