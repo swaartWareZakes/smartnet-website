@@ -543,6 +543,268 @@ function Network({
   );
 }
 
+function TunnelBeacon({
+  reduced,
+  progress,
+}: {
+  reduced: boolean;
+  progress: RefObject<number>;
+}) {
+  const groupRef = useRef<THREE.Group>(null);
+  const coreRef = useRef<THREE.Mesh>(null);
+  const cageRef = useRef<THREE.Mesh>(null);
+  const ringARef = useRef<THREE.Group>(null);
+  const ringBRef = useRef<THREE.Group>(null);
+  const ringCRef = useRef<THREE.Group>(null);
+  const shardsRef = useRef<THREE.Group>(null);
+  const shaderRef = useRef<THREE.ShaderMaterial>(null);
+  const scrollSmooth = useRef(0);
+
+  const uniforms = useMemo(
+    () => ({
+      uTime: { value: 0 },
+      uPulse: { value: 0.7 },
+    }),
+    []
+  );
+
+  const built = useMemo(() => {
+    const tickCoords: number[] = [];
+    for (let i = 0; i < 120; i++) {
+      const a = (i / 120) * Math.PI * 2;
+      const r0 = 2.05;
+      const r1 = r0 + (i % 5 === 0 ? 0.18 : 0.06);
+      tickCoords.push(
+        Math.cos(a) * r0,
+        Math.sin(a) * r0,
+        0,
+        Math.cos(a) * r1,
+        Math.sin(a) * r1,
+        0
+      );
+    }
+    const ticksGeometry = new THREE.BufferGeometry();
+    ticksGeometry.setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute(tickCoords, 3)
+    );
+
+    const edgesGeometry = new THREE.EdgesGeometry(
+      new THREE.OctahedronGeometry(1.38, 1)
+    );
+
+    return { ticksGeometry, edgesGeometry };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      built.ticksGeometry.dispose();
+      built.edgesGeometry.dispose();
+    };
+  }, [built]);
+
+  useFrame((state, delta) => {
+    if (!groupRef.current) return;
+    const t = state.clock.elapsedTime;
+    const dt = Math.min(delta, 0.05);
+
+    scrollSmooth.current = THREE.MathUtils.damp(
+      scrollSmooth.current,
+      progress.current,
+      3.4,
+      dt
+    );
+
+    const raw = THREE.MathUtils.clamp((scrollSmooth.current - 0.68) / 0.28, 0, 1);
+    const dive = raw * raw * (3 - 2 * raw);
+
+    groupRef.current.visible = dive > 0.015;
+    if (!groupRef.current.visible) return;
+
+    // Position dead-center inside the vortex ahead of the diving camera (z = -13)
+    const scale = (0.18 + dive * 0.96) * (state.size.width < 768 ? 0.72 : 1);
+    groupRef.current.scale.setScalar(scale);
+    groupRef.current.position.set(
+      0,
+      reduced ? 0 : Math.sin(t * 0.8) * 0.08,
+      -21.6 + (1 - dive) * 4.5
+    );
+
+    if (shaderRef.current) {
+      shaderRef.current.uniforms.uTime.value = t * 1.25;
+      shaderRef.current.uniforms.uPulse.value = 0.65 + Math.sin(t * 2.6) * 0.35;
+    }
+
+    if (reduced) return;
+
+    groupRef.current.rotation.x = -state.pointer.y * 0.14;
+    groupRef.current.rotation.y = state.pointer.x * 0.18;
+
+    if (coreRef.current) {
+      coreRef.current.rotation.y = t * 0.42;
+      coreRef.current.rotation.x = t * 0.2;
+      coreRef.current.scale.setScalar(1 + Math.sin(t * 2.4) * 0.045);
+    }
+
+    if (cageRef.current) {
+      cageRef.current.rotation.y = -t * 0.28;
+      cageRef.current.rotation.z = t * 0.18;
+    }
+
+    if (ringARef.current) {
+      ringARef.current.rotation.z = t * 0.35;
+      ringARef.current.rotation.x = 0.22 + Math.sin(t * 0.5) * 0.08;
+    }
+
+    if (ringBRef.current) {
+      ringBRef.current.rotation.z = -t * 0.48;
+      ringBRef.current.rotation.y = 0.32 + Math.cos(t * 0.4) * 0.12;
+    }
+
+    if (ringCRef.current) {
+      ringCRef.current.rotation.x = t * 0.25;
+      ringCRef.current.rotation.y = -t * 0.32;
+    }
+
+    if (shardsRef.current) {
+      shardsRef.current.children.forEach((shard, idx) => {
+        const angle = t * (0.45 + idx * 0.08) + idx * ((Math.PI * 2) / 6);
+        const r = 1.85 + (idx % 2) * 0.45;
+        shard.position.set(
+          Math.cos(angle) * r,
+          Math.sin(angle) * r,
+          Math.sin(angle * 2 + idx) * 0.4
+        );
+        shard.rotation.x = t * 0.9 + idx;
+        shard.rotation.y = t * 0.7;
+      });
+    }
+  });
+
+  return (
+    <group ref={groupRef} position={[0, 0, -21.6]} visible={false}>
+      {/* Radiant Fresnel Quantum Core */}
+      <mesh ref={coreRef}>
+        <icosahedronGeometry args={[0.92, 4]} />
+        <shaderMaterial
+          ref={shaderRef}
+          vertexShader={CORE_VERTEX}
+          fragmentShader={CORE_FRAGMENT}
+          uniforms={uniforms}
+          transparent
+        />
+      </mesh>
+
+      {/* Outer translucent faceted crystal + luminous edges */}
+      <group ref={cageRef}>
+        <mesh>
+          <octahedronGeometry args={[1.32, 1]} />
+          <meshPhysicalMaterial
+            color="#2484b5"
+            metalness={0.55}
+            roughness={0.14}
+            clearcoat={1}
+            emissive="#0973a8"
+            emissiveIntensity={0.45}
+            transparent
+            opacity={0.34}
+            depthWrite={false}
+            flatShading
+          />
+        </mesh>
+        <lineSegments geometry={built.edgesGeometry}>
+          <lineBasicMaterial
+            color="#b9f8ff"
+            transparent
+            opacity={0.85}
+            depthWrite={false}
+          />
+        </lineSegments>
+      </group>
+
+      {/* Counter-rotating HUD radar ring + ticks */}
+      <group ref={ringARef}>
+        <lineSegments geometry={built.ticksGeometry}>
+          <lineBasicMaterial
+            color="#88f2ff"
+            transparent
+            opacity={0.68}
+            depthWrite={false}
+          />
+        </lineSegments>
+        <mesh>
+          <torusGeometry args={[2.32, 0.014, 6, 160, Math.PI * 1.45]} />
+          <meshBasicMaterial
+            color="#7beeff"
+            transparent
+            opacity={0.68}
+            depthWrite={false}
+          />
+        </mesh>
+        <mesh rotation={[0, 0, Math.PI * 1.6]}>
+          <torusGeometry args={[2.32, 0.02, 6, 48, 0.55]} />
+          <meshBasicMaterial
+            color="#ffba6b"
+            transparent
+            opacity={0.88}
+            depthWrite={false}
+          />
+        </mesh>
+      </group>
+
+      {/* Inner amber + cyan aperture ring */}
+      <group ref={ringBRef}>
+        <mesh>
+          <torusGeometry args={[1.66, 0.015, 6, 140, Math.PI * 1.25]} />
+          <meshBasicMaterial
+            color="#ffba6b"
+            transparent
+            opacity={0.62}
+            depthWrite={false}
+          />
+        </mesh>
+        <mesh rotation={[0, 0, Math.PI * 1.38]}>
+          <torusGeometry args={[1.66, 0.011, 6, 100, Math.PI * 0.45]} />
+          <meshBasicMaterial
+            color="#9bf6ff"
+            transparent
+            opacity={0.72}
+            depthWrite={false}
+          />
+        </mesh>
+      </group>
+
+      {/* Tilted orbital gyroscope */}
+      <group ref={ringCRef}>
+        <mesh rotation={[Math.PI / 2.4, 0.25, 0]}>
+          <torusGeometry args={[2.68, 0.008, 5, 160, Math.PI * 1.6]} />
+          <meshBasicMaterial
+            color="#58d9ff"
+            transparent
+            opacity={0.42}
+            depthWrite={false}
+          />
+        </mesh>
+      </group>
+
+      {/* Orbiting holographic energy shards */}
+      <group ref={shardsRef}>
+        {Array.from({ length: 6 }, (_, i) => (
+          <mesh key={i}>
+            <octahedronGeometry args={[i % 2 === 0 ? 0.095 : 0.07, 0]} />
+            <meshBasicMaterial
+              color={i % 2 === 0 ? '#ffd49c' : '#c4fbff'}
+              toneMapped={false}
+            />
+          </mesh>
+        ))}
+      </group>
+
+      <pointLight color="#2fd2ff" intensity={24} distance={14} decay={2} />
+    </group>
+  );
+}
+
 export default function NexusScene({
   progress,
   visible,
@@ -569,6 +831,7 @@ export default function NexusScene({
       <directionalLight position={[-4, -3, 2]} intensity={2.2} color="#2ab5ff" />
 
       <Network reduced={!!reduced} progress={progress} />
+      <TunnelBeacon reduced={!!reduced} progress={progress} />
       {!reduced && <NexusTunnel progress={progress} />}
     </Canvas>
   );

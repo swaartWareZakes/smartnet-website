@@ -2567,3 +2567,33 @@ html[data-theme="light"] .sn-content-hero > .sn-signal-globe {
     animation: none !important;
   }
 }
+
+
+/* SMARTNET 3D CARD TEXT FIT V20 */
+
+.sn-3d-card {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.sn-3d-card :is(h1, h2, h3, p, a, span, li) {
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+.sn-service-card h2,
+.sn-project-info h2,
+.sn-about-feature h2 {
+  font-size: clamp(24px, 2.4vw, 38px);
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+/* Keep 3D hover float crisp without pushing headings near card borders */
+.sn-3d-card.is-tilting :is(h2, h3) {
+  transform: translate3d(
+    calc(var(--sn-px, 0) * 2.5px),
+    calc(var(--sn-py, 0) * 2px),
+    14px
+  );
+}
