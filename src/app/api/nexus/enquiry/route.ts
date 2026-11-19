@@ -316,6 +316,7 @@ export async function POST(request: Request) {
       ok: true,
       id: saved.id,
       status: saved.status,
+      consentAt: saved.contact_consent_at,
       notified: notification.status === 'sent',
     },
     { status: 201, headers: { 'Cache-Control': 'no-store' } }

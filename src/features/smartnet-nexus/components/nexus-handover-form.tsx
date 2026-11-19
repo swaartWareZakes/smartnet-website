@@ -138,13 +138,63 @@ export function NexusHandoverForm({
         }),
       });
 
-      const data: { ok?: boolean; error?: string } = await response.json();
+      const data: {
+        ok?: boolean;
+        id?: string;
+        status?: string;
+        consentAt?: string;
+        duplicate?: boolean;
+        notified?: boolean;
+        error?: string;
+      } = await response.json();
 
       if (!response.ok || !data.ok) {
         throw new Error(
           data.error ||
             'Could not save your enquiry right now. Your details are still here—please try again.'
         );
+      }
+
+      // Forward directly to Netlify's edge form handler on live deployments (skipped on localhost).
+      const isLiveHost =
+        typeof window !== 'undefined' &&
+        !['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname);
+
+      if (isLiveHost && !data.duplicate && !data.notified) {
+        try {
+          const linksText = researchLinks.length
+            ? researchLinks.map((l) => `- ${l.title}: ${l.url}`).join('\n')
+            : 'None';
+
+          const formBody = new URLSearchParams({
+            'form-name': 'nexus-enquiry',
+            'bot-field': '',
+            enquiry_id: data.id || '',
+            status: data.status || 'New enquiry',
+            visitor_name: cleanName,
+            email: cleanEmail,
+            phone: cleanPhone || 'Not provided',
+            preferred_contact: preferredContact,
+            company_name: companyName.trim() || 'Not provided',
+            company_website:
+              (initialWebsite || visitor.website || '').trim() || 'Not provided',
+            summary: cleanSummary,
+            research_links: linksText,
+            consent_timestamp: data.consentAt || new Date().toISOString(),
+            transcript_saved:
+              hasTranscript && saveTranscriptConsent
+                ? `Yes (${Math.min(visitor.messages.length, 80)} messages in Supabase)`
+                : 'No',
+          });
+
+          await fetch('/__forms.html', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formBody.toString(),
+          });
+        } catch {
+          // Enquiry is already saved in Supabase; do not block confirmation.
+        }
       }
 
       const firstName = cleanName.split(/\s+/)[0] || cleanName;

@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { CardFxController } from './card-fx';
 import {
   ArrowUpRight,
   Menu,
@@ -166,6 +167,7 @@ export function SiteChrome({
         </div>
       </header>
 
+      <CardFxController />
       {children}
     </>
   );

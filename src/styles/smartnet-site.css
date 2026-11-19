@@ -1865,3 +1865,334 @@ html[data-theme="light"] .sn-btn-primary {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* SMARTNET PORTFOLIO LIGHT MODE POLISH V17 */
+
+html[data-theme="light"] .sn-project {
+  background: #ffffff;
+  border-color: #bdd5e3;
+  box-shadow: 0 12px 34px rgba(9, 38, 58, 0.06);
+}
+
+html[data-theme="light"] .sn-project--featured {
+  border-color: #087ea5;
+  box-shadow: 0 16px 40px rgba(8, 126, 165, 0.14);
+}
+
+html[data-theme="light"] .sn-project-media,
+html[data-theme="light"] .sn-case-cover-frame,
+html[data-theme="light"] .sn-gallery-img-wrap {
+  background: linear-gradient(145deg, #e7f3fa, #f6fbfe);
+}
+
+html[data-theme="light"] .sn-project-symbol {
+  background: radial-gradient(circle, rgba(8, 126, 165, 0.14), transparent 70%);
+}
+
+html[data-theme="light"] .sn-status-pill {
+  background: #e1f3fa;
+  border-color: #087ea5;
+  color: #066384;
+}
+
+html[data-theme="light"] .sn-client-tile {
+  background: #ffffff;
+  border-color: #bdd5e3;
+  color: #09263a;
+  box-shadow: 0 8px 24px rgba(9, 38, 58, 0.05);
+}
+
+html[data-theme="light"] .sn-client-logo-box {
+  background: #071b29;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+html[data-theme="light"] .sn-client-tile span {
+  color: #36596b;
+}
+
+html[data-theme="light"] .sn-project-tags span {
+  background: #f0f7fb;
+  border-color: #bfd6e4;
+  color: #163d52;
+}
+
+
+/* SMARTNET 3D SPATIAL CARDS & TRANSITIONS V18 */
+
+:root {
+  --sn-card-bg:
+    radial-gradient(
+      460px circle at var(--sn-mx, 18%) var(--sn-my, 0%),
+      rgba(122, 234, 255, 0.16),
+      transparent 60%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(10, 42, 61, 0.78) 0%,
+      rgba(5, 22, 35, 0.86) 100%
+    );
+  --sn-card-border: rgba(112, 220, 250, 0.28);
+  --sn-card-border-top: rgba(164, 242, 255, 0.56);
+  --sn-card-bracket: rgba(124, 233, 255, 0.78);
+  --sn-card-shadow:
+    0 24px 52px -18px rgba(0, 0, 0, 0.65),
+    0 5px 0 -1px rgba(24, 78, 102, 0.55),
+    inset 0 1px 0 rgba(190, 247, 255, 0.24),
+    inset 0 -1px 0 rgba(112, 220, 250, 0.12);
+  --sn-card-shadow-hover:
+    0 34px 70px -16px rgba(0, 0, 0, 0.78),
+    0 8px 0 -1px rgba(42, 134, 168, 0.65),
+    0 0 34px rgba(84, 215, 250, 0.16),
+    inset 0 1px 0 rgba(215, 251, 255, 0.42);
+}
+
+html[data-theme="light"] {
+  --sn-card-bg:
+    radial-gradient(
+      460px circle at var(--sn-mx, 18%) var(--sn-my, 0%),
+      rgba(14, 165, 216, 0.16),
+      transparent 62%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.68) 0%,
+      rgba(232, 245, 252, 0.56) 100%
+    );
+  --sn-card-border: rgba(14, 126, 165, 0.24);
+  --sn-card-border-top: rgba(255, 255, 255, 0.96);
+  --sn-card-bracket: rgba(8, 126, 165, 0.78);
+  --sn-card-shadow:
+    0 24px 52px -18px rgba(8, 56, 82, 0.18),
+    0 5px 0 -1px rgba(154, 204, 226, 0.62),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(8, 126, 165, 0.14);
+  --sn-card-shadow-hover:
+    0 34px 68px -16px rgba(8, 66, 98, 0.24),
+    0 8px 0 -1px rgba(96, 174, 206, 0.72),
+    0 0 32px rgba(8, 152, 202, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* Unified 3D spatial glass surface for every site card */
+:is(
+  .snx-story-copy,
+  .snx-contact-panel,
+  .snx-arch-inspector,
+  .sn-service-card,
+  .sn-project,
+  .sn-client-tile,
+  .sn-web-build-card,
+  .sn-about-feature,
+  .sn-delivery-step,
+  .sn-case-sidebar,
+  .sn-gallery-card,
+  .sn-case-note-box
+) {
+  --sn-base-rx: 0deg;
+  --sn-base-ry: 0deg;
+  --sn-rx: var(--sn-base-rx);
+  --sn-ry: var(--sn-base-ry);
+  --sn-tz: 0px;
+  position: relative;
+  border-radius: 16px;
+  background: var(--sn-card-bg) !important;
+  border: 1px solid var(--sn-card-border) !important;
+  border-top-color: var(--sn-card-border-top) !important;
+  box-shadow: var(--sn-card-shadow) !important;
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  transform:
+    perspective(1100px)
+    rotateX(var(--sn-rx))
+    rotateY(var(--sn-ry))
+    translate3d(0, var(--sn-tz), 0);
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease,
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+/* Architectural 3D HUD corner brackets on cards */
+:is(
+  .snx-story-copy,
+  .snx-contact-panel,
+  .sn-service-card,
+  .sn-project,
+  .sn-about-feature,
+  .sn-delivery-step,
+  .sn-case-sidebar
+)::before,
+:is(
+  .snx-story-copy,
+  .snx-contact-panel,
+  .sn-service-card,
+  .sn-project,
+  .sn-about-feature,
+  .sn-delivery-step,
+  .sn-case-sidebar
+)::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 14px;
+  pointer-events: none;
+  z-index: 3;
+  transition: width 0.35s ease, height 0.35s ease, border-color 0.35s ease;
+}
+
+:is(
+  .snx-story-copy,
+  .snx-contact-panel,
+  .sn-service-card,
+  .sn-project,
+  .sn-about-feature,
+  .sn-delivery-step,
+  .sn-case-sidebar
+)::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--sn-card-bracket);
+  border-left: 2px solid var(--sn-card-bracket);
+  border-top-left-radius: 16px;
+}
+
+:is(
+  .snx-story-copy,
+  .snx-contact-panel,
+  .sn-service-card,
+  .sn-project,
+  .sn-about-feature,
+  .sn-delivery-step,
+  .sn-case-sidebar
+)::after {
+  right: -1px;
+  bottom: -1px;
+  border-bottom: 2px solid var(--sn-card-bracket);
+  border-right: 2px solid var(--sn-card-bracket);
+  border-bottom-right-radius: 16px;
+}
+
+/* Hover lift + crisp live pointer tracking */
+:is(
+  .snx-story-copy,
+  .snx-contact-panel,
+  .snx-arch-inspector,
+  .sn-service-card,
+  .sn-project,
+  .sn-client-tile,
+  .sn-web-build-card,
+  .sn-about-feature,
+  .sn-delivery-step,
+  .sn-case-sidebar,
+  .sn-gallery-card,
+  .sn-case-note-box
+):hover {
+  --sn-tz: -6px;
+  border-color: var(--sn-accent) !important;
+  box-shadow: var(--sn-card-shadow-hover) !important;
+}
+
+:is(
+  .snx-story-copy,
+  .snx-contact-panel,
+  .sn-service-card,
+  .sn-project,
+  .sn-about-feature,
+  .sn-delivery-step,
+  .sn-case-sidebar
+):hover::before,
+:is(
+  .snx-story-copy,
+  .snx-contact-panel,
+  .sn-service-card,
+  .sn-project,
+  .sn-about-feature,
+  .sn-delivery-step,
+  .sn-case-sidebar
+):hover::after {
+  width: 30px;
+  height: 20px;
+}
+
+/* Tighten transform transition while cursor is actively steering the 3D tilt */
+.sn-3d-card.is-tilting {
+  transition:
+    transform 0.14s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease,
+    border-color 0.3s ease !important;
+}
+
+/* Scroll-reveal 3D spatial entrance */
+.sn-3d-card.sn-3d-pending:not(.sn-3d-visible) {
+  opacity: 0;
+  filter: blur(6px);
+  transform:
+    perspective(1100px)
+    rotateX(7deg)
+    rotateY(var(--sn-base-ry))
+    translate3d(0, 34px, -24px)
+    scale(0.97);
+}
+
+.sn-3d-card.sn-3d-pending.sn-3d-visible {
+  opacity: 1;
+  filter: blur(0px);
+  transition-delay: var(--sn-enter-delay, 0ms);
+}
+
+/* Ensure rounded inner media blends cleanly with 3D glass corners */
+.sn-project-media {
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+}
+
+.sn-gallery-img-wrap {
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.sn-project--featured {
+  border-color: var(--sn-accent) !important;
+}
+
+/* Business Radar 3D glass refinement */
+.sn-signal-globe--landing > .sn-hubs-panel {
+  border-radius: 16px;
+  background: var(--sn-card-bg) !important;
+  border: 1px solid var(--sn-card-border) !important;
+  border-top-color: var(--sn-card-border-top) !important;
+  box-shadow: var(--sn-card-shadow) !important;
+  transform:
+    perspective(1100px)
+    rotateX(var(--sn-rx, 0deg))
+    rotateY(var(--sn-ry, 0deg))
+    translate3d(0, var(--sn-tz, 0px), 0);
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s ease,
+    opacity 0.65s ease;
+}
+
+@media (max-width: 800px) {
+  .sn-project-media {
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sn-3d-card,
+  .sn-3d-card:hover,
+  .sn-3d-card.sn-3d-pending:not(.sn-3d-visible) {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

@@ -4991,3 +4991,117 @@ html[data-theme="light"] .sn-guide-choices small {
     animation: none;
   }
 }
+
+
+/* SMARTNET LIGHT MODE STORY & CARD POLISH V17 */
+
+.snx-story-copy {
+  padding: clamp(24px, 3vw, 38px);
+  border-radius: 16px;
+  border: 1px solid rgba(112, 223, 255, 0.22);
+  background: linear-gradient(135deg, rgba(4, 18, 28, 0.78), rgba(4, 18, 28, 0.45));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+html[data-theme="light"] .snx-journey-sticky {
+  background: #eef6fb;
+}
+
+html[data-theme="light"] .snx-journey-sticky::before {
+  background-image:
+    linear-gradient(rgba(8, 126, 165, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(8, 126, 165, 0.08) 1px, transparent 1px);
+}
+
+html[data-theme="light"] .snx-journey-sticky::after {
+  background: linear-gradient(
+    90deg,
+    rgba(243, 249, 253, 0.86) 0%,
+    rgba(243, 249, 253, 0.34) 48%,
+    rgba(243, 249, 253, 0.04) 100%
+  );
+}
+
+html[data-theme="light"] .snx-eyebrow,
+html[data-theme="light"] .snx-story-kicker,
+html[data-theme="light"] .snx-journey-next {
+  color: #066f94;
+  border-color: #087ea5;
+}
+
+html[data-theme="light"] .snx-meta,
+html[data-theme="light"] .snx-journey-index {
+  color: #3d6275;
+}
+
+html[data-theme="light"] .snx-journey-index strong {
+  color: #09283b;
+}
+
+html[data-theme="light"] .snx-main h1 em {
+  color: #087ea5;
+}
+
+html[data-theme="light"] .snx-story-copy {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(240, 248, 253, 0.78)
+  ) !important;
+  border: 1px solid #b8d3e2;
+  box-shadow: 0 18px 48px rgba(9, 38, 58, 0.09);
+}
+
+html[data-theme="light"] .snx-story-copy p {
+  color: #35586a;
+}
+
+html[data-theme="light"] .snx-story-footer {
+  color: #426679;
+  border-top-color: #c1d8e5;
+}
+
+@media (max-width: 760px) {
+  html[data-theme="light"] .snx-journey-sticky::after {
+    background: linear-gradient(
+      0deg,
+      rgba(243, 249, 253, 0.92) 0%,
+      rgba(243, 249, 253, 0.35) 55%,
+      transparent 100%
+    );
+  }
+}
+
+
+/* SMARTNET 3D STORY STAGE ANGLE V18 */
+
+.snx-story-copy {
+  pointer-events: auto;
+  --sn-base-ry: 5deg;
+  --sn-base-rx: 1.5deg;
+  max-width: 520px;
+}
+
+.snx-story-panel--right .snx-story-copy {
+  --sn-base-ry: -5deg;
+  --sn-base-rx: 1.5deg;
+}
+
+/* Let the 3D network breathe cleanly behind the frosted story cards in light mode */
+html[data-theme="light"] .snx-journey-sticky::after {
+  background: linear-gradient(
+    90deg,
+    rgba(240, 248, 253, 0.48) 0%,
+    rgba(240, 248, 253, 0.14) 44%,
+    transparent 100%
+  );
+}
+
+@media (max-width: 760px) {
+  .snx-story-copy,
+  .snx-story-panel--right .snx-story-copy {
+    --sn-base-ry: 0deg;
+    --sn-base-rx: 0deg;
+  }
+}

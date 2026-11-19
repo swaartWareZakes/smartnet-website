@@ -28,21 +28,8 @@ function escapeHtml(value: string): string {
     .replace(/'/g, '&#39;');
 }
 
-function resolveNetlifyFormEndpoint(requestOrigin?: string): string | null {
-  const explicit = process.env.NETLIFY_FORMS_URL?.trim();
-  if (explicit) return explicit;
-
-  if (process.env.NETLIFY === 'true') {
-    const base =
-      process.env.URL?.trim() ||
-      process.env.DEPLOY_PRIME_URL?.trim() ||
-      requestOrigin?.trim();
-    if (base && /^https?:\/\//i.test(base) && !/localhost|127\.0\.0\.1/i.test(base)) {
-      return `${base.replace(/\/+$/, '')}/__forms.html`;
-    }
-  }
-
-  return null;
+function resolveNetlifyFormEndpoint(): string | null {
+  return process.env.NETLIFY_FORMS_URL?.trim() || null;
 }
 
 export async function notifySmartnetEnquiry(
@@ -56,7 +43,7 @@ export async function notifySmartnetEnquiry(
     'SmartNet NEXUS <noreply@smartnetsa.co.za>';
   const resendKey = process.env.RESEND_API_KEY?.trim();
   const webhookUrl = process.env.SMARTNET_ENQUIRY_WEBHOOK_URL?.trim();
-  const netlifyFormUrl = resolveNetlifyFormEndpoint(options?.origin);
+  const netlifyFormUrl = resolveNetlifyFormEndpoint();
 
   const linksText = lead.researchLinks.length
     ? lead.researchLinks.map((l) => `- ${l.title}: ${l.url}`).join('\n')
