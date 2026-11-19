@@ -3,6 +3,20 @@ import { Behavior, Type, type Tool } from '@google/genai';
 export const NEXUS_RESEARCH_TOOLS: Tool[] = [{
   functionDeclarations: [
     {
+      name: 'present_visual',
+      description: 'Select an approved holographic scene before explaining it. This only changes presentation; it does not research or save anything.',
+      parameters: {
+        type: Type.OBJECT,
+        properties: {
+          scene: {
+            type: Type.STRING,
+            enum: ['welcome', 'software', 'cloud', 'watchtower', 'workshop', 'roads', 'education', 'business', 'research', 'clear'],
+          },
+        },
+        required: ['scene'],
+      },
+    },
+    {
       name: 'research_company',
       description:
         'Research the visitor business using public sources to explore relevant SmartNet services. Only call after the visitor agrees to a public search and confirms the company name or website. Never use for general questions or private individuals.',

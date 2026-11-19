@@ -4,22 +4,28 @@ import { NEXUS_RESEARCH_TOOLS } from '@/lib/nexus-research-tools';
 import {
   useVoiceCompanyResearch,
   VoiceResearchPanel,
+  type ResearchNarration,
 } from './voice-company-research';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { GoogleGenAI, Modality } from '@google/genai';
+// NEXUS_SINGLE_COMPANY_INPUT_V1
 import {
-  SMARTNET_LIVE_GREETING,
-} from '@/lib/smartnet-context';
+  SMARTNET_TYPED_GREETING as SMARTNET_LIVE_GREETING,
+} from '@/lib/nexus-visual-scenes';
 import { useReducedMotion } from 'motion/react';
-import { AudioLines, Mic, MicOff, PhoneOff, X } from 'lucide-react';
+import { Mic, MicOff, PhoneOff, X } from 'lucide-react';
 import { NexusTextConsole } from './nexus-text-console';
 // NEXUS_VOICE_HUD_V1
-import { NexusVoiceHud } from './nexus-voice-hud';
+import { NexusLiveStage } from './nexus-live-stage';
+// NEXUS_SPOKEN_RESEARCH_V6
+import { NexusCompanySearch } from './nexus-company-search';
+import './nexus-research-flow.css';
+// NEXUS_RESEARCH_OVERLAY_V1
+import { NEXUS_SCENES } from '@/lib/nexus-visual-scenes';
 import { companyContext, nexusHeaders, recordMessage, visitorState } from '@/lib/nexus-visitor';
 
 import {
-  NexusHologram,
   type HologramTopic,
   type VoiceState,
 } from './nexus-hologram';
@@ -90,13 +96,26 @@ export function NexusVoiceExperience({
   onClose: () => void;
 }) {
   const [status, setStatus] = useState<VoiceState>('idle');
-  const [topic, setTopic] = useState<HologramTopic>('general');
+  const [, setTopic] = useState<HologramTopic>('general');
   const [subtitle, setSubtitle] = useState('');
   const [heard, setHeard] = useState('');
   const [muted, setMuted] = useState(false);
   const [error, setError] = useState('');
 
   const reduced = useReducedMotion();
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const [scene, setScene] = useState('');
+  const pendingVisual = useRef<{ id: string; scene: string } | null>(null);
+  const visualTimers = useRef(new Map<number, string>());
+  const visualCalls = useRef(new Set<string>());
+
+  const clearVisuals = useCallback(() => {
+    pendingVisual.current = null;
+    visualTimers.current.forEach((_, timer) => window.clearTimeout(timer));
+    visualTimers.current.clear();
+    setScene('');
+  }, []);
+
 
   const sessionRef = useRef<LiveSession | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -121,13 +140,154 @@ export function NexusVoiceExperience({
   const spokenRef = useRef('');
   const greetingPendingRef = useRef(false);
   const greetingFinishedRef = useRef(false);
+  const assistantTurnFinishedRef = useRef(true);
 
-  const voiceResearch = useVoiceCompanyResearch();
+  // NEXUS_COHESIVE_LAYOUT_V4
+  const [researchVisible, setResearchVisible] = useState(false);
+  // NEXUS_QUIET_RESEARCH_V5
+  const [inputRequested, setInputRequested] = useState(false);
+  const [inputOpen, setInputOpen] = useState(false);
+  const overlayRef = useRef(false);
+  const researchQuietRef = useRef(false);
+  const discardedTurnRef = useRef(false);
+  const invitationAudioSeenRef = useRef(false);
+  const lastOutputAtRef = useRef(0);
+  const microphoneMutedRef = useRef(false);
+  const pausedToolCallsRef = useRef(new Set<string>());
+  const lastUserAudio = useRef(0);
+  const narrationQueue = useRef<ResearchNarration[]>([]);
+  const queueNarration = useCallback((item: ResearchNarration) => {
+    narrationQueue.current.push(item);
+  }, []);
+  const voiceResearch = useVoiceCompanyResearch(queueNarration);
+  const researchRunning = voiceResearch.state.phase === 'running';
+  const companyInputVisible = inputOpen && !researchRunning;
+
+  const closeCompanyInput = useCallback(() => {
+    overlayRef.current = false;
+    setInputOpen(false);
+    setInputRequested(false);
+    if (!researchQuietRef.current && !discardedTurnRef.current) {
+      streamRef.current?.getAudioTracks().forEach(track => {
+        track.enabled = !microphoneMutedRef.current;
+      });
+    }
+  }, []);
+
+  const openCompanyInput = useCallback(() => {
+    if (
+      !sessionRef.current || closingRef.current ||
+      researchQuietRef.current || discardedTurnRef.current
+    ) return;
+
+    // Latch the input open. Later status changes cannot hide it.
+    overlayRef.current = true;
+    setInputOpen(true);
+    setInputRequested(false);
+    streamRef.current?.getAudioTracks().forEach(track => {
+      track.enabled = false;
+    });
+    try {
+      sessionRef.current.sendRealtimeInput({ audioStreamEnd: true });
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    microphoneMutedRef.current = muted;
+    overlayRef.current = companyInputVisible;
+    streamRef.current?.getAudioTracks().forEach(track => {
+      track.enabled =
+        !muted && !companyInputVisible && !researchRunning &&
+        !researchQuietRef.current && !discardedTurnRef.current;
+    });
+  }, [companyInputVisible, muted, researchRunning, status]);
+
+  useEffect(() => {
+    if (!inputRequested || inputOpen || researchRunning) return;
+
+    const timer = window.setInterval(() => {
+      if (
+        closingRef.current || researchQuietRef.current ||
+        discardedTurnRef.current || greetingPendingRef.current ||
+        !invitationAudioSeenRef.current ||
+        !assistantTurnFinishedRef.current ||
+        playbackRef.current.size > 0 ||
+        Date.now() - lastOutputAtRef.current < 450
+      ) return;
+
+      openCompanyInput();
+    }, 100);
+
+    return () => window.clearInterval(timer);
+  }, [inputRequested, inputOpen, researchRunning, openCompanyInput]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      narrationQueue.current = narrationQueue.current.filter(item => item.current());
+      const session = sessionRef.current;
+      if (
+        !session || closingRef.current ||
+        status !== 'listening' ||
+        !assistantTurnFinishedRef.current ||
+        playbackRef.current.size > 0 ||
+        overlayRef.current ||
+        discardedTurnRef.current ||
+        Date.now() - lastUserAudio.current < 1800
+      ) return;
+
+      // During research, only explicit interludes may speak.
+      // Afterwards, only the result may speak.
+      const nextIndex = narrationQueue.current.findIndex(item =>
+        researchQuietRef.current
+          ? item.duringResearch === true
+          : item.duringResearch !== true
+      );
+      if (nextIndex < 0) return;
+
+      const item = narrationQueue.current.splice(nextIndex, 1)[0];
+      if (!item || !item.current()) return;
+
+      flushTranscript();
+      setSubtitle('');
+      spokenRef.current = '';
+      assistantTurnFinishedRef.current = false;
+      setStatus('speaking');
+
+      try {
+        session.sendClientContent({
+          turns: [{
+            role: 'user',
+            parts: [{
+              text: 'APPLICATION RESEARCH UPDATE. ' + item.text,
+            }],
+          }],
+          turnComplete: true,
+        });
+      } catch {
+        assistantTurnFinishedRef.current = true;
+        setStatus('listening');
+        setError('The research update remains available on screen.');
+      }
+    }, 200);
+    return () => window.clearInterval(timer);
+  }, [status, flushTranscript]);
   const cancelResearch = voiceResearch.cancelAll;
 
   const disconnect = useCallback(() => {
+    researchQuietRef.current = false;
+    discardedTurnRef.current = false;
+    invitationAudioSeenRef.current = false;
+    pausedToolCallsRef.current.clear();
+    setResearchVisible(false);
+    setSubtitle('');
+    setHeard('');
+    narrationQueue.current = [];
+    closeCompanyInput();
+    clearVisuals();
+    visualCalls.current.clear();
     cancelResearch();
     closingRef.current = true;
+    assistantTurnFinishedRef.current = true;
     attemptRef.current += 1;
     startingRef.current = false;
     flushTranscript();
@@ -181,7 +341,7 @@ export function NexusVoiceExperience({
     setStatus('idle');
     setMuted(false);
     spokenRef.current = '';
-  }, [flushTranscript, cancelResearch]);
+  }, [flushTranscript, cancelResearch, clearVisuals, closeCompanyInput]);
 
   useEffect(() => {
     const previous = document.body.style.overflow;
@@ -193,7 +353,59 @@ export function NexusVoiceExperience({
     };
   }, [disconnect]);
 
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    const previous = document.activeElement;
+    if (dialog && !dialog.open) dialog.showModal();
+    return () => {
+      dialog?.close();
+      if (previous instanceof HTMLElement && previous.isConnected) {
+        previous.focus();
+      }
+    };
+  }, []);
+
+  function choosePrompt(prompt: string) {
+    const session = sessionRef.current;
+    if (
+      !session || closingRef.current ||
+      researchQuietRef.current || discardedTurnRef.current
+    ) return;
+
+    invitationAudioSeenRef.current = false;
+    assistantTurnFinishedRef.current = false;
+    closeCompanyInput();
+    clearVisuals();
+    if (timerRef.current === null) return;
+    playbackRef.current.forEach(source => {
+      try { source.stop(); } catch {}
+    });
+    playbackRef.current.clear();
+    playTimeRef.current = outputContextRef.current?.currentTime ?? 0;
+    flushTranscript();
+    userTurn.current = prompt;
+    setHeard(prompt);
+    setSubtitle('');
+    spokenRef.current = '';
+    setStatus('listening');
+
+    try {
+      session.sendClientContent({
+        turns: [{ role: 'user', parts: [{ text: prompt }] }],
+        turnComplete: true,
+      });
+    } catch {
+      setError('Could not send that choice. Please try speaking it.');
+    }
+  }
+
   function playAudio(base64: string) {
+    if (
+      overlayRef.current || discardedTurnRef.current
+    ) return;
+
+    invitationAudioSeenRef.current = true;
+    lastOutputAtRef.current = Date.now();
     const context = outputContextRef.current;
     if (!context) return;
 
@@ -222,6 +434,16 @@ export function NexusVoiceExperience({
       playTimeRef.current
     );
 
+    const cue = pendingVisual.current;
+    if (cue) {
+      pendingVisual.current = null;
+      const timer = window.setTimeout(() => {
+        visualTimers.current.delete(timer);
+        if (!closingRef.current) setScene(cue.scene === 'clear' ? '' : cue.scene);
+      }, Math.max(0, (startAt - context.currentTime) * 1000));
+      visualTimers.current.set(timer, cue.id);
+    }
+
     source.start(startAt);
     playTimeRef.current = startAt + buffer.duration;
 
@@ -230,7 +452,7 @@ export function NexusVoiceExperience({
     source.onended = () => {
       playbackRef.current.delete(source);
 
-      if (playbackRef.current.size === 0) {
+      if (playbackRef.current.size === 0 && assistantTurnFinishedRef.current) {
         if (greetingPendingRef.current) {
           if (greetingFinishedRef.current) {
             greetingPendingRef.current = false;
@@ -248,6 +470,11 @@ export function NexusVoiceExperience({
   async function startConversation() {
     if (startingRef.current || sessionRef.current) return;
     startingRef.current = true;
+    invitationAudioSeenRef.current = false;
+    assistantTurnFinishedRef.current = false;
+    discardedTurnRef.current = false;
+    lastOutputAtRef.current = Date.now();
+    setInputRequested(true);
     const attempt = ++attemptRef.current;
     const cancelled = () => closingRef.current || attempt !== attemptRef.current;
 
@@ -349,15 +576,122 @@ export function NexusVoiceExperience({
         },
         callbacks: {
           onopen: () => {
-            if (!cancelled()) setStatus('listening');
+            if (!cancelled()) setStatus('connecting');
           },
           onmessage: (message) => {
             if (cancelled()) return;
+
+            if (
+              overlayRef.current || discardedTurnRef.current
+            ) {
+              const pausedContent = message.serverContent;
+              const hasOutput =
+                Boolean(pausedContent?.outputTranscription?.text) ||
+                Boolean(pausedContent?.modelTurn?.parts?.some(
+                  part => Boolean(part.inlineData?.data)
+                ));
+
+              if (hasOutput) {
+                discardedTurnRef.current = true;
+                assistantTurnFinishedRef.current = false;
+              }
+
+              const calls = (message.toolCall?.functionCalls ?? []).filter(
+                call => call.id && !pausedToolCallsRef.current.has(call.id)
+              );
+
+              if (calls.length) {
+                discardedTurnRef.current = true;
+                assistantTurnFinishedRef.current = false;
+                calls.forEach(call => {
+                  if (call.id) pausedToolCallsRef.current.add(call.id);
+                });
+                try {
+                  sessionRef.current?.sendToolResponse({
+                    functionResponses: calls.map(call => ({
+                      id: call.id,
+                      name: call.name,
+                      response: {
+                        status: 'interaction_paused',
+                        instruction:
+                          'The application is collecting typed input or ' +
+                          'researching. Do not speak or call further tools. ' +
+                          'Wait for the next application or visitor message.',
+                      },
+                    })),
+                  });
+                } catch {}
+              }
+
+              if (pausedContent?.turnComplete || pausedContent?.interrupted) {
+                discardedTurnRef.current = false;
+                assistantTurnFinishedRef.current = true;
+                if (!researchQuietRef.current && !overlayRef.current) {
+                  streamRef.current?.getAudioTracks().forEach(track => {
+                    track.enabled = !microphoneMutedRef.current;
+                  });
+                  setStatus('listening');
+                }
+              }
+              return;
+            }
+
+            const cancelledVisuals = message.toolCallCancellation?.ids ?? [];
+            if (pendingVisual.current && cancelledVisuals.includes(pendingVisual.current.id)) {
+              pendingVisual.current = null;
+            }
+            visualTimers.current.forEach((id, timer) => {
+              if (cancelledVisuals.includes(id)) {
+                window.clearTimeout(timer);
+                visualTimers.current.delete(timer);
+              }
+            });
+
+            for (const call of message.toolCall?.functionCalls ?? []) {
+              if (call.name !== 'present_visual' || !call.id) continue;
+              if (visualCalls.current.has(call.id)) continue;
+              const session = sessionRef.current;
+              if (!session) continue;
+              visualCalls.current.add(call.id);
+              const requested = call.args?.scene;
+              const valid = typeof requested === 'string' &&
+                (requested === 'clear' || Object.hasOwn(NEXUS_SCENES, requested));
+
+              if (valid) {
+                if (requested === 'research' && !voiceResearch.isRunning()) {
+                  invitationAudioSeenRef.current = false;
+                  assistantTurnFinishedRef.current = false;
+                  lastOutputAtRef.current = Date.now();
+                  setInputRequested(true);
+                }
+                pendingVisual.current = { id: call.id, scene: requested as string };
+              }
+              try {
+                session.sendToolResponse({
+                  functionResponses: [{
+                    id: call.id,
+                    name: call.name,
+                    response: {
+                      status: valid ? 'queued_for_next_audio' : 'invalid_scene',
+                      instruction: valid
+                        ? 'Continue your spoken explanation now. The approved scene will appear with the next audio.'
+                        : 'Continue speaking without claiming that a visual was displayed.',
+                    },
+                  }],
+                });
+              } catch {
+                pendingVisual.current = null;
+              }
+            }
 
             voiceResearch.handle(message, sessionRef.current);
             const content = message.serverContent;
 
             if (content?.interrupted) {
+              assistantTurnFinishedRef.current = true;
+              clearVisuals();
+              setSubtitle('');
+              spokenRef.current = '';
             if (assistantTurn.current) assistantTurn.current += ' [interrupted]';
             flushTranscript();
               playbackRef.current.forEach((source) => {
@@ -371,6 +705,9 @@ export function NexusVoiceExperience({
             }
 
             if (content?.inputTranscription?.text) {
+              lastUserAudio.current = Date.now();
+              invitationAudioSeenRef.current = false;
+              assistantTurnFinishedRef.current = false;
               const text = content.inputTranscription.text;
               userTurn.current = (userTurn.current + text).slice(-20000);
             setHeard(userTurn.current);
@@ -383,7 +720,7 @@ export function NexusVoiceExperience({
             assistantTurn.current = (assistantTurn.current + text).slice(-20000);
 
               setSubtitle((previous) =>
-                (previous + text).slice(-900)
+                (previous + text).slice(-20000)
               );
 
               spokenRef.current =
@@ -405,12 +742,14 @@ export function NexusVoiceExperience({
 
             for (const part of content?.modelTurn?.parts ?? []) {
               if (part.inlineData?.data) {
+                assistantTurnFinishedRef.current = false;
                 setStatus('speaking');
                 playAudio(part.inlineData.data);
               }
             }
 
             if (content?.turnComplete) {
+              assistantTurnFinishedRef.current = true;
             flushTranscript();
               if (greetingPendingRef.current) {
                 greetingFinishedRef.current = true;
@@ -458,6 +797,7 @@ export function NexusVoiceExperience({
               'message aloud, naturally and briefly. ' +
               'Do not answer a different question. ' +
               'Do not add unrelated company information. ' +
+              'Use present_visual with welcome before speaking. ' +
               'Welcome message: ' + SMARTNET_LIVE_GREETING,
           }],
         }],
@@ -477,8 +817,19 @@ export function NexusVoiceExperience({
         if (
           !sessionRef.current ||
           closingRef.current ||
-          greetingPendingRef.current
+          greetingPendingRef.current ||
+          overlayRef.current ||
+          researchQuietRef.current ||
+          discardedTurnRef.current ||
+          microphoneMutedRef.current
         ) return;
+
+        const samples = event.inputBuffer.getChannelData(0);
+        let energy = 0;
+        for (const sample of samples) energy += sample * sample;
+        if (Math.sqrt(energy / samples.length) > 0.025) {
+          lastUserAudio.current = Date.now();
+        }
 
         try {
           sessionRef.current.sendRealtimeInput({
@@ -522,6 +873,11 @@ export function NexusVoiceExperience({
   }
 
   function toggleMicrophone() {
+    if (
+      overlayRef.current || researchQuietRef.current ||
+      discardedTurnRef.current
+    ) return;
+    microphoneMutedRef.current = !muted;
     const track = streamRef.current?.getAudioTracks()[0];
     if (!track) return;
 
@@ -538,164 +894,182 @@ export function NexusVoiceExperience({
     setMuted(!muted);
   }
 
+  async function searchCompany(
+    company: string,
+    website: string,
+    location: string
+  ) {
+    const session = sessionRef.current;
+    if (!session || closingRef.current) {
+      throw new Error('Start a voice conversation before searching.');
+    }
+
+    if (researchQuietRef.current) return;
+    const researchAttempt = attemptRef.current;
+    researchQuietRef.current = true;
+    streamRef.current?.getAudioTracks().forEach(track => {
+      track.enabled = false;
+    });
+    closeCompanyInput();
+    narrationQueue.current = [];
+    // A deliberate form submission takes priority over current playback.
+    clearVisuals();
+    playbackRef.current.forEach(source => {
+      try { source.stop(); } catch {}
+    });
+    playbackRef.current.clear();
+    playTimeRef.current = outputContextRef.current?.currentTime ?? 0;
+    flushTranscript();
+    setSubtitle('');
+    spokenRef.current = '';
+    setResearchVisible(true);
+    setScene('');
+    setStatus('listening');
+
+    try {
+      await voiceResearch.startManual(company, website, location, session);
+    } finally {
+      if (
+        !closingRef.current &&
+        researchAttempt === attemptRef.current
+      ) {
+        researchQuietRef.current = false;
+        streamRef.current?.getAudioTracks().forEach(track => {
+          track.enabled =
+            !microphoneMutedRef.current &&
+            !overlayRef.current &&
+            !discardedTurnRef.current;
+        });
+        setStatus('listening');
+      }
+    }
+  }
+
   function closeExperience() {
     disconnect();
     onClose();
   }
 
   return (
-    <div className="snx-live-overlay">
-      <section
-        className="snx-live-shell snx-nexus-immersive"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="snx-live-title"
-      >
-        <header className="snx-live-header">
-          <div>
-            <span>SMARTNET / LIVE INTELLIGENCE</span>
-            <strong id="snx-live-title">NEXUS AI</strong>
-          </div>
+    <dialog
+      ref={dialogRef}
+      className="nx-live-dialog"
+      aria-labelledby="nx-live-title"
+      onCancel={(event) => {
+        event.preventDefault();
+        closeExperience();
+      }}
+    >
+      <header className="nx-live-header">
+        <div>
+          <span>SMARTNET / LIVE INTELLIGENCE</span>
+          <strong id="nx-live-title">NEXUS</strong>
+        </div>
+        <button type="button" onClick={closeExperience} aria-label="Close NEXUS">
+          <X size={22} />
+        </button>
+      </header>
 
-          <button
-            type="button"
-            onClick={closeExperience}
-            aria-label="Close live experience"
-          >
-            <X size={23} />
-          </button>
-        </header>
+      <div className={`nx-live-body ${companyInputVisible ? 'nx-focus-active' : ''}`}>
+        <div className="nx-scene-content" inert={companyInputVisible}>
+        <NexusLiveStage
+          state={status}
+          scene={scene}
+          subtitle={subtitle}
+          heard={heard}
+          analyser={analyserRef}
+          reduced={!!reduced}
+          active={status === 'listening' || status === 'speaking'}
+          researching={voiceResearch.state.phase === 'running'}
+          researchPhase={voiceResearch.state.phase}
+          inputActive={companyInputVisible}
+          showResearch={researchVisible}
+          onDismissResearch={() => {
+            setResearchVisible(false);
+            setScene('');
+          }}
+          research={<VoiceResearchPanel research={voiceResearch.state} />}
+          onChoose={choosePrompt}
+        />
 
-        <div className="snx-live-content">
-          <div className={
-            voiceResearch.state.phase === 'idle'
-              ? 'nx-research-stage'
-              : 'nx-research-stage has-research'
-          }>
-          <NexusVoiceHud
-            state={status}
-            topic={topic}
-            subtitle={subtitle}
-            heard={heard}
-            analyser={analyserRef}
-            reduced={!!reduced}
-          >
-            <NexusHologram
-            state={status}
-            topic={topic}
-            reduced={!!reduced}
-            analyser={analyserRef}
+        <details className="nx-live-text">
+          <summary>Prefer typing?</summary>
+          <NexusTextConsole
+            disabled={status !== 'idle' && status !== 'error'}
+            onTopic={setTopic}
           />
-          </NexusVoiceHud>
-          <VoiceResearchPanel research={voiceResearch.state} />
-          </div>
+        </details>
+        </div>
+        <NexusCompanySearch
+          active={companyInputVisible}
+          running={voiceResearch.state.phase === 'running'}
+          onSearch={searchCompany}
+          onCancel={voiceResearch.cancelAll}
+          onDismiss={() => closeCompanyInput()}
+        />
+      </div>
 
-          <div className="snx-live-conversation">
-            <div className="snx-live-kicker">
-              LIVE BUSINESS INTELLIGENCE / VOICE
-            </div>
-
-            <h2>
-              Talk to
-              <br />
-              <em>NEXUS.</em>
-            </h2>
-
-            <p>
-              Describe your biggest business challenge.
-              NEXUS will explore the problem with you,
-              explain possible technology solutions and
-              help identify your next step with SmartNet.
-            </p>
-
-            <div className="snx-live-pillars">
-              <span>01 / EXPLAIN YOUR CHALLENGE</span>
-              <span>02 / EXPLORE POSSIBLE SOLUTIONS</span>
-              <span>03 / PLAN YOUR NEXT MOVE</span>
-            </div>
-
-            <div className="snx-live-status" aria-live="polite">
-              <AudioLines size={19} />
-              <span>{status.toUpperCase()}</span>
-            </div>
-
-            {heard && (
-              <div className="snx-live-transcript">
-                <span>YOU SAID</span>
-                <p>{heard}</p>
-              </div>
-            )}
-
-            {subtitle && (
-              <div className="snx-live-transcript">
-                <span>NEXUS SAYS</span>
-                <p>{subtitle}</p>
-              </div>
-            )}
-
-            {error && (
-              <p className="snx-live-error" role="alert">
-                {error}
-              </p>
-            )}
-
-            <div className="snx-live-controls">
-              {status === 'idle' || status === 'error' ? (
-                <button
-                  type="button"
-                  className="snx-live-start"
-                  onClick={startConversation}
-                >
-                  <Mic size={20} />
-                  Start Live Conversation
+      <footer className="nx-live-footer">
+        {error && <p className="nx-live-error" role="alert">{error}</p>}
+        <div className="nx-live-controls">
+          {status === 'idle' || status === 'error' ? (
+            <button type="button" className="nx-live-start" onClick={startConversation}>
+              <Mic size={18} /> Start conversation
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={toggleMicrophone}
+                disabled={
+                  status === 'connecting' ||
+                  researchRunning || companyInputVisible
+                }
+                aria-pressed={muted}
+              >
+                {muted ? <MicOff size={18} /> : <Mic size={18} />}
+                {researchRunning || companyInputVisible
+                  ? 'Microphone paused'
+                  : muted ? 'Unmute' : 'Mute'}
+              </button>
+              {!researchVisible &&
+                ['done', 'error', 'cancelled'].includes(voiceResearch.state.phase) &&
+                !companyInputVisible && (
+                  <button
+                    type="button"
+                    onClick={() => setResearchVisible(true)}
+                  >
+                    Show research
+                  </button>
+                )}
+              {voiceResearch.state.phase === 'running' ? (
+                <button type="button" onClick={voiceResearch.cancelAll}>
+                  Cancel research
                 </button>
               ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={toggleMicrophone}
-                    disabled={status === 'connecting'}
-                  >
-                    {muted ? <MicOff size={19} /> : <Mic size={19} />}
-                    {muted ? 'Unmute' : 'Mute'}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={disconnect}
-                  >
-                    <PhoneOff size={19} />
-                    End Call
-                  </button>
-                </>
+                <button
+                  type="button"
+                  disabled={status !== 'listening'}
+                  onClick={() => {
+                    if (companyInputVisible) closeCompanyInput();
+                    else openCompanyInput();
+                  }}
+                >
+                  {companyInputVisible ? 'Dismiss input' : 'Research company'}
+                </button>
               )}
-            </div>
-
-
-
-          <details className="snx-v12-text-details">
-              <summary>
-                <span>Prefer typing?</span>
-                <strong>OPEN TEXT CONVERSATION</strong>
-              </summary>
-
-              <NexusTextConsole
-                disabled={
-                  status !== 'idle' && status !== 'error'
-                }
-                onTopic={setTopic}
-              />
-            </details>
-
-            <small className="snx-live-privacy">
-              Microphone access is optional. This session sends
-              audio to Google Gemini Live for processing.
-              Do not share confidential information.
-              AI responses and diagrams can be inaccurate.
-            </small>
-          </div>
+              <button type="button" onClick={disconnect}>
+                <PhoneOff size={18} /> End conversation
+              </button>
+            </>
+          )}
         </div>
-      </section>
-    </div>
+        <small className="nx-live-privacy">
+          Microphone access starts only when you choose to begin.
+          Audio is processed by Google Gemini Live.
+          Avoid confidential information. AI responses can be inaccurate.
+        </small>
+      </footer>
+    </dialog>
   );
 }
