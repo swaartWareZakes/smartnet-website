@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans, Newsreader } from 'next/font/google';
 import './globals.css';
+import '@/styles/smartnet-site.css';
+import { SiteChrome } from '@/components/smartnet/site-chrome';
 
 const sans = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -95,7 +97,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-ZA" className={`${sans.variable} ${display.variable}`}>
+    <html lang="en-ZA" data-scroll-behavior="smooth" className={`${sans.variable} ${display.variable}`}>
       <body suppressHydrationWarning>
         <script
           type="application/ld+json"
@@ -104,7 +106,7 @@ export default function RootLayout({
               .replace(/</g, '\\u003c'),
           }}
         />
-        {children}
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );
