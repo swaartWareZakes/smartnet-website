@@ -68,7 +68,7 @@ export function SmartnetContentPage({
         <p className="sn-content-intro">{meta.description}</p>
 
         <div className="sn-hero-cta-row">
-          <Link href="/#snx-contact" className="sn-content-cta">
+          <Link href="/contact" className="sn-content-cta">
             Start a conversation <span aria-hidden="true">↗</span>
           </Link>
           {kind === 'portfolio' && (
@@ -368,7 +368,7 @@ export function SmartnetContentPage({
         <span>THE NEXT CHAPTER / STARTS WITH A CONVERSATION</span>
         <h2>Let&apos;s engineer what&apos;s next.</h2>
         <div className="sn-hero-cta-row">
-          <Link href="/#snx-contact">
+          <Link href="/contact">
             Connect with SmartNet <span aria-hidden="true">↗</span>
           </Link>
           <ProjectCallTrigger

@@ -8,7 +8,7 @@ import { SystemsStory } from './components/systems-story';
 import { NexusAssistant } from './components/nexus-assistant';
 import { SiteEntry } from './components/site-entry';
 import { NexusVoiceExperience } from './components/nexus-voice-experience';
-import { ContactSection } from './components/contact-section';
+import { TestimonialsSection } from './components/testimonials-section';
 import { SignalSection } from '@/components/smartnet/signal-globe';
 
 const DeliveryLab = dynamic(
@@ -161,7 +161,7 @@ export function NexusHome() {
 
         <div className="snx-nav-links">
           <a href="#snx-systems">Capabilities</a>
-          <a href="#snx-contact">Contact</a>
+          <Link href="/contact">Contact</Link>
           <button
             type="button"
             className="snx-theme-switch"
@@ -384,7 +384,7 @@ export function NexusHome() {
       <SystemsStory />
       <DeliveryLab />
       <SignalSection />
-      <ContactSection />
+      <TestimonialsSection onOpenNexus={() => setLiveOpen(true)} />
       <NexusAssistant />
 
       <SiteEntry onEnterAI={() => setLiveOpen(true)} />

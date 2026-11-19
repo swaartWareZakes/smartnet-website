@@ -17,6 +17,9 @@ const CARD_SELECTOR = [
   '.sn-case-sidebar',
   '.sn-gallery-card',
   '.sn-case-note-box',
+  '.sn-testimonial-card',
+  '.sn-contact-card',
+  '.sn-portal-banner',
 ].join(', ');
 
 export function CardFxController() {

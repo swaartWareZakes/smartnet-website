@@ -20,7 +20,7 @@ const LINKS = [
   { label: 'Services', href: '/services' },
   { label: 'Portfolio', href: '/portfolio' },
   { label: 'About', href: '/about' },
-  { label: 'Contact', href: '/#snx-contact' },
+  { label: 'Contact', href: '/contact' },
 ] as const;
 
 export function SiteChrome({

@@ -582,3 +582,62 @@ export const DELIVERY_STAGES = [
   ['05', 'Launch', 'Deploy, document and transfer knowledge'],
   ['06', 'Improve', 'Optimise and iterate where engaged'],
 ] as const;
+
+
+export type TestimonialItem = {
+  id: string;
+  quote: string;
+  attribution: string;
+  role: string;
+  sector: string;
+  projectSlug: string;
+  projectName: string;
+  badge: string;
+};
+
+export const TESTIMONIALS: TestimonialItem[] = [
+  {
+    id: 'rfg',
+    quote:
+      'Turns complex road-condition surveys and 10-year maintenance scenarios into clear, decision-maker-ready financial motivations and risk narratives.',
+    attribution: 'SA Roads Funding Gap',
+    role: 'Infrastructure Decision-Support Platform',
+    sector: 'PUBLIC INFRASTRUCTURE',
+    projectSlug: 'road-funding-gap',
+    projectName: 'SA Roads Funding Gap (RFG)',
+    badge: 'LIVE DEMO',
+  },
+  {
+    id: 'midwifey',
+    quote:
+      'Engineered from postgraduate clinical research at the University of Johannesburg into an award-recognised Android and iOS care companion with an interactive Midwife Bot.',
+    attribution: 'My Midwifey Mobile App',
+    role: 'Research Collaboration · Busisiwe Mdletshe (UJ)',
+    sector: 'HEALTHCARE MOBILE',
+    projectSlug: 'my-midwifey',
+    projectName: 'My Midwifey',
+    badge: 'AWARD-WINNING BUILD',
+  },
+  {
+    id: 'tickets',
+    quote:
+      'Brings real-time ticket management, role-based access control, integrated live support chat, Elasticsearch indexing, and white-label branding into one unified operations desk.',
+    attribution: 'SmartNet Ticketing Platform',
+    role: 'Issue Management & Customer Support Web App',
+    sector: 'BUSINESS OPERATIONS',
+    projectSlug: 'smartnet-tickets',
+    projectName: 'Ticketing & Support Platform',
+    badge: 'DELIVERED PLATFORM',
+  },
+  {
+    id: 'watchtower',
+    quote:
+      'Consolidates multi-cluster Azure Kubernetes Service workloads, logs, ingress, and deployment state into a single engineering-grade operational visibility layer.',
+    attribution: 'Watchtower Cloud Operations',
+    role: 'Kubernetes & DevOps Platform Scope',
+    sector: 'CLOUD & DEVOPS',
+    projectSlug: 'watchtower',
+    projectName: 'Watchtower',
+    badge: 'AZURE AKS',
+  },
+];
