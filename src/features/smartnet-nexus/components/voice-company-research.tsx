@@ -250,7 +250,7 @@ export function useVoiceCompanyResearch(
 
     pending.current = job;
     latest.current = call.id;
-    updateVisitor({ company, report: null, confirmed: false });
+    updateVisitor({ company, website, report: null, confirmed: false });
 
     setState({
       phase: 'running',
@@ -355,7 +355,7 @@ export function useVoiceCompanyResearch(
       const report = await Promise.race([request, timeout]);
       if (pending.current !== job) return;
 
-      updateVisitor({ company, report, confirmed: false });
+      updateVisitor({ company, website, report, confirmed: false });
 
       setState({
         phase: 'done',
@@ -419,7 +419,7 @@ export function useVoiceCompanyResearch(
 
     if (pending.current) {
       const calls = (message.toolCall?.functionCalls ?? []).filter(
-        call => call.name !== 'present_visual'
+        call => call.name !== 'present_visual' && call.name !== 'offer_followup'
       );
       if (calls.length) {
         try {
@@ -441,7 +441,7 @@ export function useVoiceCompanyResearch(
     }
 
     for (const call of message.toolCall?.functionCalls ?? []) {
-      if (call.name === 'present_visual') continue;
+      if (call.name === 'present_visual' || call.name === 'offer_followup') continue;
       void execute(call, session);
     }
   }

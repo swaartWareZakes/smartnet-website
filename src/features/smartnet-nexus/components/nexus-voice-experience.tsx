@@ -20,6 +20,7 @@ import { NexusTextConsole } from './nexus-text-console';
 import { NexusLiveStage } from './nexus-live-stage';
 // NEXUS_SPOKEN_RESEARCH_V6
 import { NexusCompanySearch } from './nexus-company-search';
+import { NexusHandoverForm } from './nexus-handover-form';
 import './nexus-research-flow.css';
 // NEXUS_RESEARCH_OVERLAY_V1
 import { NEXUS_SCENES } from '@/lib/nexus-visual-scenes';
@@ -147,6 +148,13 @@ export function NexusVoiceExperience({
   // NEXUS_QUIET_RESEARCH_V5
   const [inputRequested, setInputRequested] = useState(false);
   const [inputOpen, setInputOpen] = useState(false);
+  // NEXUS_HANDOVER_V1
+  const [handoverRequested, setHandoverRequested] = useState(false);
+  const [handoverOpen, setHandoverOpen] = useState(false);
+  const [handoverSummary, setHandoverSummary] = useState('');
+  const handoverOpenRef = useRef(false);
+  const handoverRequestedAtRef = useRef(0);
+  const handoverCallsRef = useRef(new Set<string>());
   const overlayRef = useRef(false);
   const researchQuietRef = useRef(false);
   const discardedTurnRef = useRef(false);
@@ -161,18 +169,59 @@ export function NexusVoiceExperience({
   }, []);
   const voiceResearch = useVoiceCompanyResearch(queueNarration);
   const researchRunning = voiceResearch.state.phase === 'running';
-  const companyInputVisible = inputOpen && !researchRunning;
+  const companyInputVisible = inputOpen && !researchRunning && !handoverOpen;
+  const overlayActive = companyInputVisible || handoverOpen;
 
   const closeCompanyInput = useCallback(() => {
-    overlayRef.current = false;
     setInputOpen(false);
     setInputRequested(false);
+    if (!handoverOpenRef.current) {
+      overlayRef.current = false;
+      if (!researchQuietRef.current && !discardedTurnRef.current) {
+        streamRef.current?.getAudioTracks().forEach(track => {
+          track.enabled = !microphoneMutedRef.current;
+        });
+      }
+    }
+  }, []);
+
+  const closeHandover = useCallback(() => {
+    handoverOpenRef.current = false;
+    overlayRef.current = false;
+    setHandoverOpen(false);
+    setHandoverRequested(false);
     if (!researchQuietRef.current && !discardedTurnRef.current) {
       streamRef.current?.getAudioTracks().forEach(track => {
         track.enabled = !microphoneMutedRef.current;
       });
     }
   }, []);
+
+  const openHandover = useCallback((summaryOverride?: string) => {
+    if (typeof summaryOverride === 'string' && summaryOverride.trim()) {
+      setHandoverSummary(summaryOverride.trim().slice(0, 2000));
+    }
+    handoverOpenRef.current = true;
+    overlayRef.current = true;
+    setInputOpen(false);
+    setInputRequested(false);
+    setHandoverRequested(false);
+    setHandoverOpen(true);
+    clearVisuals();
+    playbackRef.current.forEach(source => {
+      try { source.stop(); } catch {}
+    });
+    playbackRef.current.clear();
+    playTimeRef.current = outputContextRef.current?.currentTime ?? 0;
+    flushTranscript();
+    streamRef.current?.getAudioTracks().forEach(track => {
+      track.enabled = false;
+    });
+    try {
+      sessionRef.current?.sendRealtimeInput({ audioStreamEnd: true });
+    } catch {}
+    setStatus(current => (current === 'speaking' ? 'listening' : current));
+  }, [clearVisuals, flushTranscript]);
 
   const openCompanyInput = useCallback(() => {
     if (
@@ -194,13 +243,33 @@ export function NexusVoiceExperience({
 
   useEffect(() => {
     microphoneMutedRef.current = muted;
-    overlayRef.current = companyInputVisible;
+    overlayRef.current = overlayActive;
     streamRef.current?.getAudioTracks().forEach(track => {
       track.enabled =
-        !muted && !companyInputVisible && !researchRunning &&
+        !muted && !overlayActive && !researchRunning &&
         !researchQuietRef.current && !discardedTurnRef.current;
     });
-  }, [companyInputVisible, muted, researchRunning, status]);
+  }, [overlayActive, muted, researchRunning, status]);
+
+  useEffect(() => {
+    if (!handoverRequested || handoverOpen) return;
+
+    const timer = window.setInterval(() => {
+      if (closingRef.current || discardedTurnRef.current) return;
+      const doneSpeaking =
+        assistantTurnFinishedRef.current && playbackRef.current.size === 0;
+      if (!doneSpeaking) return;
+
+      const settled = invitationAudioSeenRef.current
+        ? Date.now() - lastOutputAtRef.current >= 450
+        : Date.now() - handoverRequestedAtRef.current >= 2200;
+      if (!settled) return;
+
+      openHandover();
+    }, 100);
+
+    return () => window.clearInterval(timer);
+  }, [handoverRequested, handoverOpen, openHandover]);
 
   useEffect(() => {
     if (!inputRequested || inputOpen || researchRunning) return;
@@ -282,7 +351,9 @@ export function NexusVoiceExperience({
     setSubtitle('');
     setHeard('');
     narrationQueue.current = [];
+    closeHandover();
     closeCompanyInput();
+    handoverCallsRef.current.clear();
     clearVisuals();
     visualCalls.current.clear();
     cancelResearch();
@@ -341,7 +412,7 @@ export function NexusVoiceExperience({
     setStatus('idle');
     setMuted(false);
     spokenRef.current = '';
-  }, [flushTranscript, cancelResearch, clearVisuals, closeCompanyInput]);
+  }, [flushTranscript, cancelResearch, clearVisuals, closeCompanyInput, closeHandover]);
 
   useEffect(() => {
     const previous = document.body.style.overflow;
@@ -365,7 +436,14 @@ export function NexusVoiceExperience({
     };
   }, []);
 
-  function choosePrompt(prompt: string) {
+  function choosePrompt(
+    prompt: string,
+    action?: 'open-handover' | 'keep-exploring'
+  ) {
+    if (action === 'open-handover') {
+      openHandover();
+      return;
+    }
     const session = sessionRef.current;
     if (
       !session || closingRef.current ||
@@ -684,6 +762,58 @@ export function NexusVoiceExperience({
               }
             }
 
+            for (const call of message.toolCall?.functionCalls ?? []) {
+              if (call.name !== 'offer_followup' || !call.id) continue;
+              if (handoverCallsRef.current.has(call.id)) continue;
+              const session = sessionRef.current;
+              if (!session) continue;
+              handoverCallsRef.current.add(call.id);
+
+              const mode = call.args?.mode === 'open' ? 'open' : 'offer';
+              const drafted =
+                typeof call.args?.summary === 'string'
+                  ? call.args.summary.trim().slice(0, 2000)
+                  : '';
+              if (drafted) setHandoverSummary(drafted);
+
+              if (mode === 'open') {
+                invitationAudioSeenRef.current = false;
+                assistantTurnFinishedRef.current = false;
+                lastOutputAtRef.current = Date.now();
+                handoverRequestedAtRef.current = Date.now();
+                setHandoverRequested(true);
+              } else {
+                setResearchVisible(false);
+                pendingVisual.current = { id: call.id, scene: 'followup' };
+                const fallbackTimer = window.setTimeout(() => {
+                  visualTimers.current.delete(fallbackTimer);
+                  if (!closingRef.current && !overlayRef.current) {
+                    setScene('followup');
+                  }
+                }, 900);
+                visualTimers.current.set(fallbackTimer, call.id);
+              }
+
+              try {
+                session.sendToolResponse({
+                  functionResponses: [{
+                    id: call.id,
+                    name: call.name,
+                    response: {
+                      status:
+                        mode === 'open'
+                          ? 'opening_handover_after_speech'
+                          : 'followup_offered',
+                      instruction:
+                        mode === 'open'
+                          ? 'Briefly tell the visitor you are opening the short follow-up form so they can check the summary and share their contact details, then stop speaking. Never claim a call is booked or an enquiry is saved.'
+                          : 'Finish asking if they would like someone from SmartNet to contact them to discuss next steps, then pause for their choice.',
+                    },
+                  }],
+                });
+              } catch {}
+            }
+
             voiceResearch.handle(message, sessionRef.current);
             const content = message.serverContent;
 
@@ -957,7 +1087,9 @@ export function NexusVoiceExperience({
       aria-labelledby="nx-live-title"
       onCancel={(event) => {
         event.preventDefault();
-        closeExperience();
+        if (handoverOpen) closeHandover();
+        else if (companyInputVisible) closeCompanyInput();
+        else closeExperience();
       }}
     >
       <header className="nx-live-header">
@@ -970,8 +1102,8 @@ export function NexusVoiceExperience({
         </button>
       </header>
 
-      <div className={`nx-live-body ${companyInputVisible ? 'nx-focus-active' : ''}`}>
-        <div className="nx-scene-content" inert={companyInputVisible}>
+      <div className={`nx-live-body ${overlayActive ? 'nx-focus-active' : ''}`}>
+        <div className="nx-scene-content" inert={overlayActive}>
         <NexusLiveStage
           state={status}
           scene={scene}
@@ -982,7 +1114,8 @@ export function NexusVoiceExperience({
           active={status === 'listening' || status === 'speaking'}
           researching={voiceResearch.state.phase === 'running'}
           researchPhase={voiceResearch.state.phase}
-          inputActive={companyInputVisible}
+          inputActive={overlayActive}
+          handoverActive={handoverOpen}
           showResearch={researchVisible}
           onDismissResearch={() => {
             setResearchVisible(false);
@@ -1007,6 +1140,15 @@ export function NexusVoiceExperience({
           onCancel={voiceResearch.cancelAll}
           onDismiss={() => closeCompanyInput()}
         />
+        {handoverOpen && (
+          <NexusHandoverForm
+            initialCompany={visitorState().company}
+            initialWebsite={visitorState().website}
+            initialSummary={handoverSummary || visitorState().brief}
+            onDismiss={closeHandover}
+            onCloseAll={closeExperience}
+          />
+        )}
       </div>
 
       <footer className="nx-live-footer">
@@ -1023,12 +1165,12 @@ export function NexusVoiceExperience({
                 onClick={toggleMicrophone}
                 disabled={
                   status === 'connecting' ||
-                  researchRunning || companyInputVisible
+                  researchRunning || overlayActive
                 }
                 aria-pressed={muted}
               >
                 {muted ? <MicOff size={18} /> : <Mic size={18} />}
-                {researchRunning || companyInputVisible
+                {researchRunning || overlayActive
                   ? 'Microphone paused'
                   : muted ? 'Unmute' : 'Mute'}
               </button>
@@ -1063,6 +1205,17 @@ export function NexusVoiceExperience({
               </button>
             </>
           )}
+          <button
+            type="button"
+            className="nx-team-trigger"
+            disabled={status === 'connecting'}
+            onClick={() => {
+              if (handoverOpen) closeHandover();
+              else openHandover();
+            }}
+          >
+            {handoverOpen ? 'Back to NEXUS' : 'Talk to our team'}
+          </button>
         </div>
         <small className="nx-live-privacy">
           Microphone access starts only when you choose to begin.

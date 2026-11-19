@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
-export async function nexusAccess(request: Request, purpose: 'chat' | 'live' | 'research') {
+export async function nexusAccess(request: Request, purpose: 'chat' | 'live' | 'research' | 'enquiry') {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   const token = request.headers.get('authorization')?.match(/^Bearer (\S+)$/)?.[1];

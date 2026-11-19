@@ -128,6 +128,7 @@ export function CompanyConsultation({
     updateVisitor({
       id,
       company: row.company,
+      website: row.website || '',
       brief: row.company_profile || '',
       intent: 'Continue my saved consultation',
       messages: messages.data.reverse(), report: report.data?.report ?? null, confirmed: false, error: '' });
@@ -299,6 +300,7 @@ export function CompanyConsultation({
                       onChange={(event) => {
                         setWebsite(event.target.value);
                         updateVisitor({
+                          website: event.target.value,
                           report: null,
                           confirmed: false,
                         });
@@ -574,6 +576,7 @@ export function CompanyConsultation({
               updateVisitor({
                 id: null,
                 company: '',
+                website: '',
                 brief: '',
                 intent: '',
                 report: null,

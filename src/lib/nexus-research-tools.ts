@@ -10,7 +10,7 @@ export const NEXUS_RESEARCH_TOOLS: Tool[] = [{
         properties: {
           scene: {
             type: Type.STRING,
-            enum: ['welcome', 'software', 'cloud', 'watchtower', 'workshop', 'roads', 'education', 'business', 'research', 'clear'],
+            enum: ['welcome', 'software', 'cloud', 'watchtower', 'workshop', 'roads', 'education', 'business', 'research', 'followup', 'clear'],
           },
         },
         required: ['scene'],
@@ -58,6 +58,28 @@ export const NEXUS_RESEARCH_TOOLS: Tool[] = [{
       parameters: {
         type: Type.OBJECT,
         properties: {},
+      },
+    },
+    {
+      name: 'offer_followup',
+      description:
+        'Offer or open the SmartNet human follow-up handover form. Use mode="offer" only after understanding the visitor main challenge and discussing a relevant SmartNet approach—never immediately after research finishes. Use mode="open" when the visitor explicitly asks for a call, quote, proposal, or contact with the team, or accepts a follow-up offer.',
+      parameters: {
+        type: Type.OBJECT,
+        properties: {
+          mode: {
+            type: Type.STRING,
+            enum: ['offer', 'open'],
+            description:
+              '"offer" shows two floating choices (Arrange a follow-up / Keep exploring). "open" opens the handover form after your spoken turn finishes.',
+          },
+          summary: {
+            type: Type.STRING,
+            description:
+              'Short 1 to 3 sentence plain-text consultation summary of what the visitor wants help with, editable by the visitor before submitting. Never include unverified claims.',
+          },
+        },
+        required: ['mode', 'summary'],
       },
     },
   ],

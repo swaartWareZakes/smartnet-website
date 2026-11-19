@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { AnimatePresence, motion } from 'motion/react';
 import { useId, useState, type ReactNode, type RefObject } from 'react';
 import { NEXUS_SCENES } from '@/lib/nexus-visual-scenes';
+import { NexusHologramVisual } from './nexus-hologram-visuals';
 import './nexus-cinematic-stage.css';
 
 const World = dynamic(() => import('./nexus-cinematic-world'), {
@@ -23,10 +24,11 @@ type Props = {
   researching: boolean;
   researchPhase: string;
   inputActive: boolean;
+  handoverActive?: boolean;
   showResearch: boolean;
   research: ReactNode;
   onDismissResearch: () => void;
-  onChoose: (prompt: string) => void;
+  onChoose: (prompt: string, action?: 'open-handover' | 'keep-exploring') => void;
 };
 
 // Advance in word-boundary pages rather than continually chopping
@@ -54,29 +56,10 @@ function captionPage(value: string) {
     : last;
 }
 
-function Blueprint() {
-  return (
-    <svg viewBox="0 0 300 125" className="nc-blueprint" aria-hidden="true">
-      <g fill="none" stroke="currentColor">
-        {Array.from({ length: 7 }, (_, i) => (
-          <path
-            key={i}
-            opacity={.18 + i * .08}
-            d={`M32 ${55 + i * 6}L150 ${10 + i * 6}L268 ${55 + i * 6}L150 ${100 + i * 3}Z`}
-          />
-        ))}
-        <path d="M150 10v108M32 55v36M268 55v36" strokeDasharray="2 4" />
-        <circle cx="150" cy="10" r="3" fill="currentColor" />
-        <circle cx="32" cy="91" r="3" fill="currentColor" />
-        <circle cx="268" cy="91" r="3" fill="currentColor" />
-      </g>
-    </svg>
-  );
-}
 
 export function NexusLiveStage({
   state, scene, subtitle, heard, analyser, reduced, active,
-  researching, researchPhase, inputActive, showResearch,
+  researching, researchPhase, inputActive, handoverActive = false, showResearch,
   research, onDismissResearch, onChoose,
 }: Props) {
   const id = useId();
@@ -97,7 +80,9 @@ export function NexusLiveStage({
           : '';
 
   const scenePanel = panelKey.startsWith('scene:');
-  const label = inputActive
+  const label = handoverActive
+    ? 'FOLLOW-UP'
+    : inputActive
     ? 'YOUR COMPANY'
     : researching
       ? 'SEARCHING'
@@ -179,22 +164,31 @@ export function NexusLiveStage({
               >
                 {scenePanel && info ? (
                   <>
-                    <span className="nc-eyebrow">{info.label}</span>
-                    {info.diagram === 'architecture' && (
-                      <div className="nc-diagram">
-                        <Blueprint />
-                        <small>CONCEPT ILLUSTRATION</small>
-                      </div>
-                    )}
+                    <div className="nc-holo-topbar">
+                      <span className="nc-eyebrow">{info.label}</span>
+                      <span className="nc-holo-dot" aria-hidden="true" />
+                    </div>
+                    <NexusHologramVisual
+                      scene={scene}
+                      image={info.image}
+                      imageAlt={info.imageAlt}
+                    />
                     <h2 id={`${id}-title`}>{info.title}</h2>
                     <p>{info.text}</p>
+                    {info.tags.length > 0 && (
+                      <div className="nc-holo-tags" aria-hidden="true">
+                        {info.tags.map((tag) => (
+                          <span key={tag}>{tag}</span>
+                        ))}
+                      </div>
+                    )}
                     <div className="nc-choices">
                       {info.choices.map(choice => (
                         <button
                           key={choice.label}
                           type="button"
                           disabled={!active}
-                          onClick={() => onChoose(choice.prompt)}
+                          onClick={() => onChoose(choice.prompt, choice.action)}
                         >
                           {choice.label}<span aria-hidden="true">↗</span>
                         </button>

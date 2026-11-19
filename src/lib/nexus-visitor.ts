@@ -8,8 +8,8 @@ export type Research = {
   evidence: { text: string; sources: number[] }[];
 };
 type Message = { id: string; role: 'user' | 'assistant'; content: string; channel: 'text' | 'voice' };
-type State = { id: string | null; company: string; brief: string; intent: string; report: Research | null; confirmed: boolean; messages: Message[]; saving: number; error: string };
-const initial: State = { id: null, company: '', brief: '', intent: '', report: null, confirmed: false, messages: [], saving: 0, error: '' };
+type State = { id: string | null; company: string; website: string; brief: string; intent: string; report: Research | null; confirmed: boolean; messages: Message[]; saving: number; error: string };
+const initial: State = { id: null, company: '', website: '', brief: '', intent: '', report: null, confirmed: false, messages: [], saving: 0, error: '' };
 let state: State = initial;
 const listeners = new Set<() => void>();
 let client: SupabaseClient | undefined;

@@ -4,7 +4,9 @@ export type NexusScene = {
   label: string;
   tags: string[];
   diagram: 'architecture' | 'globe';
-  choices: { label: string; prompt: string }[];
+  image?: string;
+  imageAlt?: string;
+  choices: { label: string; prompt: string; action?: 'open-handover' | 'keep-exploring' }[];
 };
 
 export const NEXUS_SCENES: Record<string, NexusScene> = {
@@ -108,6 +110,25 @@ export const NEXUS_SCENES: Record<string, NexusScene> = {
       { label: 'Continue without research', prompt: 'Continue without researching. Ask about my business challenge.' },
     ],
   },
+  followup: {
+    title: 'Continue with our team?',
+    text: 'You can review a short summary and request a follow-up from a SmartNet team member, or keep exploring here.',
+    label: 'HUMAN HANDOVER',
+    tags: ['SUMMARY', 'FOLLOW-UP', 'SMARTNET TEAM'],
+    diagram: 'globe',
+    choices: [
+      {
+        label: 'Arrange a follow-up',
+        prompt: 'I would like to arrange a follow-up with the SmartNet team.',
+        action: 'open-handover',
+      },
+      {
+        label: 'Keep exploring',
+        prompt: 'I would like to keep exploring for now.',
+        action: 'keep-exploring',
+      },
+    ],
+  },
 };
 
 export const NEXUS_PRESENTATION_RULES = `
@@ -150,6 +171,17 @@ relevant SmartNet opportunities, and ask whether they already have a challenge
 in mind. Clearly distinguish suggestions from verified facts about their systems.
 Use calm, warm delivery, concise sentences and natural pauses.
 Do not claim to feel emotions or to know the visitor's emotional state.
+HUMAN HANDOVER FLOW
+Only offer a human follow-up using offer_followup(mode="offer", summary) after you
+understand the visitor's main challenge and have discussed a relevant SmartNet approach.
+Never trigger follow-up merely because company research finished.
+When offering a follow-up, summarise their need in one calm sentence and ask whether
+they would like someone from SmartNet to contact them to discuss next steps.
+If the visitor explicitly asks for a call, quote, proposal, or contact with the team,
+or accepts your follow-up offer, call offer_followup(mode="open", summary) with a concise,
+accurate 1-3 sentence summary, briefly explain you are opening the short follow-up form,
+and finish speaking so the form appears.
+Never claim a call is booked, promise a response timeframe, or say an enquiry was saved.
 Presentation actions do not relax any SmartNet-only scope or accuracy rules.
 `;
 
