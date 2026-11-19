@@ -166,7 +166,7 @@ export function useVoiceCompanyResearch(
       respond({
         status: confirmed ? 'match_confirmed' : 'match_not_confirmed',
         instruction: confirmed
-          ? 'Give a brief summary of the verified findings. Suggest at most two relevant SmartNet opportunities as possibilities, not established faults. Then ask: Is either of those useful, or did you already have a particular challenge in mind?'
+          ? 'In two short sentences, summarise the verified findings and name one or two ways SmartNet Technologies could help. Do not try to solve their problem yourself. Invite them to share their contact details so a human SmartNet consultant can reach out.'
           : 'Do not make company-specific recommendations. Invite the visitor to type a corrected company name or website.',
       });
       return;
@@ -283,8 +283,8 @@ export function useVoiceCompanyResearch(
           instruction:
             'Research is still pending. Give one further natural interlude ' +
             'of at most 35 words. Briefly say you are still checking, then ' +
-            'describe a general example of how connecting systems can reduce ' +
-            'repeated data entry. Present it as an example, not a finding about ' +
+            'mention that SmartNet pairs human engineering leadership with modern ' +
+            'cloud and software delivery. Present it generally, not as a finding about ' +
             'this company. Finish and pause. Do not ask questions or call tools.',
         }, true);
       }
@@ -321,8 +321,8 @@ export function useVoiceCompanyResearch(
             'The application has started public-source research. ' +
             'Speak a warm, natural interlude of at most 40 words. ' +
             'Begin: While I check that for you, here is a little about SmartNet. ' +
-            'Briefly explain that SmartNet builds custom software and connects ' +
-            'business workflows with cloud infrastructure. ' +
+            'Briefly explain that SmartNet Technologies engineers custom software, ' +
+            'cloud platforms, and applied AI solutions for organisations. ' +
             'Finish the thought and pause. Do not ask a question, call tools, ' +
             'claim findings, or imply knowledge of this company yet.',
         }, true);

@@ -31,7 +31,7 @@ export function NexusHandoverForm({
   );
   const [summary, setSummary] = useState(initialSummary);
   const [contactConsent, setContactConsent] = useState(false);
-  const [saveTranscriptConsent, setSaveTranscriptConsent] = useState(false);
+  const [saveTranscriptConsent, setSaveTranscriptConsent] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [confirmedName, setConfirmedName] = useState('');

@@ -80,6 +80,7 @@ export function NexusLiveStage({
           : '';
 
   const scenePanel = panelKey.startsWith('scene:');
+  const isConnecting = state === 'connecting' && !inputActive && !handoverActive;
   const label = handoverActive
     ? 'FOLLOW-UP'
     : inputActive
@@ -113,7 +114,11 @@ export function NexusLiveStage({
       : captionPage(subtitle) || fallback;
 
   return (
-    <section className="nc-stage" aria-label="NEXUS holographic conversation">
+    <section
+      className="nc-stage"
+      data-connecting={isConnecting}
+      aria-label="NEXUS holographic conversation"
+    >
       <div className="nc-status">
         <span>SMARTNET</span>
         <span role="status"><i />{label}</span>
@@ -254,6 +259,46 @@ export function NexusLiveStage({
           )}
         </div>
       </div>
+
+      <AnimatePresence>
+        {isConnecting && (
+          <motion.div
+            key="nexus-connecting"
+            className="nc-connecting-overlay"
+            role="status"
+            aria-live="polite"
+            initial={reduced ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduced ? 0 : 0.28, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <motion.div
+              className="nc-connecting-card"
+              initial={reduced ? false : { opacity: 0, scale: 0.96, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.97, y: -6 }}
+              transition={{ duration: reduced ? 0 : 0.32, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="nc-wake-orbit" aria-hidden="true">
+                <span className="nc-wake-ring nc-wake-ring--outer" />
+                <span className="nc-wake-ring nc-wake-ring--amber" />
+                <span className="nc-wake-core" />
+              </div>
+
+              <span className="nc-wake-eyebrow">ESTABLISHING LIVE SESSION</span>
+              <h3>Hold on — waking up our AI consultant.</h3>
+              <p>
+                Preparing voice audio and connecting you to NEXUS. This usually
+                takes just a few seconds.
+              </p>
+
+              <div className="nc-wake-bar" aria-hidden="true">
+                <span />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

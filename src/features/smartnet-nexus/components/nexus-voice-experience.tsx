@@ -1094,7 +1094,7 @@ export function NexusVoiceExperience({
     >
       <header className="nx-live-header">
         <div>
-          <span>SMARTNET / LIVE INTELLIGENCE</span>
+          <span>SMARTNET TECHNOLOGIES · AI CONSULTANT</span>
           <strong id="nx-live-title">NEXUS</strong>
         </div>
         <button type="button" onClick={closeExperience} aria-label="Close NEXUS">
