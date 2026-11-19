@@ -128,7 +128,7 @@ export function NexusLiveStage({
               }
               researching={researching}
               reduced={reduced}
-              hasPanel={false}
+              hasPanel={Boolean(panelKey)}
               globe={researching || (active && scene === 'business')}
               analyser={analyser}
             />

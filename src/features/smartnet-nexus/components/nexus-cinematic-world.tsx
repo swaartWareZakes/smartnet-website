@@ -137,7 +137,7 @@ function World({
     };
   }, []);
 
-  useFrame(({ clock, pointer, viewport }, delta) => {
+  useFrame(({ clock, pointer, viewport, size: canvasSize }, delta) => {
     if (!core.current || !rings.current) return;
     const time = clock.elapsedTime;
     const blend = 1 - Math.exp(-Math.min(delta, 0.1) * 5);
@@ -187,21 +187,26 @@ function World({
       waveAttr.current.needsUpdate = true;
     }
 
-    const narrow = viewport.width < 7;
-    const targetX = narrow ? 0 : hasPanel ? -0.35 : 0;
-    const size = Math.min(1, viewport.width / 5.1, viewport.height / 5.6);
-    const targetSize = size * (1 + energy.current * 0.04);
+    const isMobile = canvasSize.width < 760;
+    const targetX = isMobile ? 0 : hasPanel ? -0.35 : 0;
+    const baseY = isMobile && hasPanel ? 0.04 : 0.18;
+    const scaleFactor = Math.min(
+      isMobile && hasPanel ? 1.08 : 1,
+      viewport.width / 4.85,
+      viewport.height / (isMobile && hasPanel ? 4.9 : 5.5)
+    );
+    const targetSize = scaleFactor * (1 + energy.current * 0.04);
     core.current.position.x = THREE.MathUtils.lerp(
       core.current.position.x,
       targetX,
       reduced ? 1 : blend
     );
     core.current.position.y = reduced
-      ? 0.18
-      : 0.18 + Math.sin(time * 0.55) * 0.035;
+      ? baseY
+      : baseY + Math.sin(time * 0.55) * 0.035;
     core.current.scale.setScalar(
       reduced
-        ? size
+        ? scaleFactor
         : THREE.MathUtils.lerp(core.current.scale.x, targetSize, blend)
     );
 
