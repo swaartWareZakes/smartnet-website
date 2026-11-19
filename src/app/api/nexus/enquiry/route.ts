@@ -287,8 +287,7 @@ export async function POST(request: Request) {
       consentAt: saved.contact_consent_at,
       transcriptIncluded: includeTranscript,
       transcriptCount: transcript?.length ?? 0,
-    },
-    { origin: requestOrigin }
+    }
   );
 
   // Optional: update notification_status when service role key is configured.
