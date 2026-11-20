@@ -115,12 +115,16 @@ export function NexusVoiceExperience({
   const visualTimers = useRef(new Map<number, string>());
   const visualCalls = useRef(new Set<string>());
 
-  const clearVisuals = useCallback(() => {
+  const cancelPendingVisuals = useCallback(() => {
     pendingVisual.current = null;
     visualTimers.current.forEach((_, timer) => window.clearTimeout(timer));
     visualTimers.current.clear();
-    setScene('');
   }, []);
+
+  const clearVisuals = useCallback(() => {
+    cancelPendingVisuals();
+    setScene('');
+  }, [cancelPendingVisuals]);
 
 
   const sessionRef = useRef<LiveSession | null>(null);
@@ -170,6 +174,11 @@ export function NexusVoiceExperience({
   const pausedToolCallsRef = useRef(new Set<string>());
   const lastUserAudio = useRef(0);
   const lastActivityAtRef = useRef(0);
+  const lastPlaybackEndedAtRef = useRef(0);
+  const bargeInFramesRef = useRef(0);
+  const bargeInUntilRef = useRef(0);
+  const interruptCheckTimerRef = useRef<number | null>(null);
+  const lastInterruptPromptAtRef = useRef(0);
   const narrationQueue = useRef<ResearchNarration[]>([]);
   const queueNarration = useCallback((item: ResearchNarration) => {
     narrationQueue.current.push(item);
@@ -383,6 +392,13 @@ export function NexusVoiceExperience({
       clearTimeout(timerRef.current);
       timerRef.current = null;
     }
+    if (interruptCheckTimerRef.current !== null) {
+      window.clearTimeout(interruptCheckTimerRef.current);
+      interruptCheckTimerRef.current = null;
+    }
+    bargeInFramesRef.current = 0;
+    bargeInUntilRef.current = 0;
+    lastPlaybackEndedAtRef.current = 0;
 
     try {
       sessionRef.current?.sendRealtimeInput({
@@ -609,6 +625,9 @@ export function NexusVoiceExperience({
 
     source.onended = () => {
       playbackRef.current.delete(source);
+      if (playbackRef.current.size === 0) {
+        lastPlaybackEndedAtRef.current = Date.now();
+      }
 
       if (playbackRef.current.size === 0 && assistantTurnFinishedRef.current) {
         if (greetingPendingRef.current) {
@@ -902,20 +921,76 @@ export function NexusVoiceExperience({
             const content = message.serverContent;
 
             if (content?.interrupted) {
+              const interruptedExcerpt = assistantTurn.current.trim().slice(-240);
               assistantTurnFinishedRef.current = true;
-              clearVisuals();
+              cancelPendingVisuals();
+              bargeInFramesRef.current = 0;
               setSubtitle('');
               spokenRef.current = '';
-            if (assistantTurn.current) assistantTurn.current += ' [interrupted]';
-            flushTranscript();
+              if (assistantTurn.current) assistantTurn.current += ' [interrupted]';
+              flushTranscript();
               playbackRef.current.forEach((source) => {
                 try { source.stop(); } catch {}
               });
 
               playbackRef.current.clear();
+              lastPlaybackEndedAtRef.current = Date.now();
               playTimeRef.current =
                 outputContextRef.current?.currentTime ?? 0;
               setStatus('listening');
+
+              if (interruptCheckTimerRef.current !== null) {
+                window.clearTimeout(interruptCheckTimerRef.current);
+                interruptCheckTimerRef.current = null;
+              }
+
+              const now = Date.now();
+              if (
+                interruptedExcerpt &&
+                now - lastInterruptPromptAtRef.current >= 8000
+              ) {
+                interruptCheckTimerRef.current = window.setTimeout(() => {
+                  interruptCheckTimerRef.current = null;
+                  const session = sessionRef.current;
+                  if (
+                    !session ||
+                    closingRef.current ||
+                    overlayRef.current ||
+                    researchQuietRef.current ||
+                    discardedTurnRef.current ||
+                    !assistantTurnFinishedRef.current ||
+                    playbackRef.current.size > 0
+                  ) {
+                    return;
+                  }
+                  // If the visitor actually spoke a real phrase, let Gemini reply normally.
+                  if (userTurn.current.trim().length >= 4) return;
+                  if (Date.now() - lastUserAudio.current < 850) return;
+
+                  lastInterruptPromptAtRef.current = Date.now();
+                  bargeInUntilRef.current = 0;
+                  assistantTurnFinishedRef.current = false;
+                  setStatus('speaking');
+
+                  try {
+                    session.sendClientContent({
+                      turns: [{
+                        role: 'user',
+                        parts: [{
+                          text:
+                            'APPLICATION INTERRUPTION CHECK. You were interrupted mid-sentence while saying: "' +
+                            interruptedExcerpt.replace(/"/g, "'") +
+                            '". No clear visitor question followed. Politely ask in ONE brief, warm sentence whether they were about to say something or if they would like you to continue, then pause and wait.',
+                        }],
+                      }],
+                      turnComplete: true,
+                    });
+                  } catch {
+                    assistantTurnFinishedRef.current = true;
+                    setStatus('listening');
+                  }
+                }, 1600);
+              }
             }
 
             if (content?.inputTranscription?.text) {
@@ -925,6 +1000,13 @@ export function NexusVoiceExperience({
               assistantTurnFinishedRef.current = false;
               const text = content.inputTranscription.text;
               userTurn.current = (userTurn.current + text).slice(-20000);
+              if (
+                userTurn.current.trim().length >= 4 &&
+                interruptCheckTimerRef.current !== null
+              ) {
+                window.clearTimeout(interruptCheckTimerRef.current);
+                interruptCheckTimerRef.current = null;
+              }
             setHeard(userTurn.current);
               setSubtitle('');
               setTopic(topicFromText(text));
@@ -1065,9 +1147,35 @@ export function NexusVoiceExperience({
         const samples = event.inputBuffer.getChannelData(0);
         let energy = 0;
         for (const sample of samples) energy += sample * sample;
-        if (Math.sqrt(energy / samples.length) > 0.025) {
-          lastUserAudio.current = Date.now();
-          lastActivityAtRef.current = Date.now();
+        const rms = Math.sqrt(energy / samples.length);
+        const now = Date.now();
+
+        const assistantSpeaking =
+          !assistantTurnFinishedRef.current ||
+          playbackRef.current.size > 0 ||
+          now - lastPlaybackEndedAtRef.current < 450;
+
+        if (assistantSpeaking && now > bargeInUntilRef.current) {
+          // Ignore speaker echo and brief ambient noise while NEXUS speaks;
+          // require 2 consecutive deliberate speech frames (~256ms) to interrupt.
+          if (rms > 0.068) {
+            bargeInFramesRef.current += 1;
+            if (bargeInFramesRef.current >= 2) {
+              bargeInUntilRef.current = now + 2600;
+            } else {
+              return;
+            }
+          } else {
+            bargeInFramesRef.current = 0;
+            return;
+          }
+        } else if (!assistantSpeaking) {
+          bargeInFramesRef.current = 0;
+        }
+
+        if (rms > 0.028) {
+          lastUserAudio.current = now;
+          lastActivityAtRef.current = now;
         }
 
         try {
