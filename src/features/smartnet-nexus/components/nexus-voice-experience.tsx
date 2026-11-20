@@ -23,7 +23,7 @@ import { NexusCompanySearch } from './nexus-company-search';
 import { NexusHandoverForm } from './nexus-handover-form';
 import './nexus-research-flow.css';
 // NEXUS_RESEARCH_OVERLAY_V1
-import { NEXUS_SCENES } from '@/lib/nexus-visual-scenes';
+import { NEXUS_SCENES, type NexusSceneAction } from '@/lib/nexus-visual-scenes';
 import { companyContext, nexusHeaders, recordMessage, visitorState } from '@/lib/nexus-visitor';
 
 import {
@@ -438,10 +438,14 @@ export function NexusVoiceExperience({
 
   function choosePrompt(
     prompt: string,
-    action?: 'open-handover' | 'keep-exploring'
+    action?: NexusSceneAction
   ) {
     if (action === 'open-handover') {
       openHandover();
+      return;
+    }
+    if (action === 'open-research') {
+      openCompanyInput();
       return;
     }
     const session = sessionRef.current;
@@ -552,7 +556,7 @@ export function NexusVoiceExperience({
     assistantTurnFinishedRef.current = false;
     discardedTurnRef.current = false;
     lastOutputAtRef.current = Date.now();
-    setInputRequested(true);
+    setInputRequested(false);
     const attempt = ++attemptRef.current;
     const cancelled = () => closingRef.current || attempt !== attemptRef.current;
 
@@ -880,7 +884,19 @@ export function NexusVoiceExperience({
 
             if (content?.turnComplete) {
               assistantTurnFinishedRef.current = true;
-            flushTranscript();
+              const spokenSoFar = assistantTurn.current;
+              flushTranscript();
+              // Safety net: if NEXUS announces opening the handover form without firing the tool
+              if (
+                !handoverOpenRef.current &&
+                !handoverRequested &&
+                /opening (?:the )?(?:short )?(?:follow-up|handover|contact) form/i.test(
+                  spokenSoFar
+                )
+              ) {
+                handoverRequestedAtRef.current = Date.now();
+                setHandoverRequested(true);
+              }
               if (greetingPendingRef.current) {
                 greetingFinishedRef.current = true;
               }
@@ -1121,7 +1137,23 @@ export function NexusVoiceExperience({
             setResearchVisible(false);
             setScene('');
           }}
-          research={<VoiceResearchPanel research={voiceResearch.state} />}
+          research={
+            <VoiceResearchPanel
+              research={voiceResearch.state}
+              onConfirmMatch={() =>
+                choosePrompt(
+                  'Yes, that is my company. Please briefly explain how SmartNet Technologies can assist and ask if I have any other query.'
+                )
+              }
+              onDifferentQuery={() => {
+                setResearchVisible(false);
+                choosePrompt(
+                  'I have a specific challenge or query for my company that I want to discuss with SmartNet.'
+                );
+              }}
+              onOpenHandover={() => openHandover()}
+            />
+          }
           onChoose={choosePrompt}
         />
 
@@ -1218,9 +1250,8 @@ export function NexusVoiceExperience({
           </button>
         </div>
         <small className="nx-live-privacy">
-          Microphone access starts only when you choose to begin.
-          Audio is processed by Google Gemini Live.
-          Avoid confidential information. AI responses can be inaccurate.
+          Microphone access starts only when you choose to begin. Audio is processed by Google Gemini Live.
+          Conversations, company lookups, and approximate location are logged to help SmartNet review enquiries.
         </small>
       </footer>
     </dialog>

@@ -4,7 +4,7 @@
 import dynamic from 'next/dynamic';
 import { AnimatePresence, motion } from 'motion/react';
 import { useId, useState, type ReactNode, type RefObject } from 'react';
-import { NEXUS_SCENES } from '@/lib/nexus-visual-scenes';
+import { NEXUS_SCENES, type NexusSceneAction } from '@/lib/nexus-visual-scenes';
 import { NexusHologramVisual } from './nexus-hologram-visuals';
 import './nexus-cinematic-stage.css';
 
@@ -28,7 +28,7 @@ type Props = {
   showResearch: boolean;
   research: ReactNode;
   onDismissResearch: () => void;
-  onChoose: (prompt: string, action?: 'open-handover' | 'keep-exploring') => void;
+  onChoose: (prompt: string, action?: NexusSceneAction) => void;
 };
 
 // Advance in word-boundary pages rather than continually chopping
@@ -174,9 +174,13 @@ export function NexusLiveStage({
                       <span className="nc-holo-dot" aria-hidden="true" />
                     </div>
                     <NexusHologramVisual
+                      key={scene}
                       scene={scene}
                       image={info.image}
                       imageAlt={info.imageAlt}
+                      gallery={info.gallery}
+                      demoUrl={info.demoUrl}
+                      demoLabel={info.demoLabel}
                     />
                     <h2 id={`${id}-title`}>{info.title}</h2>
                     <p>{info.text}</p>

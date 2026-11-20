@@ -9,6 +9,7 @@ import {
 } from '@google/genai';
 import {
   nexusHeaders,
+  syncSessionLog,
   updateVisitor,
   visitorState,
   type Research,
@@ -166,8 +167,8 @@ export function useVoiceCompanyResearch(
       respond({
         status: confirmed ? 'match_confirmed' : 'match_not_confirmed',
         instruction: confirmed
-          ? 'In two short sentences, summarise the verified findings and name one or two ways SmartNet Technologies could help. Do not try to solve their problem yourself. Invite them to share their contact details so a human SmartNet consultant can reach out.'
-          : 'Do not make company-specific recommendations. Invite the visitor to type a corrected company name or website.',
+          ? 'In two short sentences, summarise the verified findings and highlight one or two ways SmartNet Technologies could assist. Do not try to solve their problem yourself. Ask whether either fits what they need or if they have a different query for their company, and let them know a human SmartNet consultant can follow up.'
+          : 'Do not make company-specific recommendations. Invite the visitor to enter a corrected company name or website.',
       });
       return;
     }
@@ -356,6 +357,7 @@ export function useVoiceCompanyResearch(
       if (pending.current !== job) return;
 
       updateVisitor({ company, website, report, confirmed: false });
+      void syncSessionLog();
 
       setState({
         phase: 'done',
@@ -467,91 +469,123 @@ export function useVoiceCompanyResearch(
 
 export function VoiceResearchPanel({
   research,
+  onConfirmMatch,
+  onDifferentQuery,
+  onOpenHandover,
 }: {
   research: ResearchState;
+  onConfirmMatch?: () => void;
+  onDifferentQuery?: () => void;
+  onOpenHandover?: () => void;
 }) {
   if (research.phase === 'idle') return null;
+
+  const s = research.report?.structured;
 
   return (
     <aside
       className={`nx-research-panel nx-research-${research.phase}`}
-      aria-label="Company research"
+      aria-label="Company briefing"
     >
       <div className="nx-research-heading">
-        <span>PUBLIC COMPANY RESEARCH</span>
+        <span>COMPANY BRIEFING</span>
         <span>{research.elapsed}s</span>
       </div>
 
-      <strong>{research.company}</strong>
-      <p role="status">{research.message}</p>
+      <div className="nc-brief-title-row">
+        <strong>{s?.companyMatch || research.company}</strong>
+        {s?.industry && <span className="nc-brief-badge">{s.industry}</span>}
+      </div>
 
       {research.phase === 'running' && (
-        <div className="nx-research-scan" aria-hidden="true">
-          <span />
-        </div>
-      )}
-
-      {research.report && (
         <>
-          <ol>
-            {research.report.sources.map((source) => (
-              <li key={source.index}>
-                <a
-                  href={source.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {source.title} ↗
-                </a>
-              </li>
-            ))}
-          </ol>
-
-          <small>
-            {research.confirmed
-              ? 'Company match confirmed.'
-              : 'Tell NEXUS whether this is your company.'}
-          </small>
-
-          <details>
-            <summary>View briefing and evidence</summary>
-            <p style={{ whiteSpace: 'pre-wrap' }}>
-              {research.report.text}
-            </p>
-            {research.report.evidence.map((item, index) => (
-              <p key={index}>
-                {item.text}
-                {item.sources.map((sourceIndex) => {
-                  const source = research.report!.sources.find(
-                    (source) => source.index === sourceIndex
-                  );
-                  return source ? (
-                    <a
-                      key={sourceIndex}
-                      href={source.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    > [{sourceIndex}]</a>
-                  ) : null;
-                })}
-              </p>
-            ))}
-          </details>
-
-          {research.report.searchHtml && (
-            <iframe
-              title="Google Search suggestions"
-              sandbox="allow-popups allow-popups-to-escape-sandbox"
-              referrerPolicy="no-referrer"
-              srcDoc={research.report.searchHtml}
-              style={{ width: '100%', height: 150, border: 0 }}
-            />
-          )}
+          <p role="status">{research.message}</p>
+          <div className="nc-brief-skeleton" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
         </>
       )}
 
-      <small>
-        Public-source coverage is limited. Research is not a technical audit.
+      {research.phase !== 'running' && !research.report && (
+        <p role="status">{research.message}</p>
+      )}
+
+      {research.report && (
+        <div className="nc-brief-body">
+          {s?.overview ? (
+            <p className="nc-brief-overview">{s.overview}</p>
+          ) : (
+            <p className="nc-brief-overview">{research.report.text}</p>
+          )}
+
+          {s && s.observations.length > 0 && (
+            <div className="nc-brief-block">
+              <h4>WHAT WE FOUND</h4>
+              <ul>
+                {s.observations.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {s && s.opportunities.length > 0 && (
+            <div className="nc-brief-block nc-brief-block--accent">
+              <h4>HOW SMARTNET CAN ASSIST</h4>
+              <ul>
+                {s.opportunities.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {research.report.sources.length > 0 && (
+            <div className="nc-brief-sources">
+              <h4>VERIFIED PUBLIC SOURCES</h4>
+              <div className="nc-source-chips">
+                {research.report.sources.slice(0, 6).map((source) => (
+                  <a
+                    key={source.index}
+                    href={source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="nc-source-chip"
+                  >
+                    {source.title} ↗
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="nc-choices nc-brief-actions">
+            {!research.confirmed && onConfirmMatch && (
+              <button type="button" onClick={onConfirmMatch}>
+                Yes, that&apos;s my company — explore opportunities
+                <span aria-hidden="true">↗</span>
+              </button>
+            )}
+            {onDifferentQuery && (
+              <button type="button" onClick={onDifferentQuery}>
+                I have a different query for my company
+                <span aria-hidden="true">↗</span>
+              </button>
+            )}
+            {onOpenHandover && (
+              <button type="button" onClick={onOpenHandover}>
+                Speak with a human SmartNet consultant
+                <span aria-hidden="true">↗</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      <small className="nc-brief-footnote">
+        Based on public Google Search results — not a technical audit.
       </small>
     </aside>
   );

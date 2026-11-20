@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { nexusAccess } from '@/lib/nexus-access';
 import { notifySmartnetEnquiry } from '@/lib/nexus-enquiry-notify';
+import { extractRequestGeo } from '@/lib/request-geo';
 
 export const runtime = 'nodejs';
 
@@ -96,6 +97,8 @@ export async function POST(request: Request) {
   const conversationId = UUID_RE.test(conversationIdRaw)
     ? conversationIdRaw
     : null;
+  const sessionLogIdRaw = cleanString(body.sessionLogId, 64);
+  const sessionLogId = UUID_RE.test(sessionLogIdRaw) ? sessionLogIdRaw : null;
 
   if (!UUID_RE.test(idempotencyKey)) {
     return NextResponse.json(
@@ -204,7 +207,9 @@ export async function POST(request: Request) {
     global: { headers: { Authorization: `Bearer ${token}` } },
   });
 
-  const insertPayload = {
+  const geo = extractRequestGeo(request);
+
+  const basePayload = {
     idempotency_key: idempotencyKey,
     conversation_id: conversationId,
     visitor_name: visitorName,
@@ -223,11 +228,27 @@ export async function POST(request: Request) {
     status: 'New enquiry',
   };
 
-  const inserted = await db
+  let inserted = await db
     .from('nexus_enquiries')
-    .insert(insertPayload)
+    .insert({
+      ...basePayload,
+      session_log_id: sessionLogId,
+      ip_address: geo.ipAddress,
+      city: geo.city,
+      region: geo.region,
+      country_name: geo.countryName,
+    })
     .select('id, contact_consent_at, status')
     .single();
+
+  // Backwards-compatible fallback if the 20261120 SQL migration has not been applied yet
+  if (inserted.error?.code === '42703') {
+    inserted = await db
+      .from('nexus_enquiries')
+      .insert(basePayload)
+      .select('id, contact_consent_at, status')
+      .single();
+  }
 
   if (inserted.error) {
     // Duplicate submission with same idempotency key: treat as already saved without re-notifying.
@@ -264,13 +285,6 @@ export async function POST(request: Request) {
   }
 
   const saved = inserted.data;
-  const requestOrigin = (() => {
-    try {
-      return new URL(request.url).origin;
-    } catch {
-      return undefined;
-    }
-  })();
 
   const notification = await notifySmartnetEnquiry(
     {

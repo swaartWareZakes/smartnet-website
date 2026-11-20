@@ -10,7 +10,7 @@ export const NEXUS_RESEARCH_TOOLS: Tool[] = [{
         properties: {
           scene: {
             type: Type.STRING,
-            enum: ['welcome', 'software', 'cloud', 'watchtower', 'workshop', 'roads', 'education', 'business', 'research', 'followup', 'clear'],
+            enum: ['welcome', 'showcase', 'midwifey', 'tickets', 'prawductions', 'watchtower', 'roads', 'kairo', 'workshop', 'software', 'cloud', 'education', 'business', 'research', 'followup', 'clear'],
           },
         },
         required: ['scene'],

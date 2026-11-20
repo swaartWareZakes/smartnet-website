@@ -937,3 +937,245 @@
     opacity: 0.6;
   }
 }
+
+
+/* NEXUS_REAL_GALLERY_AND_BRIEFING_V1 */
+.nc-holo-image-wrap--portrait {
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  background: radial-gradient(circle at 50% 45%, #124a6266, #02101a 82%);
+}
+
+.nc-holo-image {
+  max-height: 200px;
+  object-fit: cover;
+}
+
+.nc-holo-image--portrait {
+  width: auto !important;
+  max-width: 100%;
+  max-height: 215px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.nc-holo-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 4;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(126, 236, 255, 0.55);
+  border-radius: 50%;
+  background: rgba(3, 18, 28, 0.84);
+  color: #dffaff;
+  cursor: pointer;
+}
+
+.nc-holo-nav:hover {
+  background: rgba(12, 56, 76, 0.95);
+  border-color: #aef7ff;
+}
+
+.nc-holo-nav--prev { left: 8px; }
+.nc-holo-nav--next { right: 8px; }
+
+.nc-holo-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.nc-holo-dots button {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(126, 236, 255, 0.28);
+  cursor: pointer;
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+.nc-holo-dots button.is-active {
+  width: 18px;
+  background: #8ef4ff;
+}
+
+.nc-holo-demo-link {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 186, 107, 0.65);
+  background: rgba(255, 170, 82, 0.14);
+  color: #ffd9a8 !important;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nc-holo-demo-link:hover {
+  background: rgba(255, 170, 82, 0.24);
+}
+
+/* Keep real project screenshots visible on mobile inside NEXUS */
+@media (max-width: 760px) {
+  .nc-holo-media.nc-holo-media--real {
+    display: block !important;
+    margin: 8px 0 4px;
+  }
+
+  .nc-holo-image,
+  .nc-holo-image--portrait {
+    max-height: 145px;
+  }
+}
+
+/* Redesigned Dark Holographic Company Briefing Card */
+.nc-brief-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.nc-brief-title-row strong {
+  font-size: 19px !important;
+  line-height: 1.25;
+  color: #edfaff;
+}
+
+.nc-brief-badge {
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(126, 236, 255, 0.45);
+  background: rgba(14, 70, 96, 0.55);
+  color: #9bf5ff;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.nc-brief-body {
+  display: grid;
+  gap: 12px;
+}
+
+.nc-brief-overview {
+  margin: 0;
+  font-size: 12.5px !important;
+  line-height: 1.65 !important;
+  color: #cfe7f0 !important;
+}
+
+.nc-brief-block {
+  padding: 11px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(104, 212, 236, 0.22);
+  background: rgba(5, 25, 38, 0.72);
+}
+
+.nc-brief-block--accent {
+  border-color: rgba(255, 186, 107, 0.38);
+  background: rgba(34, 28, 18, 0.34);
+}
+
+.nc-brief-block h4,
+.nc-brief-sources h4 {
+  margin: 0 0 7px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  color: #7feaff;
+}
+
+.nc-brief-block--accent h4 {
+  color: #ffca86;
+}
+
+.nc-brief-block ul {
+  margin: 0;
+  padding-left: 16px;
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #d6eef6;
+}
+
+.nc-source-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.nc-source-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(104, 212, 236, 0.32);
+  background: rgba(7, 34, 48, 0.85);
+  color: #9ef2ff !important;
+  font-size: 11px;
+  text-decoration: none;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nc-source-chip:hover {
+  border-color: #9ef2ff;
+  background: rgba(14, 58, 78, 0.95);
+}
+
+.nc-brief-actions {
+  margin-top: 4px !important;
+}
+
+.nc-brief-footnote {
+  display: block;
+  margin-top: 12px;
+  color: #7ba3b3;
+  font-size: 10px;
+}
+
+.nc-brief-skeleton {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.nc-brief-skeleton span {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(96, 212, 240, 0.12),
+    rgba(130, 238, 255, 0.28),
+    rgba(96, 212, 240, 0.12)
+  );
+  background-size: 200% 100%;
+  animation: nc-skel 1.4s ease-in-out infinite;
+}
+
+.nc-brief-skeleton span:nth-child(2) { width: 82%; }
+.nc-brief-skeleton span:nth-child(3) { width: 64%; }
+
+@keyframes nc-skel {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

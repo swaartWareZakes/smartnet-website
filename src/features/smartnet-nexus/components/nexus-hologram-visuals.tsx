@@ -1,31 +1,118 @@
 'use client';
 
 import Image from 'next/image';
+import { useState } from 'react';
+import { ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import type { NexusGalleryItem } from '@/lib/nexus-visual-scenes';
 
 type Props = {
   scene: string;
   image?: string;
   imageAlt?: string;
+  gallery?: NexusGalleryItem[];
+  demoUrl?: string;
+  demoLabel?: string;
 };
 
-export function NexusHologramVisual({ scene, image, imageAlt }: Props) {
-  if (image) {
+export function NexusHologramVisual({
+  scene,
+  image,
+  imageAlt,
+  gallery,
+  demoUrl,
+  demoLabel,
+}: Props) {
+  const [index, setIndex] = useState(0);
+
+  const items: NexusGalleryItem[] =
+    gallery && gallery.length > 0
+      ? gallery
+      : image
+        ? [{ src: image, alt: imageAlt || 'SmartNet project preview', caption: 'Project preview' }]
+        : [];
+
+  if (items.length > 0) {
+    const safeIdx = index % items.length;
+    const current = items[safeIdx];
+
     return (
-      <div className="nc-holo-media">
-        <div className="nc-holo-image-wrap">
+      <div className="nc-holo-media nc-holo-media--real">
+        <div
+          className={`nc-holo-image-wrap ${
+            current.portrait ? 'nc-holo-image-wrap--portrait' : ''
+          }`}
+        >
           <Image
-            src={image}
-            alt={imageAlt || 'SmartNet project preview'}
-            width={640}
-            height={360}
-            className="nc-holo-image"
+            src={current.src}
+            alt={current.alt}
+            width={current.portrait ? 380 : 680}
+            height={current.portrait ? 680 : 410}
+            className={`nc-holo-image ${
+              current.portrait ? 'nc-holo-image--portrait' : ''
+            }`}
           />
           <div className="nc-holo-scanline" aria-hidden="true" />
+
+          {items.length > 1 && (
+            <>
+              <button
+                type="button"
+                className="nc-holo-nav nc-holo-nav--prev"
+                aria-label="Previous screenshot"
+                onClick={() =>
+                  setIndex((prev) => (prev - 1 + items.length) % items.length)
+                }
+              >
+                <ChevronLeft size={15} />
+              </button>
+              <button
+                type="button"
+                className="nc-holo-nav nc-holo-nav--next"
+                aria-label="Next screenshot"
+                onClick={() => setIndex((prev) => (prev + 1) % items.length)}
+              >
+                <ChevronRight size={15} />
+              </button>
+            </>
+          )}
         </div>
+
         <div className="nc-holo-caption-bar">
-          <span>PROJECT PREVIEW</span>
-          <span>HOLOGRAPHIC PROJECTION</span>
+          <span>{current.caption}</span>
+          <span>
+            {items.length > 1
+              ? `SCREEN ${safeIdx + 1} / ${items.length}`
+              : 'ACTUAL APPLICATION'}
+          </span>
         </div>
+
+        {items.length > 1 && (
+          <div className="nc-holo-dots" role="tablist" aria-label="Project screenshots">
+            {items.map((shot, i) => (
+              <button
+                key={shot.src}
+                type="button"
+                role="tab"
+                aria-selected={i === safeIdx}
+                aria-label={`Show screenshot ${i + 1}: ${shot.caption}`}
+                className={i === safeIdx ? 'is-active' : ''}
+                onClick={() => setIndex(i)}
+              />
+            ))}
+          </div>
+        )}
+
+        {demoUrl && (
+          <a
+            href={demoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="nc-holo-demo-link"
+          >
+            <span>{demoLabel || 'Open Live Demo'}</span>
+            <ArrowUpRight size={14} aria-hidden="true" />
+          </a>
+        )}
       </div>
     );
   }
@@ -33,80 +120,12 @@ export function NexusHologramVisual({ scene, image, imageAlt }: Props) {
   return (
     <div className="nc-holo-media" aria-hidden="true">
       <div className="nc-holo-frame">
-        {scene === 'watchtower' ? (
+        {scene === 'roads' ? (
           <svg viewBox="0 0 360 170" className="nc-holo-svg">
-            {/* Cluster telemetry grid + AKS nodes */}
-            <g stroke="#5cdff2" strokeWidth="1" fill="none" opacity=".32">
-              <path d="M18 144H342M18 112H342M18 80H342M18 48H342" />
-            </g>
-            {/* Central hexagonal AKS cluster core with amber pulse */}
-            <g transform="translate(96 86)">
-              <polygon
-                points="0,-46 40,-23 40,23 0,46 -40,23 -40,-23"
-                fill="#0b3a4d66"
-                stroke="#8af3ff"
-                strokeWidth="1.4"
-              />
-              <polygon
-                points="0,-28 24,-14 24,14 0,28 -24,14 -24,-14"
-                fill="#ffaa5218"
-                stroke="#ffaa52"
-                strokeWidth="1.2"
-              />
-              <circle r="7" fill="#ffbe73" />
-              <circle r="15" fill="none" stroke="#ffaa52" strokeDasharray="3 4" opacity=".8" />
-              {[
-                [0, -46],
-                [40, -23],
-                [40, 23],
-                [0, 46],
-                [-40, 23],
-                [-40, -23],
-              ].map(([x, y], i) => (
-                <circle key={i} cx={x} cy={y} r="3" fill="#9bf5ff" />
-              ))}
-            </g>
-            {/* Right telemetry signal & workload bars */}
-            <g transform="translate(166 28)">
-              <rect width="174" height="54" rx="4" fill="#062230aa" stroke="#5bd6ea55" />
-              <polyline
-                points="10,38 30,32 48,40 70,18 92,26 114,14 136,24 162,16"
-                fill="none"
-                stroke="#8df4ff"
-                strokeWidth="1.6"
-              />
-              <circle cx="114" cy="14" r="3" fill="#ffaa52" />
-              <circle cx="162" cy="16" r="3" fill="#9bf5ff" />
-              <text x="10" y="13" fill="#7fc8d9" fontSize="7" fontFamily="monospace">
-                CLUSTER TELEMETRY
-              </text>
-            </g>
-            <g transform="translate(166 94)">
-              <rect width="174" height="52" rx="4" fill="#062230aa" stroke="#5bd6ea55" />
-              {[24, 38, 30, 44, 34, 41, 28, 36, 46, 32].map((h, i) => (
-                <rect
-                  key={i}
-                  x={12 + i * 15}
-                  y={44 - h * 0.68}
-                  width="8"
-                  height={h * 0.68}
-                  rx="1"
-                  fill={i === 3 || i === 8 ? '#ffaa52' : '#65e2f5'}
-                  opacity={i === 3 || i === 8 ? '.95' : '.68'}
-                />
-              ))}
-              <text x="10" y="12" fill="#7fc8d9" fontSize="7" fontFamily="monospace">
-                AKS WORKLOAD VISIBILITY
-              </text>
-            </g>
-          </svg>
-        ) : scene === 'roads' ? (
-          <svg viewBox="0 0 360 170" className="nc-holo-svg">
-            {/* Road Funding Gap scenario model matching video_1.mp4 00:03 telemetry + isometric structure */}
             <g transform="translate(16 18)">
               <rect width="194" height="134" rx="4" fill="#06223099" stroke="#5bd6ea55" />
               <text x="10" y="15" fill="#7fd3e5" fontSize="7" fontFamily="monospace">
-                SCENARIO INVESTMENT CURVES
+                10-YEAR SCENARIO CURVES
               </text>
               {[18, 28, 24, 42, 36, 56, 48, 68, 62, 82].map((h, i) => (
                 <rect
@@ -128,7 +147,6 @@ export function NexusHologramVisual({ scene, image, imageAlt }: Props) {
               />
               <circle cx="182" cy="34" r="3.5" fill="#ffbe73" />
             </g>
-            {/* Radial condition ring + corridor wireframe */}
             <g transform="translate(282 64)">
               <circle r="38" fill="none" stroke="#3c7a8d" strokeWidth="5" opacity=".4" />
               <circle
@@ -147,31 +165,14 @@ export function NexusHologramVisual({ scene, image, imageAlt }: Props) {
                 strokeDasharray="95 90"
                 transform="rotate(-40)"
               />
-              <text
-                y="3"
-                textAnchor="middle"
-                fill="#dff9ff"
-                fontSize="8"
-                fontFamily="monospace"
-              >
-                SCENARIOS
+              <text y="3" textAnchor="middle" fill="#dff9ff" fontSize="8" fontFamily="monospace">
+                RFG MODEL
               </text>
-            </g>
-            <g transform="translate(226 116)">
-              <path
-                d="M0 32 L38 6 L112 6 L74 32 Z"
-                fill="#0b3a4d66"
-                stroke="#7beeff"
-                strokeWidth="1"
-              />
-              <path d="M19 19 L93 19" stroke="#ffaa52" strokeDasharray="5 4" strokeWidth="1.4" />
             </g>
           </svg>
         ) : scene === 'workshop' ? (
           <svg viewBox="0 0 360 170" className="nc-holo-svg">
-            {/* LMG-WMS mechanical/workflow hologram inspired by video_1.mp4 00:05-00:06 */}
             <g transform="translate(24 22)">
-              {/* Isometric assembly block */}
               <g transform="translate(76 62)">
                 <path
                   d="M0,-44 L56,-18 L56,22 L0,48 L-56,22 L-56,-18 Z"
@@ -180,7 +181,6 @@ export function NexusHologramVisual({ scene, image, imageAlt }: Props) {
                   strokeWidth="1.3"
                 />
                 <path d="M0,-44 L0,48 M-56,-18 L0,8 L56,-18" stroke="#78eeff88" strokeWidth="1" fill="none" />
-                {/* Glowing amber workshop core */}
                 <path
                   d="M0,-18 L24,-6 L24,14 L0,26 L-24,14 L-24,-6 Z"
                   fill="#ffaa5233"
@@ -189,14 +189,13 @@ export function NexusHologramVisual({ scene, image, imageAlt }: Props) {
                 />
                 <circle r="4.5" cy="4" fill="#ffd29a" />
               </g>
-              {/* Connected workflow cards */}
               {[
                 { y: 4, title: 'JOB CARDS', accent: '#78eeff' },
-                { y: 46, title: 'WORKSHOP FLOW', accent: '#ffaa52' },
+                { y: 46, title: 'OPERATIONS', accent: '#ffaa52' },
                 { y: 88, title: 'PARTS & RECORDS', accent: '#78eeff' },
               ].map((row) => (
                 <g key={row.title} transform={`translate(162 ${row.y})`}>
-                  <path d={`M-26 ${16} H0`} stroke={row.accent} strokeDasharray="3 3" opacity=".8" />
+                  <path d="M-26 16 H0" stroke={row.accent} strokeDasharray="3 3" opacity=".8" />
                   <rect width="150" height="32" rx="4" fill="#062230bb" stroke={row.accent} strokeOpacity=".65" />
                   <circle cx="12" cy="16" r="3" fill={row.accent} />
                   <text x="24" y="19" fill="#daf8ff" fontSize="8" fontFamily="monospace">
@@ -208,7 +207,6 @@ export function NexusHologramVisual({ scene, image, imageAlt }: Props) {
           </svg>
         ) : scene === 'education' ? (
           <svg viewBox="0 0 360 170" className="nc-holo-svg">
-            {/* Guided learning network & human oversight */}
             <g stroke="#6deeff" strokeWidth="1.1" fill="none" opacity=".55">
               <path d="M62 124 L132 52 L212 96 L296 42" />
               <path d="M62 124 L152 122 L212 96 L284 128" strokeDasharray="4 4" />
@@ -222,13 +220,7 @@ export function NexusHologramVisual({ scene, image, imageAlt }: Props) {
               <g key={String(label)} transform={`translate(${x} ${y})`}>
                 <circle r="15" fill="#072736cc" stroke={String(color)} strokeWidth="1.3" />
                 <circle r="4" fill={String(color)} />
-                <text
-                  y="27"
-                  textAnchor="middle"
-                  fill="#c8eff8"
-                  fontSize="7"
-                  fontFamily="monospace"
-                >
+                <text y="27" textAnchor="middle" fill="#c8eff8" fontSize="7" fontFamily="monospace">
                   {String(label)}
                 </text>
               </g>
@@ -236,21 +228,19 @@ export function NexusHologramVisual({ scene, image, imageAlt }: Props) {
           </svg>
         ) : scene === 'software' || scene === 'cloud' ? (
           <svg viewBox="0 0 360 170" className="nc-holo-svg">
-            {/* Layered isometric architecture stack inspired by video_1.mp4 00:03 */}
             <g fill="none">
               {[0, 1, 2, 3].map((i) => {
                 const y = 38 + i * 24;
                 const accent = i === 1 ? '#ffaa52' : '#74ecff';
                 return (
-                  <g key={i}>
-                    <path
-                      d={`M64 ${y + 24} L180 ${y - 12} L296 ${y + 24} L180 ${y + 60} Z`}
-                      fill={i === 1 ? '#ffaa5214' : '#0b3a4d38'}
-                      stroke={accent}
-                      strokeWidth={i === 1 ? '1.5' : '1'}
-                      opacity={0.45 + i * 0.14}
-                    />
-                  </g>
+                  <path
+                    key={i}
+                    d={`M64 ${y + 24} L180 ${y - 12} L296 ${y + 24} L180 ${y + 60} Z`}
+                    fill={i === 1 ? '#ffaa5214' : '#0b3a4d38'}
+                    stroke={accent}
+                    strokeWidth={i === 1 ? '1.5' : '1'}
+                    opacity={0.45 + i * 0.14}
+                  />
                 );
               })}
               <path d="M180 18 V146" stroke="#9cf5ff" strokeDasharray="3 4" />
@@ -266,23 +256,13 @@ export function NexusHologramVisual({ scene, image, imageAlt }: Props) {
           </svg>
         ) : (
           <svg viewBox="0 0 360 170" className="nc-holo-svg">
-            {/* Global connected network inspired by video_1.mp4 00:07-00:09 */}
             <g transform="translate(110 85)" fill="none">
               <circle r="56" stroke="#6ceaff" strokeWidth="1.2" opacity=".75" />
               <ellipse rx="28" ry="56" stroke="#6ceaff" strokeWidth=".9" opacity=".42" />
               <ellipse rx="56" ry="22" stroke="#6ceaff" strokeWidth=".9" opacity=".42" />
               <ellipse rx="68" ry="18" stroke="#ffaa52" strokeWidth="1.2" transform="rotate(-18)" opacity=".8" />
               <ellipse rx="68" ry="18" stroke="#7cf2ff" strokeWidth=".9" transform="rotate(22)" opacity=".5" />
-              {[
-                [-26, -12, '#9bf5ff'],
-                [14, 18, '#ffaa52'],
-                [28, -22, '#9bf5ff'],
-                [-12, 26, '#7cf2ff'],
-              ].map(([x, y, c], i) => (
-                <circle key={i} cx={Number(x)} cy={Number(y)} r="3.5" fill={String(c)} />
-              ))}
             </g>
-            {/* Rising data pillars on right */}
             <g transform="translate(212 24)">
               {[34, 62, 48, 86, 54, 96, 72, 44].map((h, i) => (
                 <g key={i} transform={`translate(${i * 16} 0)`}>
@@ -310,9 +290,20 @@ export function NexusHologramVisual({ scene, image, imageAlt }: Props) {
         <div className="nc-holo-scanline" aria-hidden="true" />
       </div>
       <div className="nc-holo-caption-bar">
-        <span>ILLUSTRATIVE HOLOGRAM</span>
-        <span>SMARTNET NEXUS</span>
+        <span>SMARTNET SOLUTION</span>
+        <span>NEXUS VIEW</span>
       </div>
+      {demoUrl && (
+        <a
+          href={demoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="nc-holo-demo-link"
+        >
+          <span>{demoLabel || 'Open Live Demo'}</span>
+          <ArrowUpRight size={14} aria-hidden="true" />
+        </a>
+      )}
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { CheckCircle2 } from 'lucide-react';
-import { nexusHeaders, visitorState } from '@/lib/nexus-visitor';
+import {nexusHeaders, visitorState, ensureSessionLogId, syncSessionLog } from '@/lib/nexus-visitor';
 
 type Props = {
   initialCompany: string;
@@ -197,6 +197,7 @@ export function NexusHandoverForm({
         }
       }
 
+      void syncSessionLog({ enquiryId: data.id, visitorName: cleanName, visitorEmail: cleanEmail, visitorPhone: cleanPhone });
       const firstName = cleanName.split(/\s+/)[0] || cleanName;
       setConfirmedName(firstName);
     } catch (cause) {
