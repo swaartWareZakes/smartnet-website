@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Search, X } from 'lucide-react';
+import { Building2, Globe, Search, X } from 'lucide-react';
 
 type Props = {
   active: boolean;
@@ -11,11 +11,58 @@ type Props = {
   onDismiss: () => void;
 };
 
-function normalizeWebsite(raw: string): string {
+const DOMAIN_LIKE_RE =
+  /^(https?:\/\/)?(www\.)?[a-z0-9-]+(\.[a-z0-9-]+)+(\/[^\s]*)?$/i;
+
+function parseCompanyQuery(raw: string): {
+  mode: 'empty' | 'website' | 'company';
+  company: string;
+  website: string;
+  valid: boolean;
+} {
   const trimmed = raw.trim();
-  if (!trimmed) return '';
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  return `https://${trimmed}`;
+  if (!trimmed) {
+    return { mode: 'empty', company: '', website: '', valid: false };
+  }
+
+  const looksLikeUrl =
+    !trimmed.includes(' ') &&
+    (/^https?:\/\//i.test(trimmed) || DOMAIN_LIKE_RE.test(trimmed));
+
+  if (looksLikeUrl) {
+    try {
+      const withScheme = /^https?:\/\//i.test(trimmed)
+        ? trimmed
+        : `https://${trimmed}`;
+      const parsed = new URL(withScheme);
+      if (
+        !['http:', 'https:'].includes(parsed.protocol) ||
+        !parsed.hostname.includes('.') ||
+        parsed.username ||
+        parsed.password ||
+        parsed.port ||
+        /\.(local|internal|localhost)$/i.test(parsed.hostname)
+      ) {
+        return { mode: 'website', company: '', website: '', valid: false };
+      }
+      parsed.protocol = 'https:';
+      return {
+        mode: 'website',
+        company: parsed.hostname.replace(/^www\./i, ''),
+        website: parsed.href,
+        valid: parsed.href.length <= 250,
+      };
+    } catch {
+      return { mode: 'website', company: '', website: '', valid: false };
+    }
+  }
+
+  return {
+    mode: 'company',
+    company: trimmed.slice(0, 160),
+    website: '',
+    valid: trimmed.length >= 2,
+  };
 }
 
 function CompanySearchModalInner({
@@ -24,57 +71,46 @@ function CompanySearchModalInner({
   onCancel,
   onDismiss,
 }: Omit<Props, 'active'>) {
-  const [company, setCompany] = useState('');
-  const [website, setWebsite] = useState('');
+  const [query, setQuery] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const companyInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      companyInputRef.current?.focus();
+      inputRef.current?.focus();
     }, 60);
     return () => window.clearTimeout(timer);
   }, []);
 
   const busy = running || submitting;
+  const parsed = parseCompanyQuery(query);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy) return;
 
-    const cleanCompany = company.trim();
-    const rawSite = website.trim();
-
-    if (!cleanCompany && !rawSite) {
-      setError('Enter your company name or website (or both).');
-      companyInputRef.current?.focus();
+    if (parsed.mode === 'empty') {
+      setError('Enter your company name or website to continue.');
+      inputRef.current?.focus();
       return;
     }
 
-    let cleanWebsite = '';
-    if (rawSite) {
-      try {
-        const parsed = new URL(normalizeWebsite(rawSite));
-        if (!parsed.hostname.includes('.')) throw new Error();
-        cleanWebsite = parsed.href;
-      } catch {
-        setError('Please enter a valid website, for example yourcompany.co.za.');
-        return;
-      }
+    if (!parsed.valid) {
+      setError(
+        parsed.mode === 'website'
+          ? 'Enter a valid public website, for example yourcompany.co.za.'
+          : 'Enter at least 2 characters for your company name.'
+      );
+      inputRef.current?.focus();
+      return;
     }
-
-    const effectiveCompany =
-      cleanCompany ||
-      (cleanWebsite
-        ? new URL(cleanWebsite).hostname.replace(/^www\./i, '')
-        : '');
 
     setError('');
     setSubmitting(true);
     try {
-      await onSearch(effectiveCompany, cleanWebsite, '');
+      await onSearch(parsed.company, parsed.website, '');
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -92,7 +128,11 @@ function CompanySearchModalInner({
       aria-modal="true"
       aria-label="Explore your company"
     >
-      <form className="nx-focus-card" onSubmit={handleSubmit} noValidate>
+      <form
+        className="nx-focus-card nx-single-search-card"
+        onSubmit={handleSubmit}
+        noValidate
+      >
         <div className="nx-focus-heading">
           <div>
             <span>SMARTNET AI CONSULTANT · COMPANY LOOKUP</span>
@@ -107,50 +147,77 @@ function CompanySearchModalInner({
           </button>
         </div>
 
-        <p
-          style={{
-            margin: '8px 0 18px',
-            fontSize: '13px',
-            color: '#a5c6d4',
-            lineHeight: 1.6,
-          }}
-        >
-          Enter your company name, website, or both. NEXUS will check public
-          information so we can suggest where SmartNet Technologies can assist.
+        <p className="nx-single-lead">
+          Enter your company name or website in one step. NEXUS will review
+          public sources and highlight where SmartNet Technologies can assist.
         </p>
 
-        <div style={{ display: 'grid', gap: '12px' }}>
-          <label style={{ display: 'grid', gap: '6px', fontSize: '12px' }}>
-            <span>Company name</span>
-            <input
-              ref={companyInputRef}
-              type="text"
-              maxLength={160}
-              placeholder="e.g. Acme Logistics"
-              value={company}
-              disabled={busy}
-              onChange={(e) => {
-                setCompany(e.target.value);
-                if (error) setError('');
-              }}
-            />
+        <div className="nx-single-field">
+          <label htmlFor="nx-company-query" className="nx-single-label">
+            Company name or website
           </label>
 
-          <label style={{ display: 'grid', gap: '6px', fontSize: '12px' }}>
-            <span>Website</span>
+          <div
+            className={`nx-single-input-wrap ${
+              parsed.mode === 'website' ? 'is-url' : ''
+            }`}
+          >
+            <span className="nx-single-icon" aria-hidden="true">
+              {parsed.mode === 'website' ? (
+                <Globe size={18} />
+              ) : (
+                <Building2 size={18} />
+              )}
+            </span>
+
             <input
+              id="nx-company-query"
+              ref={inputRef}
               type="text"
-              inputMode="url"
+              className="nx-single-input"
               maxLength={250}
-              placeholder="yourcompany.co.za"
-              value={website}
+              autoComplete="organization"
+              placeholder="e.g. Acme Logistics or yourcompany.co.za"
+              value={query}
               disabled={busy}
               onChange={(e) => {
-                setWebsite(e.target.value);
+                setQuery(e.target.value);
                 if (error) setError('');
               }}
             />
-          </label>
+
+            {query && !busy && (
+              <button
+                type="button"
+                className="nx-single-clear"
+                aria-label="Clear input"
+                onClick={() => {
+                  setQuery('');
+                  setError('');
+                  inputRef.current?.focus();
+                }}
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          <div className="nx-single-hint-row">
+            {parsed.mode === 'website' && parsed.valid ? (
+              <span className="nx-single-detect is-url">
+                Website detected · {parsed.website.replace(/^https:\/\//, '')}
+              </span>
+            ) : parsed.mode === 'company' && parsed.valid ? (
+              <span className="nx-single-detect">
+                Company search · {parsed.company}
+              </span>
+            ) : (
+              <span className="nx-single-muted">
+                Tip: Paste a domain like <code>company.co.za</code> or type your
+                business name.
+              </span>
+            )}
+          </div>
         </div>
 
         {error && (
@@ -159,16 +226,7 @@ function CompanySearchModalInner({
           </p>
         )}
 
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '10px',
-            marginTop: '20px',
-          }}
-        >
+        <div className="nx-single-actions">
           <button
             type="button"
             className="nx-focus-skip"
@@ -178,9 +236,13 @@ function CompanySearchModalInner({
             Back to conversation
           </button>
 
-          <button type="submit" className="nx-handover-submit" disabled={busy}>
-            <Search size={14} aria-hidden="true" />{' '}
-            {busy ? 'Checking public info…' : 'Explore my company'}
+          <button
+            type="submit"
+            className="nx-handover-submit nx-single-submit"
+            disabled={busy}
+          >
+            <Search size={15} aria-hidden="true" />
+            <span>{busy ? 'Checking public info…' : 'Explore my company'}</span>
           </button>
         </div>
       </form>

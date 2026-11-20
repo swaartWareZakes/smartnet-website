@@ -22,60 +22,64 @@ export type NexusScene = {
     label: string;
     prompt: string;
     action?: NexusSceneAction;
+    targetScene?: string;
   }[];
 };
 
 export const NEXUS_SCENES: Record<string, NexusScene> = {
   welcome: {
     title: 'How would you like to begin?',
-    text: 'Explore SmartNet Technologies and walk through our real projects, or enter your company name or website so we can see how SmartNet can help.',
+    text: 'Explore SmartNet Technologies’ leading, cutting-edge projects, or enter your company name or website so we can see how SmartNet can support your business.',
     label: 'SMARTNET AI CONSULTANT',
-    tags: ['OUR WORK', 'YOUR COMPANY', 'CONSULTATION'],
+    tags: ['LEADING PROJECTS', 'YOUR BUSINESS', 'CONSULTATION'],
     diagram: 'globe',
     choices: [
       {
         label: 'Explore SmartNet & Our Work',
         prompt:
-          'Introduce SmartNet Technologies briefly and showcase our real work starting with our project showcase.',
+          'Briefly introduce SmartNet Technologies, display our showcase, and ask if I would like to explore one of your leading, cutting-edge projects.',
+        targetScene: 'showcase',
       },
       {
-        label: 'Explore My Company',
-        prompt:
-          'I want to explore how SmartNet can help my company.',
+        label: 'Explore My Business',
+        prompt: 'I want to enquire how SmartNet can help my business.',
         action: 'open-research',
       },
     ],
   },
   showcase: {
-    title: 'Real systems built by SmartNet.',
-    text: 'From award-winning mobile healthcare apps and municipal road-funding models to ticketing platforms and Azure Kubernetes operations.',
+    title: 'Leading SmartNet Solutions',
+    text: 'Select any of SmartNet’s cutting-edge builds—SA Roads Funding Gap, My Midwifey, Ticketing Platform, or Watchtower—to explore how we engineered it.',
     label: 'OUR WORK & EXPERIENCE',
-    tags: ['MY MIDWIFEY', 'RFG', 'TICKETING', 'KAIRO STUDIO'],
+    tags: ['RFG', 'MY MIDWIFEY', 'TICKETING', 'WATCHTOWER'],
     diagram: 'globe',
     choices: [
       {
-        label: 'View My Midwifey screenshots',
-        prompt: 'Show me My Midwifey with its screenshots and walk me through what SmartNet built.',
+        label: 'SA Roads Funding Gap',
+        prompt: 'Walk me through SA Roads Funding Gap and how SmartNet engineered it.',
+        targetScene: 'roads',
       },
       {
-        label: 'View SA Roads Funding Gap',
-        prompt: 'Show me SA Roads Funding Gap and explain how it helps road authorities.',
+        label: 'My Midwifey',
+        prompt: 'Walk me through My Midwifey and what SmartNet built.',
+        targetScene: 'midwifey',
       },
       {
-        label: 'View Ticketing Platform',
-        prompt: 'Show me the SmartNet Ticketing Platform screenshots and capabilities.',
+        label: 'Ticketing Platform',
+        prompt: 'Walk me through the SmartNet Ticketing Platform and its capabilities.',
+        targetScene: 'tickets',
       },
       {
-        label: 'Explore my company instead',
-        prompt: 'Now let us explore how SmartNet can help my company.',
-        action: 'open-research',
+        label: 'Watchtower (AKS)',
+        prompt: 'Walk me through Watchtower and SmartNet’s Azure Kubernetes operations.',
+        targetScene: 'watchtower',
       },
     ],
   },
   midwifey: {
     title: 'My Midwifey',
     text: 'Award-winning native iOS and Android prenatal hypertension companion built with University of Johannesburg researcher Busisiwe Mdletshe, featuring the interactive Midwife Bot.',
-    label: 'REAL PROJECT · MOBILE APP',
+    label: 'DELIVERED PLATFORM · MOBILE APP',
     tags: ['iOS & ANDROID', 'MIDWIFE BOT', 'UJ COLLABORATION'],
     diagram: 'architecture',
     gallery: [
@@ -106,24 +110,26 @@ export const NEXUS_SCENES: Record<string, NexusScene> = {
     ],
     choices: [
       {
-        label: 'Next: Ticketing Platform',
-        prompt: 'Show me the SmartNet Ticketing Platform screenshots next.',
-      },
-      {
-        label: 'Next: SA Roads Funding Gap',
-        prompt: 'Show me SA Roads Funding Gap next.',
-      },
-      {
-        label: 'Discuss a similar app with our team',
-        prompt: 'I would like to speak with the SmartNet team about building a similar application.',
+        label: 'Speak with our team about building an app',
+        prompt: 'I would like to leave my details so a SmartNet consultant can reach out about an app.',
         action: 'open-handover',
+      },
+      {
+        label: 'Back to leading projects',
+        prompt: 'Show your leading SmartNet projects again.',
+        targetScene: 'showcase',
+      },
+      {
+        label: 'Explore my business',
+        prompt: 'Now let us explore how SmartNet can help my business.',
+        action: 'open-research',
       },
     ],
   },
   tickets: {
     title: 'SmartNet Ticketing Platform',
     text: 'Real-time issue tracking and support web platform (originally swaartTickets) with role-based permissions, integrated live support chat, Elasticsearch, and white-label branding.',
-    label: 'REAL PROJECT · SUPPORT SAAS',
+    label: 'DELIVERED PLATFORM · SUPPORT SAAS',
     tags: ['REAL-TIME TICKETS', 'LIVE CHAT', 'RBAC'],
     diagram: 'architecture',
     gallery: [
@@ -150,53 +156,18 @@ export const NEXUS_SCENES: Record<string, NexusScene> = {
     ],
     choices: [
       {
-        label: 'Next: Prawductions Studio',
-        prompt: 'Show me Prawductions Studio screenshots next.',
+        label: 'Request a custom platform consultation',
+        prompt: 'I would like a SmartNet consultant to contact me about a support or operations platform.',
+        action: 'open-handover',
       },
       {
-        label: 'Next: Watchtower (AKS)',
-        prompt: 'Show me Watchtower cloud operations next.',
+        label: 'Back to leading projects',
+        prompt: 'Show your leading SmartNet projects again.',
+        targetScene: 'showcase',
       },
       {
-        label: 'Explore my company',
-        prompt: 'Let us explore how SmartNet can help my company.',
-        action: 'open-research',
-      },
-    ],
-  },
-  prawductions: {
-    title: 'Prawductions Studio',
-    text: 'Custom responsive studio showcase and online session-booking web platform delivered for Prawductions Studio.',
-    label: 'REAL PROJECT · WEB BOOKING',
-    tags: ['BOOKING PLATFORM', 'RESPONSIVE UI', 'CLIENT BUILD'],
-    diagram: 'architecture',
-    demoUrl: 'https://prawductions.com/',
-    demoLabel: 'Visit Prawductions',
-    gallery: [
-      {
-        src: '/images/portfolio/prawduction/1.png',
-        alt: 'Prawductions Studio landing page',
-        caption: 'Studio showcase landing page',
-      },
-      {
-        src: '/images/portfolio/prawduction/2.png',
-        alt: 'Prawductions Studio booking interface',
-        caption: 'Online studio booking interface',
-      },
-      {
-        src: '/images/portfolio/prawduction/6.png',
-        alt: 'Prawductions Studio reservation flow',
-        caption: 'Client reservation screens',
-      },
-    ],
-    choices: [
-      {
-        label: 'See Kairo Studio (Coming Soon)',
-        prompt: 'Tell me about Kairo Studio, SmartNet’s upcoming AI consultant platform.',
-      },
-      {
-        label: 'Explore my company',
-        prompt: 'Let us explore how SmartNet can help my company.',
+        label: 'Explore my business',
+        prompt: 'Let us explore how SmartNet can help my business.',
         action: 'open-research',
       },
     ],
@@ -221,14 +192,19 @@ export const NEXUS_SCENES: Record<string, NexusScene> = {
     ],
     choices: [
       {
-        label: 'Explore my company',
-        prompt: 'Let us look at my company and how SmartNet can assist.',
-        action: 'open-research',
+        label: 'Connect with a SmartNet cloud engineer',
+        prompt: 'I would like a SmartNet cloud consultant to reach out to me.',
+        action: 'open-handover',
       },
       {
-        label: 'Talk to a cloud engineer',
-        prompt: 'I would like to arrange a follow-up with SmartNet about cloud or AKS.',
-        action: 'open-handover',
+        label: 'Back to leading projects',
+        prompt: 'Show your leading SmartNet projects again.',
+        targetScene: 'showcase',
+      },
+      {
+        label: 'Explore my business',
+        prompt: 'Let us look at my business and how SmartNet can assist.',
+        action: 'open-research',
       },
     ],
   },
@@ -242,13 +218,57 @@ export const NEXUS_SCENES: Record<string, NexusScene> = {
     demoLabel: 'Open RFG Live Demo',
     choices: [
       {
-        label: 'View My Midwifey screenshots',
-        prompt: 'Show me My Midwifey screenshots next.',
+        label: 'Request an RFG walkthrough with our team',
+        prompt: 'I would like a SmartNet consultant to contact me for an RFG walkthrough.',
+        action: 'open-handover',
       },
       {
-        label: 'Request an RFG walkthrough',
-        prompt: 'I would like to arrange a walkthrough of SA Roads Funding Gap with the SmartNet team.',
+        label: 'Back to leading projects',
+        prompt: 'Show your leading SmartNet projects again.',
+        targetScene: 'showcase',
+      },
+      {
+        label: 'Explore my business',
+        prompt: 'Let us explore how SmartNet can help my business.',
+        action: 'open-research',
+      },
+    ],
+  },
+  prawductions: {
+    title: 'Prawductions Studio',
+    text: 'Custom responsive studio showcase and online session-booking web platform delivered for Prawductions Studio.',
+    label: 'DELIVERED PLATFORM · WEB BOOKING',
+    tags: ['BOOKING PLATFORM', 'RESPONSIVE UI', 'CLIENT BUILD'],
+    diagram: 'architecture',
+    demoUrl: 'https://prawductions.com/',
+    demoLabel: 'Visit Prawductions',
+    gallery: [
+      {
+        src: '/images/portfolio/prawduction/1.png',
+        alt: 'Prawductions Studio landing page',
+        caption: 'Studio showcase landing page',
+      },
+      {
+        src: '/images/portfolio/prawduction/2.png',
+        alt: 'Prawductions Studio booking interface',
+        caption: 'Online studio booking interface',
+      },
+      {
+        src: '/images/portfolio/prawduction/6.png',
+        alt: 'Prawductions Studio reservation flow',
+        caption: 'Client reservation screens',
+      },
+    ],
+    choices: [
+      {
+        label: 'Talk to our team about a web platform',
+        prompt: 'I would like to speak with SmartNet about building a booking or web platform.',
         action: 'open-handover',
+      },
+      {
+        label: 'Back to leading projects',
+        prompt: 'Show your leading SmartNet projects again.',
+        targetScene: 'showcase',
       },
     ],
   },
@@ -260,14 +280,14 @@ export const NEXUS_SCENES: Record<string, NexusScene> = {
     diagram: 'globe',
     choices: [
       {
-        label: 'Request early access',
-        prompt: 'I would like to request early access to Kairo Studio from the SmartNet team.',
+        label: 'Request Kairo Studio early access',
+        prompt: 'I would like to leave my contact details for Kairo Studio early access.',
         action: 'open-handover',
       },
       {
-        label: 'Explore my company',
-        prompt: 'Let us explore how SmartNet can help my company.',
-        action: 'open-research',
+        label: 'Back to leading projects',
+        prompt: 'Show your leading SmartNet projects again.',
+        targetScene: 'showcase',
       },
     ],
   },
@@ -279,12 +299,13 @@ export const NEXUS_SCENES: Record<string, NexusScene> = {
     diagram: 'architecture',
     choices: [
       {
-        label: 'See real project screenshots',
-        prompt: 'Show me real SmartNet projects like My Midwifey and the Ticketing Platform.',
+        label: 'Explore leading projects',
+        prompt: 'Show your leading SmartNet projects so I can pick one.',
+        targetScene: 'showcase',
       },
       {
-        label: 'Explore my company',
-        prompt: 'Let us explore how SmartNet can help my company.',
+        label: 'Explore my business',
+        prompt: 'Let us explore how SmartNet can help my business.',
         action: 'open-research',
       },
     ],
@@ -297,8 +318,9 @@ export const NEXUS_SCENES: Record<string, NexusScene> = {
     diagram: 'architecture',
     choices: [
       {
-        label: 'Show Watchtower',
-        prompt: 'Show me Watchtower and explain its AKS visibility scope.',
+        label: 'Show Watchtower (AKS)',
+        prompt: 'Walk me through Watchtower and its AKS visibility scope.',
+        targetScene: 'watchtower',
       },
       {
         label: 'Speak with our cloud team',
@@ -315,8 +337,9 @@ export const NEXUS_SCENES: Record<string, NexusScene> = {
     diagram: 'architecture',
     choices: [
       {
-        label: 'See more projects',
-        prompt: 'Show me other SmartNet projects like My Midwifey or SA Roads Funding Gap.',
+        label: 'Explore leading projects',
+        prompt: 'Show your leading SmartNet projects.',
+        targetScene: 'showcase',
       },
       {
         label: 'Talk to our team',
@@ -333,8 +356,9 @@ export const NEXUS_SCENES: Record<string, NexusScene> = {
     diagram: 'architecture',
     choices: [
       {
-        label: 'See delivered projects',
-        prompt: 'Show me delivered SmartNet projects with screenshots.',
+        label: 'Explore leading projects',
+        prompt: 'Show your leading SmartNet projects.',
+        targetScene: 'showcase',
       },
       {
         label: 'Discuss with our team',
@@ -346,7 +370,7 @@ export const NEXUS_SCENES: Record<string, NexusScene> = {
   business: {
     title: 'Explore how SmartNet can help.',
     text: 'Share your company name or website for a quick public lookup, or tell NEXUS your main challenge directly.',
-    label: 'YOUR COMPANY',
+    label: 'YOUR BUSINESS',
     tags: ['COMPANY LOOKUP', 'TAILORED SCOPE', 'HUMAN HANDOVER'],
     diagram: 'globe',
     choices: [
@@ -363,7 +387,7 @@ export const NEXUS_SCENES: Record<string, NexusScene> = {
     ],
   },
   research: {
-    title: 'Explore your company.',
+    title: 'Explore your business.',
     text: 'Enter your company name or website so NEXUS can check public sources and identify how SmartNet Technologies can help.',
     label: 'COMPANY LOOKUP',
     tags: ['COMPANY NAME', 'WEBSITE', 'SMARTNET FIT'],
@@ -393,55 +417,59 @@ export const NEXUS_SCENES: Record<string, NexusScene> = {
         action: 'open-handover',
       },
       {
-        label: 'Keep exploring',
-        prompt: 'I would like to keep exploring for now.',
-        action: 'keep-exploring',
+        label: 'Explore leading projects',
+        prompt: 'Show me your leading SmartNet projects again.',
+        targetScene: 'showcase',
       },
     ],
   },
 };
 
 export const NEXUS_PRESENTATION_RULES = `
-VISUAL PRESENTATION & TWO-PATH FLOW
-You control the holographic presentation using present_visual.
-Available scenes: welcome, showcase, midwifey, tickets, prawductions, watchtower,
-roads, kairo, workshop, software, cloud, education, business, research, followup, clear.
+STRICT TWO-PATH ROUTING (READ CAREFULLY)
+You control the visual stage with present_visual.
+Available scenes: welcome, showcase, roads, midwifey, tickets, watchtower,
+prawductions, kairo, workshop, software, cloud, education, business, research, followup, clear.
 
-TWO CLEAR PATHS AT THE START:
-1. Explore SmartNet & Our Work:
-   - Call present_visual(scene="showcase") or jump directly to the requested real project:
-     * midwifey: REAL Android/iOS screenshots of My Midwifey (4 screens visitors can swipe/browse!)
-     * tickets: REAL screenshots of SmartNet Ticketing Platform (4 screens!)
-     * prawductions: REAL screenshots of Prawductions Studio (3 screens!)
-     * watchtower: REAL cloud/AKS visuals for Watchtower
-     * roads: SA Roads Funding Gap (with live demo link button right on the card)
-     * kairo: Kairo Studio upcoming SaaS platform (NEXUS is the live POC)
-   - When presenting midwifey, tickets, prawductions, or watchtower, DO walk the visitor through
-     the real screenshots displayed on screen! Never say "no project screenshots are connected."
-   - For conceptual scenes without screenshots (software, cloud, workshop, education), do not claim
-     they are real screenshots.
+LANGUAGE & PHRASING RULES (IMPORTANT):
+- NEVER say "our four projects", "four flagship builds", "four holograms", or "screenshots".
+- Instead, speak naturally like a senior technology consultant—for example:
+  "Would you like to explore one of the leading, cutting-edge projects we've delivered?"
+- When displaying a project (midwifey, tickets, prawductions, watchtower, roads), walk them
+  through the live interface views naturally without saying "screenshots" or claiming "no visuals are connected".
 
-2. Explore Their Company:
-   - Do NOT push the company lookup form during the greeting. Only invite them to enter their
-     company name or website when they choose to explore their own company.
-   - When they want to look up their company, call present_visual(scene="research") and say:
-     "Please enter your company name or website in the form below." Then pause—the app opens a
-     simple one-step form (company name and/or website only; never ask for an address or location).
-   - Do NOT call research_company from speech; the visitor starts research by submitting the form.
-   - After research completes and the visitor confirms their company match (via confirm_company_match),
-     give a crisp 2-sentence summary of verified findings, mention 1 or 2 ways SmartNet could assist,
-     and ask: "Does either of those fit what you have in mind, or do you have a different query for your company?"
+PATH 1 — VISITOR ASKS HOW SMARTNET CAN HELP THEIR BUSINESS / COMPANY (HIGHEST PRIORITY):
+- If the visitor says anything like "how can SmartNet help my business", "help my company",
+  "enquire about my company", or asks about their own organisation:
+  * DO NOT call present_visual(scene="showcase")! Do NOT show SmartNet's project showcase!
+  * IMMEDIATELY call present_visual(scene="research") and say in ONE concise sentence:
+    "I'd love to explore how SmartNet can support your business—please enter your company name or website in the box appearing on screen."
+  * Then STOP speaking so the single company lookup input opens immediately.
+- Do NOT call research_company from speech; the visitor submits the form.
+- After company confirmation (confirm_company_match), give a 2-sentence summary of verified
+  findings, suggest 1-2 ways SmartNet can assist, and ask:
+  "Does either of those fit what you have in mind, or do you have a different query for your company?"
 
-HUMAN HANDOVER FLOW (CRITICAL):
-- Never try to solve technical problems yourself or repeat "workflows" jargon.
-- Once you understand what they need and explain how SmartNet's team can help, invite them to
-  leave their contact details for a human SmartNet consultant using offer_followup(mode="offer", summary).
-- The moment they say yes, ask for a call/quote, or agree to leave their details, you MUST invoke
-  offer_followup(mode="open", summary="...") BEFORE saying you are opening the form. Never claim
-  you opened a form without actually calling offer_followup(mode="open", summary).
-- Never claim a call is already booked or an enquiry is saved before they submit the form.
+PATH 2 — VISITOR ASKS ABOUT SMARTNET OR OUR WORK / PROJECTS:
+- ONLY call present_visual(scene="showcase") when the visitor specifically asks to learn about
+  SmartNet Technologies, our capabilities, or the work we have delivered.
+- In 2 crisp sentences, introduce SmartNet Technologies (custom software, cloud infrastructure,
+  and applied AI) and ask: "Would you like to explore one of our leading, cutting-edge projects we've delivered?"
+  (You may briefly mention examples like SA Roads Funding Gap, My Midwifey, our Ticketing Platform, or Watchtower without counting "four".)
+- Once they choose a project, call present_visual with its scene (roads, midwifey, tickets, or
+  watchtower), walk them through what SmartNet built in 2-3 punchy sentences, and IMMEDIATELY
+  pivot to conversion: ask whether they are looking to build or modernise something similar and
+  invite them to leave their contact details so a human SmartNet consultant can reach out.
+
+LEAD CONVERSION & HUMAN HANDOVER (CRITICAL):
+- Keep every reply to 2-3 short, executive sentences. Never DIY-solve problems or repeat "workflows".
+- After explaining a project OR discussing their business need, guide them toward connecting with
+  a human SmartNet consultant using offer_followup(mode="offer", summary).
+- The moment they agree to connect, ask for a call/quote/proposal, or ask for the form, you MUST
+  call offer_followup(mode="open", summary="...") BEFORE saying you are opening the form.
+- Never claim a call is booked or an enquiry is saved before they submit the form.
 `;
 
 export const SMARTNET_TYPED_GREETING =
   "Welcome to SmartNet Technologies. I'm NEXUS, SmartNet's AI technology consultant. " +
-  "Would you like to explore SmartNet and walk through our real projects, or explore how we can help your company?";
+  "Would you like to explore some of our leading, cutting-edge projects, or see how SmartNet can help your business?";

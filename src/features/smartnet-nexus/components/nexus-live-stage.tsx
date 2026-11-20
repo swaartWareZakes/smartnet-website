@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useId, useState, type ReactNode, type RefObject } from 'react';
 import { NEXUS_SCENES, type NexusSceneAction } from '@/lib/nexus-visual-scenes';
 import { NexusHologramVisual } from './nexus-hologram-visuals';
+import { NexusHoloDeck } from './nexus-holo-deck';
 import './nexus-cinematic-stage.css';
 
 const World = dynamic(() => import('./nexus-cinematic-world'), {
@@ -28,7 +29,7 @@ type Props = {
   showResearch: boolean;
   research: ReactNode;
   onDismissResearch: () => void;
-  onChoose: (prompt: string, action?: NexusSceneAction) => void;
+  onChoose: (prompt: string, action?: NexusSceneAction, targetScene?: string) => void;
 };
 
 // Advance in word-boundary pages rather than continually chopping
@@ -80,6 +81,7 @@ export function NexusLiveStage({
           : '';
 
   const scenePanel = panelKey.startsWith('scene:');
+  const isShowcaseDeck = panelKey === 'scene:showcase';
   const isConnecting = state === 'connecting' && !inputActive && !handoverActive;
   const label = handoverActive
     ? 'FOLLOW-UP'
@@ -124,7 +126,11 @@ export function NexusLiveStage({
         <span role="status"><i />{label}</span>
       </div>
 
-      <div className="nc-composition" data-panel={Boolean(panelKey)}>
+      <div
+        className="nc-composition"
+        data-panel={Boolean(panelKey) && !isShowcaseDeck}
+        data-showcase={isShowcaseDeck}
+      >
         <div className="nc-visual-zone">
           <div className="nc-world" aria-hidden="true">
             <World
@@ -133,7 +139,7 @@ export function NexusLiveStage({
               }
               researching={researching}
               reduced={reduced}
-              hasPanel={Boolean(panelKey)}
+              hasPanel={Boolean(panelKey) && !isShowcaseDeck}
               globe={researching || (active && scene === 'business')}
               analyser={analyser}
             />
@@ -141,9 +147,20 @@ export function NexusLiveStage({
           <div className="nc-core-label" aria-hidden="true">NEXUS</div>
         </div>
 
+        <AnimatePresence>
+          {isShowcaseDeck && (
+            <NexusHoloDeck
+              key="holo-deck"
+              active={active}
+              reduced={reduced}
+              onSelect={onChoose}
+            />
+          )}
+        </AnimatePresence>
+
         <div className="nc-slot" aria-label="Conversation presentation">
           <AnimatePresence mode="wait" initial={false}>
-            {panelKey && (
+            {panelKey && !isShowcaseDeck && (
               <motion.aside
                 key={panelKey}
                 className="nc-card"
@@ -197,7 +214,7 @@ export function NexusLiveStage({
                           key={choice.label}
                           type="button"
                           disabled={!active}
-                          onClick={() => onChoose(choice.prompt, choice.action)}
+                          onClick={() => onChoose(choice.prompt, choice.action, choice.targetScene)}
                         >
                           {choice.label}<span aria-hidden="true">↗</span>
                         </button>

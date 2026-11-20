@@ -34,6 +34,9 @@ import {
 type LiveSession =
   Awaited<ReturnType<GoogleGenAI['live']['connect']>>;
 
+const IDLE_WARNING_MS = 25_000;
+const IDLE_TIMEOUT_MS = 40_000;
+
 
 function topicFromText(text: string): HologramTopic {
   const value = text.toLowerCase();
@@ -102,6 +105,8 @@ export function NexusVoiceExperience({
   const [heard, setHeard] = useState('');
   const [muted, setMuted] = useState(false);
   const [error, setError] = useState('');
+  const [idleNotice, setIdleNotice] = useState('');
+  const [idleSecondsLeft, setIdleSecondsLeft] = useState<number | null>(null);
 
   const reduced = useReducedMotion();
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -147,6 +152,7 @@ export function NexusVoiceExperience({
   const [researchVisible, setResearchVisible] = useState(false);
   // NEXUS_QUIET_RESEARCH_V5
   const [inputRequested, setInputRequested] = useState(false);
+  const inputRequestedAtRef = useRef(0);
   const [inputOpen, setInputOpen] = useState(false);
   // NEXUS_HANDOVER_V1
   const [handoverRequested, setHandoverRequested] = useState(false);
@@ -163,6 +169,7 @@ export function NexusVoiceExperience({
   const microphoneMutedRef = useRef(false);
   const pausedToolCallsRef = useRef(new Set<string>());
   const lastUserAudio = useRef(0);
+  const lastActivityAtRef = useRef(0);
   const narrationQueue = useRef<ResearchNarration[]>([]);
   const queueNarration = useCallback((item: ResearchNarration) => {
     narrationQueue.current.push(item);
@@ -175,6 +182,7 @@ export function NexusVoiceExperience({
   const closeCompanyInput = useCallback(() => {
     setInputOpen(false);
     setInputRequested(false);
+    lastActivityAtRef.current = Date.now();
     if (!handoverOpenRef.current) {
       overlayRef.current = false;
       if (!researchQuietRef.current && !discardedTurnRef.current) {
@@ -190,6 +198,7 @@ export function NexusVoiceExperience({
     overlayRef.current = false;
     setHandoverOpen(false);
     setHandoverRequested(false);
+    lastActivityAtRef.current = Date.now();
     if (!researchQuietRef.current && !discardedTurnRef.current) {
       streamRef.current?.getAudioTracks().forEach(track => {
         track.enabled = !microphoneMutedRef.current;
@@ -277,12 +286,17 @@ export function NexusVoiceExperience({
     const timer = window.setInterval(() => {
       if (
         closingRef.current || researchQuietRef.current ||
-        discardedTurnRef.current || greetingPendingRef.current ||
-        !invitationAudioSeenRef.current ||
-        !assistantTurnFinishedRef.current ||
-        playbackRef.current.size > 0 ||
-        Date.now() - lastOutputAtRef.current < 450
+        discardedTurnRef.current || greetingPendingRef.current
       ) return;
+
+      const doneSpeaking =
+        assistantTurnFinishedRef.current && playbackRef.current.size === 0;
+      if (!doneSpeaking) return;
+
+      const settled = invitationAudioSeenRef.current
+        ? Date.now() - lastOutputAtRef.current >= 450
+        : Date.now() - inputRequestedAtRef.current >= 1400;
+      if (!settled) return;
 
       openCompanyInput();
     }, 100);
@@ -411,8 +425,66 @@ export function NexusVoiceExperience({
 
     setStatus('idle');
     setMuted(false);
+    setIdleSecondsLeft(null);
     spokenRef.current = '';
   }, [flushTranscript, cancelResearch, clearVisuals, closeCompanyInput, closeHandover]);
+
+  // Automatically close listening after sustained silence so the mic never stays open indefinitely
+  useEffect(() => {
+    const canCountIdle =
+      status === 'listening' &&
+      !muted &&
+      !overlayActive &&
+      !researchRunning;
+
+    if (!canCountIdle) return;
+
+    lastActivityAtRef.current = Date.now();
+
+    const timer = window.setInterval(() => {
+      if (
+        closingRef.current ||
+        overlayRef.current ||
+        researchQuietRef.current ||
+        microphoneMutedRef.current ||
+        greetingPendingRef.current ||
+        playbackRef.current.size > 0 ||
+        !assistantTurnFinishedRef.current
+      ) {
+        lastActivityAtRef.current = Date.now();
+        setIdleSecondsLeft(null);
+        return;
+      }
+
+      const lastSignal = Math.max(
+        lastActivityAtRef.current,
+        lastUserAudio.current,
+        lastOutputAtRef.current
+      );
+      const silentMs = Date.now() - lastSignal;
+
+      if (silentMs >= IDLE_TIMEOUT_MS) {
+        setIdleSecondsLeft(null);
+        setIdleNotice(
+          'Listening closed after inactivity. Click Start conversation whenever you want to continue.'
+        );
+        disconnect();
+        return;
+      }
+
+      if (silentMs >= IDLE_WARNING_MS) {
+        const remaining = Math.max(
+          1,
+          Math.ceil((IDLE_TIMEOUT_MS - silentMs) / 1000)
+        );
+        setIdleSecondsLeft(remaining);
+      } else {
+        setIdleSecondsLeft(null);
+      }
+    }, 500);
+
+    return () => window.clearInterval(timer);
+  }, [status, muted, overlayActive, researchRunning, disconnect]);
 
   useEffect(() => {
     const previous = document.body.style.overflow;
@@ -438,7 +510,8 @@ export function NexusVoiceExperience({
 
   function choosePrompt(
     prompt: string,
-    action?: NexusSceneAction
+    action?: NexusSceneAction,
+    targetScene?: string
   ) {
     if (action === 'open-handover') {
       openHandover();
@@ -458,6 +531,9 @@ export function NexusVoiceExperience({
     assistantTurnFinishedRef.current = false;
     closeCompanyInput();
     clearVisuals();
+    if (targetScene && Object.hasOwn(NEXUS_SCENES, targetScene)) {
+      setScene(targetScene);
+    }
     if (timerRef.current === null) return;
     playbackRef.current.forEach(source => {
       try { source.stop(); } catch {}
@@ -562,6 +638,9 @@ export function NexusVoiceExperience({
 
     setStatus('connecting');
     setError('');
+    setIdleNotice('');
+    setIdleSecondsLeft(null);
+    lastActivityAtRef.current = Date.now();
     setSubtitle('');
     setHeard('');
     spokenRef.current = '';
@@ -744,6 +823,7 @@ export function NexusVoiceExperience({
                   invitationAudioSeenRef.current = false;
                   assistantTurnFinishedRef.current = false;
                   lastOutputAtRef.current = Date.now();
+                  inputRequestedAtRef.current = Date.now();
                   setInputRequested(true);
                 }
                 pendingVisual.current = { id: call.id, scene: requested as string };
@@ -840,6 +920,7 @@ export function NexusVoiceExperience({
 
             if (content?.inputTranscription?.text) {
               lastUserAudio.current = Date.now();
+              lastActivityAtRef.current = Date.now();
               invitationAudioSeenRef.current = false;
               assistantTurnFinishedRef.current = false;
               const text = content.inputTranscription.text;
@@ -896,6 +977,17 @@ export function NexusVoiceExperience({
               ) {
                 handoverRequestedAtRef.current = Date.now();
                 setHandoverRequested(true);
+              }
+              // Safety net: if NEXUS invites the visitor to enter their company name/website without firing present_visual("research")
+              if (
+                !overlayRef.current &&
+                !researchQuietRef.current &&
+                !inputRequested &&
+                voiceResearch.state.phase === 'idle' &&
+                /(?:enter|type) your company name or website/i.test(spokenSoFar)
+              ) {
+                inputRequestedAtRef.current = Date.now();
+                setInputRequested(true);
               }
               if (greetingPendingRef.current) {
                 greetingFinishedRef.current = true;
@@ -975,6 +1067,7 @@ export function NexusVoiceExperience({
         for (const sample of samples) energy += sample * sample;
         if (Math.sqrt(energy / samples.length) > 0.025) {
           lastUserAudio.current = Date.now();
+          lastActivityAtRef.current = Date.now();
         }
 
         try {
@@ -1037,6 +1130,7 @@ export function NexusVoiceExperience({
       } catch {}
     }
 
+    lastActivityAtRef.current = Date.now();
     setMuted(!muted);
   }
 
@@ -1185,6 +1279,31 @@ export function NexusVoiceExperience({
 
       <footer className="nx-live-footer">
         {error && <p className="nx-live-error" role="alert">{error}</p>}
+        {!error && idleNotice && status === 'idle' && (
+          <p className="nx-idle-notice" role="status">{idleNotice}</p>
+        )}
+        {status === 'listening' &&
+          !muted &&
+          !overlayActive &&
+          !researchRunning &&
+          idleSecondsLeft !== null && (
+            <div className="nx-idle-warning" role="status" aria-live="polite">
+              <span>
+                No speech detected — closing mic in{' '}
+                <strong>{idleSecondsLeft}s</strong>
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  lastActivityAtRef.current = Date.now();
+                  lastUserAudio.current = Date.now();
+                  setIdleSecondsLeft(null);
+                }}
+              >
+                Keep listening
+              </button>
+            </div>
+          )}
         <div className="nx-live-controls">
           {status === 'idle' || status === 'error' ? (
             <button type="button" className="nx-live-start" onClick={startConversation}>
