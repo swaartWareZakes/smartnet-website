@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   ArrowUpRight,
@@ -102,11 +103,17 @@ export function SiteEntry({
       {phase === 'boot' && (
         <div className="snx-entry-loader" role="status">
           <div
-            className="snx-entry-symbol"
+            className="snx-entry-symbol snx-entry-symbol--logo"
             aria-hidden="true"
           >
-            <span>S</span>
-            <span>N</span>
+            <Image
+              src="/images/logo-mark.png"
+              alt=""
+              width={86}
+              height={86}
+              priority
+              className="snx-entry-logo-img"
+            />
           </div>
 
           <div className="snx-entry-line">

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 export default function GlobalLoading() {
   return (
     <div className="sn-route-veil is-entering" role="status" aria-live="polite">
@@ -8,7 +9,7 @@ export default function GlobalLoading() {
         <div className="sn-route-ring sn-route-ring--outer" aria-hidden="true" />
         <div className="sn-route-ring sn-route-ring--inner" aria-hidden="true" />
         <div className="sn-route-ring sn-route-ring--amber" aria-hidden="true" />
-        <span className="sn-route-monogram">SN</span>
+        <span className="sn-route-monogram"><Image src="/images/logo-mark.png" alt="" width={34} height={34} className="sn-route-logo-img" /></span>
       </div>
 
       <div className="sn-route-readout">

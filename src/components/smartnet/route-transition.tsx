@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
@@ -183,7 +185,7 @@ export function RouteTransition() {
           <div className="sn-route-ring sn-route-ring--outer" aria-hidden="true" />
           <div className="sn-route-ring sn-route-ring--inner" aria-hidden="true" />
           <div className="sn-route-ring sn-route-ring--amber" aria-hidden="true" />
-          <span className="sn-route-monogram">SN</span>
+          <span className="sn-route-monogram"><Image src="/images/logo-mark.png" alt="" width={34} height={34} className="sn-route-logo-img" /></span>
         </div>
 
         <div className="sn-route-readout">

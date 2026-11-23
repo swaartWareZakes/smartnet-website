@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { CardFxController } from './card-fx';
@@ -101,7 +102,16 @@ export function SiteChrome({
           aria-label="SmartNet Technologies homepage"
           onClick={() => setMenuOpen(false)}
         >
-          <span className="sn-global-monogram">SN</span>
+          <span className="sn-global-monogram sn-global-monogram--logo">
+            <Image
+              src="/images/logo-mark.png"
+              alt=""
+              width={40}
+              height={40}
+              priority
+              className="sn-brand-logo-img"
+            />
+          </span>
           <span>
             <strong>SMARTNET</strong>
             <small>TECHNOLOGIES</small>

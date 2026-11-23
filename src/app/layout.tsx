@@ -72,7 +72,7 @@ const organisationJsonLd = {
   name: 'SmartNet Technologies',
   legalName: 'SmartNet Technologies',
   url: 'https://smartnetsa.co.za',
-  logo: 'https://smartnetsa.co.za/icon.svg',
+  logo: 'https://smartnetsa.co.za/images/logo-mark.png',
   identifier: '2021/570418/07',
   description:
     'South African technology company specialising in software engineering, cloud infrastructure, DevOps, solutions architecture and digital transformation.',
