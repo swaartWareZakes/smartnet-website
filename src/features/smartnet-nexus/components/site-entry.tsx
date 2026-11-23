@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   ArrowUpRight,
   AudioLines,
@@ -16,6 +17,7 @@ export function SiteEntry({
 }: {
   onEnterAI: () => void;
 }) {
+  const router = useRouter();
   const [phase, setPhase] = useState<Phase>('boot');
 
   useEffect(() => {
@@ -69,7 +71,7 @@ export function SiteEntry({
     };
   }, [phase]);
 
-  function choose(mode: 'website' | 'ai') {
+  function choose(mode: 'website' | 'ai' | 'kairo') {
     try {
       sessionStorage.setItem(STORAGE_KEY, mode);
     } catch {
@@ -80,6 +82,16 @@ export function SiteEntry({
 
     if (mode === 'ai') {
       onEnterAI();
+      return;
+    }
+
+    if (mode === 'kairo') {
+      window.dispatchEvent(
+        new CustomEvent('smartnet:route-start', {
+          detail: { path: '/portfolio/kairo-studio' },
+        })
+      );
+      router.push('/portfolio/kairo-studio');
     }
   }
 
@@ -101,9 +113,9 @@ export function SiteEntry({
             <span />
           </div>
 
-          <p>INITIALISING SMARTNET SYSTEMS</p>
+          <p>SMARTNET TECHNOLOGIES</p>
           <small>
-            HUMAN EXPERTISE / INTELLIGENT EXECUTION
+            HUMAN EXPERTISE · INTELLIGENT EXECUTION
           </small>
         </div>
       )}
@@ -116,18 +128,16 @@ export function SiteEntry({
           aria-labelledby="snx-entry-heading"
         >
           <div className="snx-entry-label">
-            SMARTNET / CHOOSE YOUR EXPERIENCE
+            SMARTNET TECHNOLOGIES · CHOOSE YOUR EXPERIENCE
           </div>
 
           <h2 id="snx-entry-heading">
-            How would you like
-            <br />
-            <em>to explore?</em>
+            How would you like <em>to explore?</em>
           </h2>
 
           <p>
-            Explore our engineering world yourself,
-            or meet NEXUS — your AI business consultant.
+            Browse our engineering capabilities and delivered work, or speak
+            live with NEXUS — SmartNet&apos;s AI technology consultant.
           </p>
 
           <div className="snx-entry-options">
@@ -135,29 +145,62 @@ export function SiteEntry({
               type="button"
               onClick={() => choose('website')}
             >
-              <Globe2 size={26} />
+              <div className="snx-entry-option-top">
+                <Globe2 size={22} />
+                <ArrowUpRight size={17} aria-hidden="true" />
+              </div>
               <strong>Explore Website</strong>
               <small>
-                Discover our technology and services
+                Review our services, cloud expertise, and client case studies.
               </small>
-              <ArrowUpRight size={18} />
             </button>
 
             <button
               type="button"
+              className="snx-entry-option--nexus"
               onClick={() => choose('ai')}
             >
-              <AudioLines size={26} />
-              <strong>Enter NEXUS AI</strong>
+              <div className="snx-entry-option-top">
+                <AudioLines size={22} />
+                <ArrowUpRight size={17} aria-hidden="true" />
+              </div>
+              <strong>Consult NEXUS</strong>
               <small>
-                Explore our live AI experience
+                Speak with SmartNet&apos;s live AI consultant about your business.
               </small>
-              <ArrowUpRight size={18} />
             </button>
           </div>
 
+          <button
+            type="button"
+            className="snx-entry-kairo"
+            onClick={() => choose('kairo')}
+          >
+            <div className="snx-entry-kairo-copy">
+              <div className="snx-entry-kairo-badges">
+                <span className="snx-kairo-pill">
+                  <i aria-hidden="true" />
+                  COMING SOON
+                </span>
+                <span className="snx-kairo-name">KAIRO STUDIOS</span>
+              </div>
+              <strong>
+                Want your own AI consultant — just like NEXUS?
+              </strong>
+              <small>
+                Deploy a custom-branded voice &amp; visual AI consultant on your
+                company website or bio link with Kairo Studios.
+              </small>
+            </div>
+
+            <span className="snx-entry-kairo-cta">
+              <span>Preview &amp; Early Access</span>
+              <ArrowUpRight size={16} aria-hidden="true" />
+            </span>
+          </button>
+
           <div className="snx-entry-footnote">
-            MICROPHONE ACCESS IS OPTIONAL
+            MICROPHONE ACCESS IS OPTIONAL · POWERED BY SMARTNET TECHNOLOGIES
           </div>
         </section>
       )}
