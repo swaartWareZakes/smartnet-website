@@ -48,15 +48,27 @@ export const SERVICES = [
     ],
   },
   {
-    title: 'Security & Resilience',
-    subtitle: 'Protection designed in',
+    title: 'Disaster Recovery & Resilience',
+    subtitle: 'Continuity engineered and verified',
     description:
-      'Secure development practices, infrastructure reviews, disaster recovery planning and operational governance.',
+      'Active/passive cloud and Kubernetes failover architecture, automated rebuild scripts, timed RTO/RPO drills and DNS cutover planning.',
     capabilities: [
-      'Secure development',
-      'Access and secrets management',
-      'Disaster recovery planning',
-      'Technical assurance',
+      'AKS & cloud failover architecture',
+      'Automated DR rebuild & evidence scripts',
+      'Timed RTO/RPO drill validation',
+      'Failback & DNS cutover governance',
+    ],
+  },
+  {
+    title: 'Technical Documentation & Handover',
+    subtitle: 'Audit-ready engineering clarity',
+    description:
+      'Structured DR playbooks, operational runbooks, architecture inventories, RBAC/ingress registers and formal sign-off packs.',
+    capabilities: [
+      'Audit-ready DR & operational playbooks',
+      'System, ingress & RBAC inventories',
+      'Incident & troubleshooting runbooks',
+      'Engineering handover & knowledge transfer',
     ],
   },
   {
@@ -250,8 +262,48 @@ export const SOLUTIONS: SolutionItem[] = [
     note: 'Individual product capabilities and production rollout scope are verified through project-specific demonstrations and documentation.',
   },
   {
+    slug: 'enterprise-aks-disaster-recovery',
+    code: '04 / CLOUD RESILIENCE & GOVERNANCE',
+    category: 'Disaster Recovery & Audit Documentation',
+    name: 'Enterprise AKS Disaster Recovery & Playbook Framework',
+    shortName: 'DRP',
+    status: 'Confidential Enterprise Engagement',
+    tagline: 'Repeatable Kubernetes failover automation, timed RTO validation, and audit-ready runbooks.',
+    description:
+      'An end-to-end Azure Kubernetes Service (AKS) disaster recovery framework combining active/passive warm-standby architecture, scripted cluster rebuild and evidence capture, timed failover drills, and formal audit sign-off documentation.',
+    overview: [
+      'Enterprise Kubernetes environments require more than ad-hoc backups—auditors and platform owners need repeatable, verifiable recovery procedures that any senior engineer can execute under pressure.',
+      'SmartNet’s engineering leadership designed and executed a structured AKS disaster recovery playbook covering namespace reconstruction, secrets and PVC restoration, Helm and manifest rollouts, ingress and TLS certificate validation, timed RTO/RPO measurement, and controlled failback procedures.',
+    ],
+    capabilities: [
+      'Active/passive warm-standby AKS recovery architecture',
+      'Scripted Bash & PowerShell cluster rebuild and evidence capture',
+      'Timed failover drill execution & RTO/RPO measurement',
+      'Audit-ready validation checklists, DNS cutover & failback runbooks',
+    ],
+    highlights: [
+      {
+        title: 'Repeatable Rebuild Automation',
+        detail:
+          'Standardises namespace provisioning, baseline manifests, PVC snapshot restores, Helm releases, and rollout health checks into deterministic scripts.',
+      },
+      {
+        title: 'Timestamped Audit Evidence Pack',
+        detail:
+          'Captures UTC/local start-and-end failover markers, node/pod readiness, ingress endpoints, TLS certificates, and formal governance sign-off tables.',
+      },
+      {
+        title: 'Complete Operational Handover',
+        detail:
+          'Delivers clear architecture inventories, pre-flight checklists, and failback steps so internal operations teams maintain full ownership.',
+      },
+    ],
+    stack: ['Azure AKS', 'Kubernetes', 'Helm', 'Bash & PowerShell', 'TLS / Ingress', 'DR Governance'],
+    note: 'Client identities, cluster contexts, and environment specifics are withheld under confidentiality obligations. Architecture patterns and documentation frameworks are tailored per engagement.',
+  },
+  {
     slug: 'lmg-wms',
-    code: '04 / BUSINESS APPLICATIONS',
+    code: '05 / BUSINESS APPLICATIONS',
     category: 'Automotive Workshop Software',
     name: 'LMG-WMS',
     shortName: 'WMS',
@@ -286,7 +338,7 @@ export const SOLUTIONS: SolutionItem[] = [
   },
   {
     slug: 'my-midwifey',
-    code: '05 / HEALTHCARE MOBILE APP',
+    code: '06 / HEALTHCARE MOBILE APP',
     category: 'Award-Winning iOS & Android App',
     name: 'My Midwifey',
     shortName: 'MID',
@@ -354,7 +406,7 @@ export const SOLUTIONS: SolutionItem[] = [
   },
   {
     slug: 'smartnet-tickets',
-    code: '06 / SUPPORT & OPERATIONS SAAS',
+    code: '07 / SUPPORT & OPERATIONS SAAS',
     category: 'Issue Management Web App',
     name: 'Ticketing & Support Platform',
     shortName: 'TCK',
@@ -418,7 +470,7 @@ export const SOLUTIONS: SolutionItem[] = [
   },
   {
     slug: 'prawductions-studio',
-    code: '07 / WEB & BOOKING PLATFORM',
+    code: '08 / WEB & BOOKING PLATFORM',
     category: 'Studio Booking Web App',
     name: 'Prawductions Studio',
     shortName: 'PRW',
@@ -479,7 +531,7 @@ export const SOLUTIONS: SolutionItem[] = [
   },
   {
     slug: 'ai-learning-support',
-    code: '08 / EDUCATION TECHNOLOGY',
+    code: '09 / EDUCATION TECHNOLOGY',
     category: 'Responsible AI Initiative',
     name: 'AI Learning Support',
     shortName: 'EDU',

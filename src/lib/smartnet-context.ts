@@ -90,13 +90,16 @@ SmartNet can review inherited or vendor-produced software
 for code quality, security, maintainability, documentation,
 operational readiness and agreed delivery requirements.
 
-SECURITY AND BUSINESS CONTINUITY
-Secure application architecture, authentication,
-authorisation, secrets management, infrastructure review,
-backup and recovery planning, DR runbooks, RTO/RPO
-considerations and recovery testing plans.
-Do not claim independent compliance certification or
-tested disaster recovery where only documentation exists.
+DISASTER RECOVERY, RESILIENCE & TECHNICAL DOCUMENTATION
+Active/passive cloud and Azure Kubernetes Service (AKS)
+failover architecture, scripted cluster rebuild and evidence
+capture, timed RTO/RPO drill planning, DNS cutover and
+failback runbooks, ingress/TLS/storage validation checklists,
+and audit-ready operational handover documentation.
+SmartNet can author custom DR playbooks, system inventories,
+and operational runbooks for client environments.
+Never disclose confidential employer or client cluster details,
+and do not claim formal audit certification unless verified.
 
 KAIRO STUDIO (UPCOMING SAAS BY SMARTNET)
 Kairo Studio is SmartNet's upcoming multi-tenant SaaS platform
@@ -231,7 +234,7 @@ SmartNet Technologies is a technology-led company specialising in:
 - Custom software development and enterprise applications.
 - Solutions architecture and systems integration.
 - Cloud engineering, Microsoft Azure, Kubernetes, DevOps and CI/CD.
-- Infrastructure automation, monitoring and disaster recovery planning.
+- Infrastructure automation, monitoring, disaster recovery playbooks and audit-ready technical documentation.
 - Security-first software and infrastructure engineering.
 - Responsible AI integration and AI-assisted technology solutions.
 - Education technology and digital learning platforms.
