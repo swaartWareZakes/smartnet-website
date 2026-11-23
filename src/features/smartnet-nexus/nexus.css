@@ -5235,3 +5235,310 @@ html[data-theme="light"] .snx-journey-sticky::after {
   letter-spacing: 0;
   border-radius: 8px;
 }
+
+
+/* SMARTNET SWISS HOMEPAGE SYSTEM V25 */
+
+.snx-page {
+  font-family: var(--sn-font-sans, var(--font-sans), -apple-system, BlinkMacSystemFont, sans-serif);
+  background: var(--sn-bg, #07111a);
+  color: var(--sn-text, #f1f6fa);
+}
+
+/* Align every homepage section cleanly to the shared 1200px container grid */
+.snx-main,
+.snx-main.snx-journey-panel,
+.snx-story-panel,
+.snx-process,
+.snx-lab,
+.snx-contact,
+.snx-footer {
+  padding-inline: var(--sn-container-pad, max(clamp(20px, 4vw, 40px), calc((100% - 1200px) / 2)));
+}
+
+.snx-journey-index {
+  left: var(--sn-container-pad, max(clamp(20px, 4vw, 40px), calc((100% - 1200px) / 2)));
+  font-family: var(--sn-font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+}
+
+/* Disciplined Homepage Hero Typography (replaces 155px display text) */
+.snx-main.snx-journey-panel {
+  padding-top: 120px;
+  padding-bottom: 72px;
+}
+
+.snx-main h1 {
+  font-family: var(--sn-font-sans);
+  font-size: clamp(38px, 4.6vw, 60px);
+  font-weight: 600;
+  line-height: 1.07;
+  letter-spacing: -0.03em;
+  max-width: 15ch;
+  text-shadow: none;
+  text-wrap: balance;
+}
+
+.snx-main p {
+  font-family: var(--sn-font-sans);
+  font-size: clamp(15.5px, 1.15vw, 17px);
+  line-height: 1.68;
+  max-width: 50ch;
+  margin: 22px 0 26px;
+}
+
+.snx-eyebrow,
+.snx-meta,
+.snx-story-kicker,
+.snx-story-footer,
+.snx-journey-next,
+.snx-process-heading,
+.snx-process-status,
+.snx-process-kicker,
+.snx-process-detail,
+.snx-lab-top,
+.snx-lab-eyebrow,
+.snx-lab-meta,
+.snx-lab-outro,
+.snx-lab-controls button span,
+.snx-contact-top,
+.snx-contact-bottom,
+.snx-contact-eyebrow,
+.snx-contact-panel-head,
+.snx-contact-note,
+.snx-contact-option-number,
+.snx-footer {
+  font-family: var(--sn-font-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+.snx-eyebrow {
+  margin-bottom: 18px;
+}
+
+.snx-hero-actions {
+  margin-top: 18px;
+  gap: 12px;
+}
+
+.snx-hero-ai,
+.snx-hero-explore {
+  min-height: 46px;
+  padding: 11px 20px;
+  border-radius: 8px;
+  font-family: var(--sn-font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  box-shadow: none;
+}
+
+/* Level, contained Story Panels (removes permanent diagonal 7deg skew) */
+.snx-story-panel {
+  padding-block: 10vh;
+}
+
+.snx-story-copy,
+.snx-story-panel--right .snx-story-copy {
+  --sn-base-ry: 0deg;
+  --sn-base-rx: 0deg;
+  width: min(100%, 480px);
+  max-width: 480px;
+  padding: clamp(24px, 2.6vw, 34px);
+}
+
+.snx-story-copy h2 {
+  font-family: var(--sn-font-sans);
+  font-size: clamp(26px, 2.6vw, 36px);
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -0.024em;
+  margin: 14px 0 14px;
+}
+
+.snx-story-copy p {
+  font-family: var(--sn-font-sans);
+  font-size: 15px;
+  line-height: 1.66;
+}
+
+/* Process / Architecture Section Container & Scale */
+.snx-process {
+  gap: clamp(32px, 4vw, 56px);
+  background: var(--sn-bg);
+  border-top: 1px solid var(--sn-border);
+}
+
+.snx-process-step {
+  min-height: 76svh;
+  padding-block: 56px;
+}
+
+.snx-process-step h2 {
+  font-family: var(--sn-font-sans);
+  font-size: clamp(26px, 2.8vw, 38px);
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -0.024em;
+  margin: 16px 0;
+}
+
+.snx-process-step p {
+  font-family: var(--sn-font-sans);
+  font-size: 15px;
+  line-height: 1.68;
+  max-width: 48ch;
+}
+
+/* Delivery Engine (Lab) Section Container & Scale */
+.snx-lab {
+  padding-block: clamp(64px, 7vw, 96px);
+}
+
+.snx-lab-heading {
+  margin-top: 48px;
+}
+
+.snx-lab-heading h2 {
+  font-family: var(--sn-font-sans);
+  font-size: clamp(28px, 3.2vw, 44px);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.026em;
+  margin: 16px 0;
+}
+
+.snx-lab-heading p {
+  font-family: var(--sn-font-sans);
+  font-size: 15.5px;
+  line-height: 1.68;
+  max-width: 52ch;
+}
+
+.snx-lab-controls {
+  max-width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--sn-border);
+}
+
+.snx-lab-controls button {
+  font-family: var(--sn-font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 18px 14px;
+}
+
+.snx-lab-detail {
+  max-width: 100%;
+  margin: 44px auto 64px;
+  gap: clamp(24px, 4vw, 56px);
+}
+
+.snx-lab-detail h3 {
+  font-family: var(--sn-font-sans);
+  font-size: clamp(22px, 2.2vw, 30px);
+  font-weight: 600;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+}
+
+.snx-lab-detail p {
+  font-family: var(--sn-font-sans);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.snx-lab-outro a {
+  font-family: var(--sn-font-sans);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Homepage Contact Section Scale */
+.snx-contact {
+  min-height: auto;
+  padding-block: clamp(64px, 7vw, 96px);
+}
+
+.snx-contact-layout {
+  min-height: auto;
+  padding: 48px 0;
+  gap: clamp(28px, 4vw, 56px);
+}
+
+.snx-contact-intro h2 {
+  font-family: var(--sn-font-sans);
+  font-size: clamp(32px, 3.6vw, 48px);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.028em;
+  margin: 16px 0 18px;
+}
+
+.snx-contact-intro > p {
+  font-family: var(--sn-font-sans);
+  font-size: 15.5px;
+  line-height: 1.68;
+  margin-bottom: 28px;
+}
+
+.snx-contact-primary {
+  min-height: 48px;
+  border-radius: 8px;
+  font-family: var(--sn-font-sans);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.snx-contact-option-copy strong {
+  font-family: var(--sn-font-sans);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.snx-contact-option-copy small {
+  font-family: var(--sn-font-sans);
+  font-size: 13px;
+}
+
+.snx-arch-inspector {
+  border-radius: 12px;
+}
+
+.snx-arch-inspector strong {
+  font-family: var(--sn-font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.snx-arch-inspector p {
+  font-family: var(--sn-font-sans);
+  font-size: 14px;
+}
+
+@media (max-width: 760px) {
+  .snx-main.snx-journey-panel {
+    padding-top: 96px;
+    padding-bottom: 56px;
+  }
+
+  .snx-main h1 {
+    font-size: clamp(32px, 8.5vw, 44px);
+  }
+
+  .snx-story-panel,
+  .snx-story-panel--right {
+    padding-block: 64px;
+  }
+
+  .snx-story-copy h2 {
+    font-size: clamp(24px, 6.5vw, 32px);
+  }
+}

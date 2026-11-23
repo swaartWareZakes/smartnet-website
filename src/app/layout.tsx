@@ -1,18 +1,20 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, Newsreader } from 'next/font/google';
+import { IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
 import '@/styles/smartnet-site.css';
 import { SiteChrome } from '@/components/smartnet/site-chrome';
 
-const sans = Plus_Jakarta_Sans({
+const sans = IBM_Plex_Sans({
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-sans',
   display: 'swap',
 });
 
-const display = Newsreader({
+const mono = IBM_Plex_Mono({
   subsets: ['latin'],
-  variable: '--font-display',
+  weight: ['400', '500', '600'],
+  variable: '--font-mono',
   display: 'swap',
 });
 
@@ -97,7 +99,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-ZA" data-scroll-behavior="smooth" className={`${sans.variable} ${display.variable}`}>
+    <html lang="en-ZA" data-scroll-behavior="smooth" className={`${sans.variable} ${mono.variable}`}>
       <body suppressHydrationWarning>
         <script
           type="application/ld+json"
